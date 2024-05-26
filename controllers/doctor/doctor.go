@@ -76,7 +76,7 @@ func (controller *DoctorController) GetAll(c echo.Context) error {
 	for _, doctor := range *doctorResult {
 		doctorResponse = append(doctorResponse, *doctor.ToDoctorResponse())
 	}
-	return c.JSON(base.ConvertResponseCode(err), base.NewSuccessResponse("Success Get All Doctor", doctorResponse))
+	return c.JSON(base.ConvertResponseCode(err), base.NewMetadataSuccessResponse("Success Get All Doctor", metadata, doctorResponse))
 }
 
 func (controller *DoctorController) GetActive(c echo.Context) error {
@@ -94,5 +94,5 @@ func (controller *DoctorController) GetActive(c echo.Context) error {
 	for _, doctor := range *doctorResult {
 		doctorResponse = append(doctorResponse, *doctor.ToDoctorResponse())
 	}
-	return c.JSON(base.ConvertResponseCode(err), base.NewSuccessResponse("Success Get Active Doctor", doctorResponse))
+	return c.JSON(base.ConvertResponseCode(err), base.NewMetadataSuccessResponse("Success Get Active Doctor", metadata, doctorResponse))
 }
