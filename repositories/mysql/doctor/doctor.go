@@ -2,6 +2,7 @@ package doctor
 
 import (
 	"capstone/constants"
+	"capstone/entities"
 	doctorEntities "capstone/entities/doctor"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -64,9 +65,16 @@ func (repository *DoctorRepo) GetDoctorByID(doctorID int) (doctor *doctorEntitie
 	return doctor, nil
 }
 
-func (repository *DoctorRepo) GetAllDoctor() (*[]doctorEntities.Doctor, error) {
-	//TODO implement me
-	panic("implement me")
+func (repository *DoctorRepo) GetAllDoctor(metadata *entities.Metadata) (*[]doctorEntities.Doctor, error) {
+	var doctorsDb []Doctor
+	if err := repository.db.Limit(metadata.Limit).Offset((metadata.Page-1)*metadata.Limit).Find(&doctorsDb, "").Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+	var doctorsResponse []doctorEntities.Doctor
+	for _, doctor := range doctorsDb {
+		doctorsResponse = append(doctorsResponse, *doctor.ToEntities())
+	}
+	return &doctorsResponse, nil
 }
 
 func (repository *DoctorRepo) GetActiveDoctor(status bool) (*[]doctorEntities.Doctor, error) {

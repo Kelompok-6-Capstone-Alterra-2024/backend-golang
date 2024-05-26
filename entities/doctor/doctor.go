@@ -1,6 +1,9 @@
 package doctor
 
-import "capstone/controllers/doctor/response"
+import (
+	"capstone/controllers/doctor/response"
+	"capstone/entities"
+)
 
 type Doctor struct {
 	ID               uint
@@ -30,7 +33,7 @@ type DoctorRepositoryInterface interface {
 	Register(doctor *Doctor) (*Doctor, error)
 	Login(doctor *Doctor) (*Doctor, error)
 	GetDoctorByID(doctorID int) (*Doctor, error)
-	GetAllDoctor() (*[]Doctor, error)
+	GetAllDoctor(metadata *entities.Metadata) (*[]Doctor, error)
 	GetActiveDoctor(status bool) (*[]Doctor, error)
 }
 
@@ -38,7 +41,7 @@ type DoctorUseCaseInterface interface {
 	Register(doctor *Doctor) (*Doctor, error)
 	Login(doctor *Doctor) (*Doctor, error)
 	GetDoctorByID(doctorID int) (*Doctor, error)
-	GetAllDoctor() (*[]Doctor, error)
+	GetAllDoctor(metadata *entities.Metadata) (*[]Doctor, error)
 	GetActiveDoctor(status bool) (*[]Doctor, error)
 }
 

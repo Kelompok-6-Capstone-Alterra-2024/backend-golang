@@ -2,6 +2,7 @@ package doctor
 
 import (
 	"capstone/constants"
+	"capstone/entities"
 	doctorEntities "capstone/entities/doctor"
 	"capstone/middlewares"
 	"golang.org/x/crypto/bcrypt"
@@ -62,9 +63,12 @@ func (usecase *DoctorUseCase) GetDoctorByID(doctorID int) (*doctorEntities.Docto
 	return result, nil
 }
 
-func (usecase *DoctorUseCase) GetAllDoctor() (*[]doctorEntities.Doctor, error) {
-	//TODO implement me
-	panic("implement me")
+func (usecase *DoctorUseCase) GetAllDoctor(metadata *entities.Metadata) (*[]doctorEntities.Doctor, error) {
+	result, err := usecase.doctorRepository.GetAllDoctor(metadata)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func (usecase *DoctorUseCase) GetActiveDoctor(status bool) (*[]doctorEntities.Doctor, error) {
