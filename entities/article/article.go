@@ -12,10 +12,12 @@ type Article struct {
 
 type ArticleRepositoryInterface interface {
 	CreateArticle(article *Article) (*Article, error)
+	GetAllArticle() ([]*Article, error)
 }
 
 type ArticleUseCaseInterface interface {
 	CreateArticle(article *Article) (*Article, error)
+	GetAllArticle() ([]*Article, error)
 }
 
 func (ar *Article) ToResponse() response.ArticleCreatedResponse {

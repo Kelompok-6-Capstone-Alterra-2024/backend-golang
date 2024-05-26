@@ -27,3 +27,7 @@ func (useCase *ArticleUseCase) CreateArticle(article *articleEntities.Article) (
 
 	return createdArticle, nil
 }
+
+func (useCase *ArticleUseCase) GetAllArticle() ([]*articleEntities.Article, error) {
+	return useCase.articleRepository.GetAllArticle()
+}

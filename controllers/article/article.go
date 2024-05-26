@@ -2,6 +2,7 @@ package article
 
 import (
 	"capstone/controllers/article/request"
+	"capstone/controllers/article/response"
 	articleUseCase "capstone/entities/article"
 	"capstone/utilities"
 	"capstone/utilities/base"
@@ -55,4 +56,18 @@ func (controller *ArticleController) CreateArticle(c echo.Context) error {
 
 	articleResponse := createdArticle.ToResponse()
 	return c.JSON(base.ConvertResponseCode(err), base.NewSuccessResponse("Success Create Article", articleResponse))
+}
+
+func (controller *ArticleController) GetAllArticle(c echo.Context) error {
+	articles, err := controller.articleUseCase.GetAllArticle()
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	articleResponse := make([]response.ArticleCreatedResponse, 0, len(articles))
+	for _, article := range articles {
+		articleResponse = append(articleResponse, article.ToResponse())
+	}
+
+	return c.JSON(base.ConvertResponseCode(err), base.NewSuccessResponse("Success Get All Articles", articleResponse))
 }

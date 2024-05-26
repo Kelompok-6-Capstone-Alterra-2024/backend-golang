@@ -38,5 +38,5 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	articleAuth := e.Group("/v1/article")
 	articleAuth.POST("/create", r.articleController.CreateArticle)
-
+	articleAuth.GET("/list", r.articleController.GetAllArticle)
 }

@@ -43,3 +43,11 @@ func (repository *ArticleRepo) CreateArticle(article *articleEntities.Article) (
 	articleEntity := articleDB.ToEntities()
 	return articleEntity, nil
 }
+
+func (repository *ArticleRepo) GetAllArticle() ([]*articleEntities.Article, error) {
+	var articles []*articleEntities.Article
+	if err := repository.db.Find(&articles).Error; err != nil {
+		return nil, err
+	}
+	return articles, nil
+}
