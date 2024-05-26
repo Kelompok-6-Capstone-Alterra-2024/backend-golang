@@ -11,7 +11,7 @@ type DoctorUseCase struct {
 	doctorRepository doctorEntities.DoctorRepositoryInterface
 }
 
-func NewDoctorUseCase(doctorRepository doctorEntities.DoctorRepositoryInterface) *DoctorUseCase {
+func NewDoctorUseCase(doctorRepository doctorEntities.DoctorRepositoryInterface) doctorEntities.DoctorUseCaseInterface {
 	return &DoctorUseCase{
 		doctorRepository: doctorRepository,
 	}
@@ -52,4 +52,22 @@ func (usecase *DoctorUseCase) Login(doctor *doctorEntities.Doctor) (*doctorEntit
 	}
 	userResult.Token = token
 	return userResult, nil
+}
+
+func (usecase *DoctorUseCase) GetDoctorByID(doctorID int) (*doctorEntities.Doctor, error) {
+	result, err := usecase.doctorRepository.GetDoctorByID(doctorID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (usecase *DoctorUseCase) GetAllDoctor() (*[]doctorEntities.Doctor, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (usecase *DoctorUseCase) GetActiveDoctor(status bool) (*[]doctorEntities.Doctor, error) {
+	//TODO implement me
+	panic("implement me")
 }

@@ -29,16 +29,46 @@ type Doctor struct {
 type DoctorRepositoryInterface interface {
 	Register(doctor *Doctor) (*Doctor, error)
 	Login(doctor *Doctor) (*Doctor, error)
+	GetDoctorByID(doctorID int) (*Doctor, error)
+	GetAllDoctor() (*[]Doctor, error)
+	GetActiveDoctor(status bool) (*[]Doctor, error)
 }
 
 type DoctorUseCaseInterface interface {
 	Register(doctor *Doctor) (*Doctor, error)
 	Login(doctor *Doctor) (*Doctor, error)
+	GetDoctorByID(doctorID int) (*Doctor, error)
+	GetAllDoctor() (*[]Doctor, error)
+	GetActiveDoctor(status bool) (*[]Doctor, error)
 }
 
 func (r *Doctor) ToResponse() response.DoctorLoginAndRegisterResponse {
 	return response.DoctorLoginAndRegisterResponse{
 		ID:    r.ID,
 		Token: r.Token,
+	}
+}
+
+func (r *Doctor) ToDoctorResponse() *response.DoctorResponse {
+	return &response.DoctorResponse{
+		ID:               r.ID,
+		Username:         r.Username,
+		Email:            r.Email,
+		Name:             r.Name,
+		Address:          r.Address,
+		PhoneNumber:      r.PhoneNumber,
+		Gender:           r.Gender,
+		IsAvailable:      r.IsAvailable,
+		ProfilePicture:   r.ProfilePicture,
+		Balance:          r.Balance,
+		Experience:       r.Experience,
+		Almamater:        r.Almamater,
+		GraduationYear:   r.GraduationYear,
+		PracticeLocation: r.PracticeLocation,
+		PracticeCity:     r.PracticeCity,
+		PracticeProvince: r.PracticeProvince,
+		StrNumber:        r.StrNumber,
+		Fee:              r.Fee,
+		Specialist:       r.Specialist,
 	}
 }

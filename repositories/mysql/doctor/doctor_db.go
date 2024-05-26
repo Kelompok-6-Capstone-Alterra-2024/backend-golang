@@ -51,7 +51,6 @@ func (doctor *Doctor) ToEntities() *doctorEntities.Doctor {
 		Fee:              doctor.Fee,
 		Specialist:       doctor.Specialist,
 	}
-
 }
 
 func ToDoctorModel(request *doctorEntities.Doctor) *Doctor {

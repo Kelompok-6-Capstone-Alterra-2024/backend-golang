@@ -11,7 +11,7 @@ type DoctorRepo struct {
 	db *gorm.DB
 }
 
-func NewDoctorRepo(db *gorm.DB) *DoctorRepo {
+func NewDoctorRepo(db *gorm.DB) doctorEntities.DoctorRepositoryInterface {
 	return &DoctorRepo{
 		db: db,
 	}
@@ -52,4 +52,24 @@ func (repository *DoctorRepo) Login(doctor *doctorEntities.Doctor) (*doctorEntit
 
 	return result, nil
 
+}
+
+func (repository *DoctorRepo) GetDoctorByID(doctorID int) (doctor *doctorEntities.Doctor, err error) {
+	var doctorDb Doctor
+	if err = repository.db.First(&doctorDb, doctorID).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	doctor = doctorDb.ToEntities()
+	return doctor, nil
+}
+
+func (repository *DoctorRepo) GetAllDoctor() (*[]doctorEntities.Doctor, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (repository *DoctorRepo) GetActiveDoctor(status bool) (*[]doctorEntities.Doctor, error) {
+	//TODO implement me
+	panic("implement me")
 }
