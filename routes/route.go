@@ -4,7 +4,9 @@ import (
 	"capstone/controllers/doctor"
 	"capstone/controllers/user"
 	myMiddleware "capstone/middlewares"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
+	"os"
 )
 
 type RouteController struct {
@@ -23,10 +25,15 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	myMiddleware.LogMiddleware(e)
 
 	userAuth := e.Group("/v1/user")
-	userAuth.POST("register", r.userController.Register) //Register User
-	userAuth.POST("login", r.userController.Login)       //Login User
+	userAuth.POST("/register", r.userController.Register) //Register User
+	userAuth.POST("/login", r.userController.Login)       //Login User
 
-	//user := userAuth.Group("", echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))
+	userRoute := userAuth.Group("/")
+	userRoute.Use(echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))
+	// Doctor
+	userRoute.GET("doctor/:id", r.doctorController.GetByID)         //Get Doctor By ID
+	userRoute.GET("doctor", r.doctorController.GetAll)              //Get All Doctor
+	userRoute.GET("doctor/available", r.doctorController.GetActive) //Get All Active Doctor
 
 	doctorAuth := e.Group("/v1/doctor")
 	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor
