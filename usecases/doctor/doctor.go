@@ -1,24 +1,23 @@
-package usecases
+package doctor
 
 import (
 	"capstone/constants"
-	"capstone/entities"
+	doctorEntities "capstone/entities/doctor"
 	"capstone/middlewares"
-	"capstone/repositories/mysql/doctor"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type DoctorUseCase struct {
-	doctorRepository doctor.DoctorRepo
+	doctorRepository doctorEntities.DoctorRepositoryInterface
 }
 
-func NewDoctorUseCase(doctorRepository doctor.DoctorRepo) entities.DoctorUseCaseInterface {
+func NewDoctorUseCase(doctorRepository doctorEntities.DoctorRepositoryInterface) *DoctorUseCase {
 	return &DoctorUseCase{
 		doctorRepository: doctorRepository,
 	}
 }
 
-func (usecase *DoctorUseCase) Register(doctor *entities.Doctor) (*entities.Doctor, error) {
+func (usecase *DoctorUseCase) Register(doctor *doctorEntities.Doctor) (*doctorEntities.Doctor, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(doctor.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, constants.ErrHashedPassword
@@ -39,7 +38,7 @@ func (usecase *DoctorUseCase) Register(doctor *entities.Doctor) (*entities.Docto
 
 }
 
-func (usecase *DoctorUseCase) Login(doctor *entities.Doctor) (*entities.Doctor, error) {
+func (usecase *DoctorUseCase) Login(doctor *doctorEntities.Doctor) (*doctorEntities.Doctor, error) {
 	if (doctor.Email == "" && doctor.Password == "") || (doctor.Username == "" && doctor.Password == "") {
 		return nil, constants.ErrEmptyInputLogin
 	}

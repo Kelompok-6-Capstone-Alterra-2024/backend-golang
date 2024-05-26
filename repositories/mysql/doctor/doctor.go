@@ -2,7 +2,7 @@ package doctor
 
 import (
 	"capstone/constants"
-	"capstone/entities"
+	doctorEntities "capstone/entities/doctor"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -11,21 +11,20 @@ type DoctorRepo struct {
 	db *gorm.DB
 }
 
-func NewDoctorRepo(db *gorm.DB) entities.DoctorRepositoryInterface {
+func NewDoctorRepo(db *gorm.DB) *DoctorRepo {
 	return &DoctorRepo{
 		db: db,
 	}
 }
 
-func (repository *DoctorRepo) Register(doctor *entities.Doctor) (*entities.Doctor, error) {
+func (repository *DoctorRepo) Register(doctor *doctorEntities.Doctor) (*doctorEntities.Doctor, error) {
 
-	doctorDb := *ToDoctorModel(doctor)
-
-	if err := repository.db.Model(&doctorDb).First(&doctorDb, "username = ?", doctorDb.Username).Error; err != nil {
+	doctorDb := ToDoctorModel(doctor)
+	if err := repository.db.Model(&doctorDb).First(&doctorDb, "username = ?", doctorDb.Username).Error; err == nil {
 		return nil, constants.ErrUsernameAlreadyExist
 	}
 
-	if err := repository.db.Model(&doctorDb).First(&doctorDb, "email = ?", doctorDb.Email).Error; err != nil {
+	if err := repository.db.Model(&doctorDb).First(&doctorDb, "email = ?", doctorDb.Email).Error; err == nil {
 		return nil, constants.ErrEmailAlreadyExist
 	}
 
@@ -33,15 +32,15 @@ func (repository *DoctorRepo) Register(doctor *entities.Doctor) (*entities.Docto
 		return nil, constants.ErrInsertDatabase
 	}
 
-	doctorResult := entities.ToDoctorEntities(&doctorDb)
+	doctorResult := doctorDb.ToEntities()
 	return doctorResult, nil
 }
 
-func (repository *DoctorRepo) Login(doctor *entities.Doctor) (*entities.Doctor, error) {
+func (repository *DoctorRepo) Login(doctor *doctorEntities.Doctor) (*doctorEntities.Doctor, error) {
 	doctorDb := ToDoctorModel(doctor)
 
 	doctorPassword := doctorDb.Password
-	if err := repository.db.First(&doctorDb, "username LIKE ? OR email LIKE ?", doctorDb.Username, doctorDb.Password).Error; err != nil {
+	if err := repository.db.First(&doctorDb, "username LIKE ? OR email LIKE ?", doctorDb.Username, doctorDb.Email).Error; err != nil {
 		return nil, constants.ErrUserNotFound
 	}
 
@@ -49,7 +48,7 @@ func (repository *DoctorRepo) Login(doctor *entities.Doctor) (*entities.Doctor, 
 		return nil, constants.ErrUserNotFound
 	}
 
-	result := entities.ToDoctorEntities(doctorDb)
+	result := doctorDb.ToEntities()
 
 	return result, nil
 

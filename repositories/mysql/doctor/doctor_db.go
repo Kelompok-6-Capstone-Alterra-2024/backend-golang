@@ -1,7 +1,7 @@
 package doctor
 
 import (
-	"capstone/entities"
+	doctorEntities "capstone/entities/doctor"
 	"gorm.io/gorm"
 )
 
@@ -12,7 +12,6 @@ type Doctor struct {
 	Password         string `gorm:"type:varchar(100);not null"`
 	Name             string `gorm:"type:varchar(100);not null"`
 	Address          string `gorm:"type:text"`
-	Bio              string `gorm:"type:text"`
 	PhoneNumber      string `gorm:"type:varchar(100)"`
 	Gender           string `gorm:"type:ENUM('pria', 'wanita')"`
 	IsAvailable      bool   `gorm:"type:boolean;default:true"`
@@ -29,17 +28,19 @@ type Doctor struct {
 	Specialist       string `gorm:"type:varchar(100)"`
 }
 
-func ToDoctorModel(doctor *entities.Doctor) *Doctor {
-	return &Doctor{
+func (doctor *Doctor) ToEntities() *doctorEntities.Doctor {
+	return &doctorEntities.Doctor{
+		ID:               doctor.ID,
 		Username:         doctor.Username,
 		Email:            doctor.Email,
 		Password:         doctor.Password,
 		Name:             doctor.Name,
 		Address:          doctor.Address,
-		Bio:              doctor.Bio,
 		PhoneNumber:      doctor.PhoneNumber,
 		Gender:           doctor.Gender,
+		IsAvailable:      doctor.IsAvailable,
 		ProfilePicture:   doctor.ProfilePicture,
+		Balance:          doctor.Balance,
 		Experience:       doctor.Experience,
 		Almamater:        doctor.Almamater,
 		GraduationYear:   doctor.GraduationYear,
@@ -49,5 +50,28 @@ func ToDoctorModel(doctor *entities.Doctor) *Doctor {
 		StrNumber:        doctor.StrNumber,
 		Fee:              doctor.Fee,
 		Specialist:       doctor.Specialist,
+	}
+
+}
+
+func ToDoctorModel(request *doctorEntities.Doctor) *Doctor {
+	return &Doctor{
+		Username:         request.Username,
+		Email:            request.Email,
+		Password:         request.Password,
+		Name:             request.Name,
+		Address:          request.Address,
+		PhoneNumber:      request.PhoneNumber,
+		Gender:           request.Gender,
+		ProfilePicture:   request.ProfilePicture,
+		Balance:          request.Balance,
+		Experience:       request.Experience,
+		Almamater:        request.Almamater,
+		GraduationYear:   request.GraduationYear,
+		PracticeLocation: request.PracticeLocation,
+		PracticeCity:     request.PracticeCity,
+		PracticeProvince: request.PracticeProvince,
+		StrNumber:        request.StrNumber,
+		Specialist:       request.Specialist,
 	}
 }
