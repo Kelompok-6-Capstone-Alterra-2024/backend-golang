@@ -1,21 +1,25 @@
 package routes
 
 import (
+	"capstone/controllers/article"
 	"capstone/controllers/doctor"
 	"capstone/controllers/user"
 	myMiddleware "capstone/middlewares"
+
 	"github.com/labstack/echo/v4"
 )
 
 type RouteController struct {
-	userController   *user.UserController
-	doctorController *doctor.DoctorController
+	userController    *user.UserController
+	doctorController  *doctor.DoctorController
+	articleController *article.ArticleController
 }
 
-func NewRoute(userController *user.UserController, doctorController *doctor.DoctorController) *RouteController {
+func NewRoute(userController *user.UserController, doctorController *doctor.DoctorController, articleController *article.ArticleController) *RouteController {
 	return &RouteController{
-		userController:   userController,
-		doctorController: doctorController,
+		userController:    userController,
+		doctorController:  doctorController,
+		articleController: articleController,
 	}
 }
 
@@ -31,5 +35,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorAuth := e.Group("/v1/doctor")
 	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor
 	doctorAuth.POST("/login", r.doctorController.Login)       //Login Doctor
+
+	articleAuth := e.Group("/v1/article")
+	articleAuth.POST("/create", r.articleController.CreateArticle)
 
 }
