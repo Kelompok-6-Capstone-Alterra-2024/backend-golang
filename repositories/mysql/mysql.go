@@ -1,10 +1,8 @@
 package mysql
 
 import (
-	"capstone/repositories/mysql/doctor"
 	"capstone/repositories/mysql/user"
 	"fmt"
-	"log"
 	"strconv"
 
 	"gorm.io/driver/mysql"
@@ -40,7 +38,5 @@ func ConnectDB(config Config) *gorm.DB {
 }
 
 func InitMigrate(db *gorm.DB) {
-	if err := db.AutoMigrate(user.User{}, doctor.Doctor{}); err != nil {
-		log.Println("Error migrating user table")
-	}
+	db.AutoMigrate(user.User{})
 }
