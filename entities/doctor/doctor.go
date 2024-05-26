@@ -34,7 +34,7 @@ type DoctorRepositoryInterface interface {
 	Login(doctor *Doctor) (*Doctor, error)
 	GetDoctorByID(doctorID int) (*Doctor, error)
 	GetAllDoctor(metadata *entities.Metadata) (*[]Doctor, error)
-	GetActiveDoctor(status bool) (*[]Doctor, error)
+	GetActiveDoctor(metadata *entities.Metadata) (*[]Doctor, error)
 }
 
 type DoctorUseCaseInterface interface {
@@ -42,7 +42,7 @@ type DoctorUseCaseInterface interface {
 	Login(doctor *Doctor) (*Doctor, error)
 	GetDoctorByID(doctorID int) (*Doctor, error)
 	GetAllDoctor(metadata *entities.Metadata) (*[]Doctor, error)
-	GetActiveDoctor(status bool) (*[]Doctor, error)
+	GetActiveDoctor(metadata *entities.Metadata) (*[]Doctor, error)
 }
 
 func (r *Doctor) ToResponse() response.DoctorLoginAndRegisterResponse {

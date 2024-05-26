@@ -78,3 +78,21 @@ func (controller *DoctorController) GetAll(c echo.Context) error {
 	}
 	return c.JSON(base.ConvertResponseCode(err), base.NewSuccessResponse("Success Get All Doctor", doctorResponse))
 }
+
+func (controller *DoctorController) GetActive(c echo.Context) error {
+	pageParam := c.QueryParam("page")
+	limitParam := c.QueryParam("limit")
+
+	metadata := utilities.GetMetadata(pageParam, limitParam)
+
+	doctorResult, err := controller.doctorUseCase.GetActiveDoctor(metadata)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var doctorResponse []response.DoctorResponse
+	for _, doctor := range *doctorResult {
+		doctorResponse = append(doctorResponse, *doctor.ToDoctorResponse())
+	}
+	return c.JSON(base.ConvertResponseCode(err), base.NewSuccessResponse("Success Get Active Doctor", doctorResponse))
+}

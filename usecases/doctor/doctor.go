@@ -71,7 +71,10 @@ func (usecase *DoctorUseCase) GetAllDoctor(metadata *entities.Metadata) (*[]doct
 	return result, nil
 }
 
-func (usecase *DoctorUseCase) GetActiveDoctor(status bool) (*[]doctorEntities.Doctor, error) {
-	//TODO implement me
-	panic("implement me")
+func (usecase *DoctorUseCase) GetActiveDoctor(metadata *entities.Metadata) (*[]doctorEntities.Doctor, error) {
+	result, err := usecase.doctorRepository.GetActiveDoctor(metadata)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }

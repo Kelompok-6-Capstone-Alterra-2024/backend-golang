@@ -31,8 +31,9 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute := userAuth.Group("/")
 	userRoute.Use(echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))
 	// Doctor
-	userRoute.GET("doctor/:id", r.doctorController.GetByID) //Get Doctor By ID
-	userRoute.GET("doctor", r.doctorController.GetAll)      //Get All Doctor
+	userRoute.GET("doctor/:id", r.doctorController.GetByID)         //Get Doctor By ID
+	userRoute.GET("doctor", r.doctorController.GetAll)              //Get All Doctor
+	userRoute.GET("doctor/available", r.doctorController.GetActive) //Get All Active Doctor
 
 	doctorAuth := e.Group("/v1/doctor")
 	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor

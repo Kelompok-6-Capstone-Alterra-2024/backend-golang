@@ -77,7 +77,14 @@ func (repository *DoctorRepo) GetAllDoctor(metadata *entities.Metadata) (*[]doct
 	return &doctorsResponse, nil
 }
 
-func (repository *DoctorRepo) GetActiveDoctor(status bool) (*[]doctorEntities.Doctor, error) {
-	//TODO implement me
-	panic("implement me")
+func (repository *DoctorRepo) GetActiveDoctor(metadata *entities.Metadata) (*[]doctorEntities.Doctor, error) {
+	var doctorsDb []Doctor
+	if err := repository.db.Limit(metadata.Limit).Offset((metadata.Page-1)*metadata.Limit).Find(&doctorsDb, "is_available = ?", true).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+	var doctorsResponse []doctorEntities.Doctor
+	for _, doctor := range doctorsDb {
+		doctorsResponse = append(doctorsResponse, *doctor.ToEntities())
+	}
+	return &doctorsResponse, nil
 }
