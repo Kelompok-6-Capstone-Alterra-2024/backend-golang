@@ -39,8 +39,9 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("doctor/available", r.doctorController.GetActive) //Get All Active Doctor
 
 	// Consultation
-	userRoute.POST("consultations", r.consultationController.CreateConsultation) //Get All Consultation
-	userRoute.GET("consultations/:id", r.consultationController.GetConsultationByID)
+	userRoute.POST("consultations", r.consultationController.CreateConsultation)     //Get All Consultation
+	userRoute.GET("consultations/:id", r.consultationController.GetConsultationByID) //Get Consultation By ID
+	userRoute.GET("consultations", r.consultationController.GetAllConsultation)      //Get All Consultation
 
 	doctorAuth := e.Group("/v1/doctor")
 	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor

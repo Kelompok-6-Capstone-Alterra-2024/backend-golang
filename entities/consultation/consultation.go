@@ -2,6 +2,7 @@ package consultation
 
 import (
 	"capstone/controllers/consultation/response"
+	"capstone/entities"
 	"capstone/entities/doctor"
 	"capstone/entities/user"
 	"time"
@@ -23,13 +24,13 @@ type Consultation struct {
 type ConsultationRepository interface {
 	CreateConsultation(consultation *Consultation) (*Consultation, error)
 	GetConsultationByID(consultationID int) (*Consultation, error)
-	GetAllConsultation(userID int) (*[]Consultation, error)
+	GetAllConsultation(metadata *entities.Metadata, userID int) (*[]Consultation, error)
 }
 
 type ConsultationUseCase interface {
 	CreateConsultation(consultation *Consultation) (*Consultation, error)
 	GetConsultationByID(consultationID int) (*Consultation, error)
-	GetAllConsultation(userID int) (*[]Consultation, error)
+	GetAllConsultation(metadata *entities.Metadata, userID int) (*[]Consultation, error)
 }
 
 func (r *Consultation) ToResponse() *response.ConsultationResponse {

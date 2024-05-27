@@ -1,6 +1,9 @@
 package consultation
 
-import consultationEntities "capstone/entities/consultation"
+import (
+	"capstone/entities"
+	consultationEntities "capstone/entities/consultation"
+)
 
 type ConsultationUseCase struct {
 	consultationRepo consultationEntities.ConsultationRepository
@@ -28,7 +31,10 @@ func (usecase *ConsultationUseCase) GetConsultationByID(consultationID int) (*co
 	return result, nil
 }
 
-func (usecase *ConsultationUseCase) GetAllConsultation(userID int) (*[]consultationEntities.Consultation, error) {
-	//TODO implement me
-	panic("implement me")
+func (usecase *ConsultationUseCase) GetAllConsultation(metadata *entities.Metadata, userID int) (*[]consultationEntities.Consultation, error) {
+	result, err := usecase.consultationRepo.GetAllConsultation(metadata, userID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }

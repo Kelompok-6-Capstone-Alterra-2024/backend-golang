@@ -2,6 +2,7 @@ package consultation
 
 import (
 	"capstone/controllers/consultation/request"
+	"capstone/controllers/consultation/response"
 	"capstone/entities/consultation"
 	"capstone/utilities"
 	"capstone/utilities/base"
@@ -50,4 +51,27 @@ func (controller *ConsultationController) GetConsultationByID(c echo.Context) er
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation", response.ToResponse()))
+}
+
+func (controller *ConsultationController) GetAllConsultation(c echo.Context) error {
+	pageParam := c.QueryParam("page")
+	limitParam := c.QueryParam("limit")
+	metadata := utilities.GetMetadata(pageParam, limitParam)
+
+	token := c.Request().Header.Get("Authorization")
+	userId, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	consultations, err := controller.consultationUseCase.GetAllConsultation(metadata, userId)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	var responses []response.ConsultationResponse
+	for _, value := range *consultations {
+		responses = append(responses, *value.ToResponse())
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation", responses))
 }

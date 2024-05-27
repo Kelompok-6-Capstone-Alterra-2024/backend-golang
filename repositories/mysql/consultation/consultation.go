@@ -2,6 +2,7 @@ package consultation
 
 import (
 	"capstone/constants"
+	"capstone/entities"
 	consultationEntities "capstone/entities/consultation"
 	"gorm.io/gorm"
 )
@@ -36,7 +37,17 @@ func (repository *ConsultationRepo) GetConsultationByID(consultationID int) (con
 	return consultationResult.ToEntities(), nil
 }
 
-func (repository *ConsultationRepo) GetAllConsultation(userID int) (*[]consultationEntities.Consultation, error) {
-	//TODO implement me
-	panic("implement me")
+func (repository *ConsultationRepo) GetAllConsultation(metadata *entities.Metadata, userID int) (*[]consultationEntities.Consultation, error) {
+	var consultationResult []Consultation
+
+	if err := repository.db.Limit(metadata.Limit).Offset((metadata.Page-1)*metadata.Limit).Preload("Doctor").Find(&consultationResult, "user_id LIKE ?", userID).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	var consultations []consultationEntities.Consultation
+	for _, consultation := range consultationResult {
+		consultations = append(consultations, *consultation.ToEntities())
+	}
+
+	return &consultations, nil
 }
