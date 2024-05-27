@@ -11,7 +11,7 @@ import (
 	"github.com/cloudinary/cloudinary-go/api/uploader"
 )
 
-func UploadImage(file multipart.File, path string) (string, error) {
+func UploadImage(file multipart.File, path, folder string) (string, error) {
 	// Mendapatkan URL Cloudinary dari environment variables
 	cloudinaryURL := os.Getenv("CLOUDINARY_URL")
 	if cloudinaryURL == "" {
@@ -31,6 +31,7 @@ func UploadImage(file multipart.File, path string) (string, error) {
 	// Mengunggah file ke Cloudinary
 	uploadResult, err := cld.Upload.Upload(ctx, file, uploader.UploadParams{
 		PublicID: path,
+		Folder:   folder,
 	})
 	if err != nil {
 		return "", fmt.Errorf("failed to upload image: %v", err)

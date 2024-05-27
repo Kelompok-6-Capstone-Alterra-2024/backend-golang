@@ -40,7 +40,7 @@ func (controller *ArticleController) CreateArticle(c echo.Context) error {
 	defer fileContent.Close() // Make sure to close the file after uploading
 
 	// Upload gambar ke Cloudinary
-	imageUpload, err := utilities.UploadImage(fileContent, "article_images")
+	imageUpload, err := utilities.UploadImage(fileContent, "article_images/"+file.Filename, "article_images")
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse("Failed to upload image"))
 	}
