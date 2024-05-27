@@ -1,0 +1,41 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  build-image:
+    name: build image
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: build image
+        run: docker build -t wdinx/capstone-project:latest .
+      - name: login registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: push image
+        run: docker push wdinx/capstone-project:latest
+
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-image
+    steps:
+      - name: deploy-to-droplets
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.PASSPRHASE }}
+          script: |
+            cd ~/
+            docker pull wdinx/capstone-project:latest
+            docker container rm -f capstone-project
+            docker run -d --name capstone -p 8080:8080 --env DBHost=${{ secrets.DBHOST }} --env DBPort=${{ secrets.DBPORT }} --env DBUser=${{ secrets.DBUSER }} --env DBPass=${{ secrets.DBPASS }} --env DBName=${{ secrets.DBNAME }} --env SECRET_JWT=${{ secrets.SECRET_JWT }}  wdinx/capstone-project:latest
