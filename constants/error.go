@@ -16,4 +16,6 @@ var ErrEmptyInputLogin error = errors.New("username or password cannot be empty"
 
 var ErrUserNotFound error = errors.New("user not found")
 
+var ErrDataNotFound error = errors.New("data not found")
+
 var ErrEmptyInputArticle error = errors.New("title or content cannot be empty")

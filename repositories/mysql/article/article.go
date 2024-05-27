@@ -16,18 +16,6 @@ func NewArticleRepo(db *gorm.DB) *ArticleRepo {
 	}
 }
 
-// type ArticleRepoWithDoctorID struct {
-// 	db       *gorm.DB
-// 	doctorID uint
-// }
-
-// func NewArticleRepoWithDoctorID(db *gorm.DB, doctorID uint) *ArticleRepoWithDoctorID {
-// 	return &ArticleRepoWithDoctorID{
-// 		db:       db,
-// 		doctorID: doctorID,
-// 	}
-// }
-
 func (repository *ArticleRepo) CreateArticle(article *articleEntities.Article) (*articleEntities.Article, error) {
 	articleDB := Article{
 		DoctorID: article.DoctorID,
