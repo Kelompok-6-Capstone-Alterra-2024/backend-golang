@@ -21,8 +21,11 @@ func (usecase *ConsultationUseCase) CreateConsultation(consultation *consultatio
 }
 
 func (usecase *ConsultationUseCase) GetConsultationByID(consultationID int) (*consultationEntities.Consultation, error) {
-	//TODO implement me
-	panic("implement me")
+	result, err := usecase.consultationRepo.GetConsultationByID(consultationID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func (usecase *ConsultationUseCase) GetAllConsultation(userID int) (*[]consultationEntities.Consultation, error) {

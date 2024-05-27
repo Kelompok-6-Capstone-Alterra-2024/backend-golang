@@ -40,6 +40,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	// Consultation
 	userRoute.POST("consultations", r.consultationController.CreateConsultation) //Get All Consultation
+	userRoute.GET("consultations/:id", r.consultationController.GetConsultationByID)
 
 	doctorAuth := e.Group("/v1/doctor")
 	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor

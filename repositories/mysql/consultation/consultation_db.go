@@ -25,6 +25,7 @@ func (receiver Consultation) ToEntities() *consultation.Consultation {
 	return &consultation.Consultation{
 		ID:            receiver.ID,
 		DoctorID:      receiver.DoctorID,
+		Doctor:        receiver.Doctor.ToEntities(),
 		UserID:        receiver.UserID,
 		Status:        receiver.Status,
 		PaymentStatus: receiver.PaymentStatus,

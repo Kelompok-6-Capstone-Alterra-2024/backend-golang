@@ -27,9 +27,13 @@ func (repository *ConsultationRepo) CreateConsultation(consultation *consultatio
 	return consultationResult, nil
 }
 
-func (repository *ConsultationRepo) GetConsultationByID(consultationID int) (*consultationEntities.Consultation, error) {
-	//TODO implement me
-	panic("implement me")
+func (repository *ConsultationRepo) GetConsultationByID(consultationID int) (consultation *consultationEntities.Consultation, err error) {
+	var consultationResult Consultation
+	if err := repository.db.Preload("User").Preload("Doctor").First(&consultationResult, consultationID).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	return consultationResult.ToEntities(), nil
 }
 
 func (repository *ConsultationRepo) GetAllConsultation(userID int) (*[]consultationEntities.Consultation, error) {

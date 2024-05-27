@@ -7,6 +7,7 @@ import (
 	"capstone/utilities/base"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"strconv"
 )
 
 type ConsultationController struct {
@@ -37,4 +38,16 @@ func (controller *ConsultationController) CreateConsultation(c echo.Context) err
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Add Consultation", response))
+}
+
+func (controller *ConsultationController) GetConsultationByID(c echo.Context) error {
+	consultationID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("Invalid ID"))
+	}
+	response, err := controller.consultationUseCase.GetConsultationByID(consultationID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation", response.ToResponse()))
 }
