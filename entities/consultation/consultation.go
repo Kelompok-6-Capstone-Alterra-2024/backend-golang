@@ -3,6 +3,7 @@ package consultation
 import (
 	"capstone/entities/doctor"
 	"capstone/entities/user"
+	"time"
 )
 
 type Consultation struct {
@@ -15,7 +16,7 @@ type Consultation struct {
 	PaymentStatus string
 	IsAccepted    bool
 	IsActive      bool
-	Date          string
+	Date          time.Time
 }
 
 type ConsultationRepository interface {

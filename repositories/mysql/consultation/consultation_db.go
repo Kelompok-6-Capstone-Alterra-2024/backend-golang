@@ -5,6 +5,7 @@ import (
 	"capstone/repositories/mysql/doctor"
 	"capstone/repositories/mysql/user"
 	"gorm.io/gorm"
+	"time"
 )
 
 type Consultation struct {
@@ -13,11 +14,11 @@ type Consultation struct {
 	Doctor        doctor.Doctor `gorm:"foreignKey:doctor_id;references:id"`
 	UserID        int           `gorm:"column:user_id;not null"`
 	User          user.User     `gorm:"foreignKey:user_id;references:id"`
-	Status        string        `gorm:"column:status;not null"`
+	Status        string        `gorm:"column:status;not null;default:'pending'"`
 	PaymentStatus string        `gorm:"column:payment_status;not null;default:'pending'"`
 	IsAccepted    bool          `gorm:"column:is_accepted"`
 	IsActive      bool          `json:"is_active"`
-	Date          string        `json:"date"`
+	Date          time.Time     `json:"date"`
 }
 
 func (receiver Consultation) ToEntities() *consultation.Consultation {
