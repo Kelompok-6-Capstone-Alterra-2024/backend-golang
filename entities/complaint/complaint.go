@@ -1,20 +1,26 @@
 package complaint
 
 import (
-	consultationEntities "capstone/entities/consultation"
-	userEntities "capstone/entities/user"
+	"capstone/controllers/complaint/response"
 )
 
 type Complaint struct {
 	ID                 uint
-	ComplaintID        uint
-	Consultation       consultationEntities.Consultation
-	UserID             int
-	User               userEntities.User
+	ConsultationID     uint
 	Name               string
 	Age                int
 	Gender             string
 	Message            string
 	MedicalHistory     string
 	DoctorNotification string
+}
+
+func (r *Complaint) ToResponse() *response.ComplaintResponse {
+	return &response.ComplaintResponse{
+		ID:             r.ID,
+		Name:           r.Name,
+		Age:            r.Age,
+		Gender:         r.Gender,
+		MedicalHistory: r.MedicalHistory,
+	}
 }
