@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"capstone/controllers/consultation"
 	"capstone/controllers/doctor"
 	"capstone/controllers/user"
 	myMiddleware "capstone/middlewares"
@@ -10,14 +11,16 @@ import (
 )
 
 type RouteController struct {
-	userController   *user.UserController
-	doctorController *doctor.DoctorController
+	userController         *user.UserController
+	doctorController       *doctor.DoctorController
+	consultationController *consultation.ConsultationController
 }
 
-func NewRoute(userController *user.UserController, doctorController *doctor.DoctorController) *RouteController {
+func NewRoute(userController *user.UserController, doctorController *doctor.DoctorController, consultationController *consultation.ConsultationController) *RouteController {
 	return &RouteController{
-		userController:   userController,
-		doctorController: doctorController,
+		userController:         userController,
+		doctorController:       doctorController,
+		consultationController: consultationController,
 	}
 }
 
@@ -34,6 +37,11 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("doctor/:id", r.doctorController.GetByID)         //Get Doctor By ID
 	userRoute.GET("doctor", r.doctorController.GetAll)              //Get All Doctor
 	userRoute.GET("doctor/available", r.doctorController.GetActive) //Get All Active Doctor
+
+	// Consultation
+	userRoute.POST("consultations", r.consultationController.CreateConsultation)     //Get All Consultation
+	userRoute.GET("consultations/:id", r.consultationController.GetConsultationByID) //Get Consultation By ID
+	userRoute.GET("consultations", r.consultationController.GetAllConsultation)      //Get All Consultation
 
 	doctorAuth := e.Group("/v1/doctor")
 	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor

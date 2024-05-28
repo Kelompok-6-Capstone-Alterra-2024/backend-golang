@@ -17,3 +17,5 @@ var ErrEmptyInputLogin error = errors.New("username or password cannot be empty"
 var ErrUserNotFound error = errors.New("user not found")
 
 var ErrDataNotFound error = errors.New("data not found")
+
+var ErrInvalidToken error = errors.New("invalid token")

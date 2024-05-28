@@ -2,12 +2,15 @@ package main
 
 import (
 	"capstone/configs"
+	consultationController "capstone/controllers/consultation"
 	doctorController "capstone/controllers/doctor"
 	userController "capstone/controllers/user"
 	"capstone/repositories/mysql"
+	consultationRepositories "capstone/repositories/mysql/consultation"
 	doctorRepositories "capstone/repositories/mysql/doctor"
 	userRepositories "capstone/repositories/mysql/user"
 	"capstone/routes"
+	consultationUseCase "capstone/usecases/consultation"
 	doctorUseCase "capstone/usecases/doctor"
 	userUseCase "capstone/usecases/user"
 
@@ -20,14 +23,17 @@ func main() {
 
 	userRepo := userRepositories.NewUserRepo(db)
 	doctorRepo := doctorRepositories.NewDoctorRepo(db)
+	consultationRepo := consultationRepositories.NewConsultationRepo(db)
 
 	userUC := userUseCase.NewUserUseCase(userRepo)
 	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo)
+	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo)
 
 	userCont := userController.NewUserController(userUC)
 	doctorCont := doctorController.NewDoctorController(doctorUC)
+	consultationCont := consultationController.NewConsultationController(consultationUC)
 
-	route := routes.NewRoute(userCont, doctorCont)
+	route := routes.NewRoute(userCont, doctorCont, consultationCont)
 
 	e := echo.New()
 	route.InitRoute(e)
