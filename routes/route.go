@@ -27,7 +27,7 @@ func NewRoute(userController *user.UserController, doctorController *doctor.Doct
 func (r *RouteController) InitRoute(e *echo.Echo) {
 	myMiddleware.LogMiddleware(e)
 
-	userAuth := e.Group("/v1/user")
+	userAuth := e.Group("/v1/users")
 	userAuth.POST("/register", r.userController.Register) //Register User
 	userAuth.POST("/login", r.userController.Login)       //Login User
 
@@ -43,7 +43,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("consultations/:id", r.consultationController.GetConsultationByID) //Get Consultation By ID
 	userRoute.GET("consultations", r.consultationController.GetAllConsultation)      //Get All Consultation
 
-	doctorAuth := e.Group("/v1/doctor")
+	doctorAuth := e.Group("/v1/doctors")
 	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor
 	doctorAuth.POST("/login", r.doctorController.Login)       //Login Doctor
 
