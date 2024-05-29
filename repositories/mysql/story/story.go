@@ -1,6 +1,7 @@
 package story
 
 import (
+	"capstone/constants"
 	"capstone/entities"
 	doctorEntities "capstone/entities/doctor"
 	storyEntities "capstone/entities/story"
@@ -24,7 +25,7 @@ func (repository *StoriesRepo) GetAllStories(metadata entities.Metadata, userId 
 	err := repository.DB.Limit(metadata.Limit).Offset((metadata.Page-1)*metadata.Limit).Preload("Doctor").Find(&storiesDb).Error
 
 	if err != nil {
-		return nil, err
+		return nil, constants.ErrDataNotFound
 	}
 
 	storyLikes := make([]StoryLikes, len(storiesDb))
@@ -37,7 +38,7 @@ func (repository *StoriesRepo) GetAllStories(metadata entities.Metadata, userId 
 		err = repository.DB.Model(&storyLikes[i]).Where("user_id = ? AND story_id = ?", storyLikes[i].UserId, storyLikes[i].StoryId).Count(&counter).Error
 
 		if err != nil {
-			return nil, err
+			return nil, constants.ErrServer
 		}
 
 		if counter > 0 {

@@ -52,5 +52,5 @@ func (storyController *StoryController) GetAllStories(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get All Stories", storiesResp))
+	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get All Stories", metadata, storiesResp))
 }
