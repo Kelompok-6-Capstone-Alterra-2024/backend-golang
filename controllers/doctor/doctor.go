@@ -31,7 +31,7 @@ func (controller *DoctorController) Register(c echo.Context) error {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 	doctorResponse := doctorResult.ToResponse()
-	return c.JSON(base.ConvertResponseCode(err), base.NewSuccessResponse("Success Register", doctorResponse))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Register", doctorResponse))
 }
 
 func (controller *DoctorController) Login(c echo.Context) error {
@@ -44,7 +44,7 @@ func (controller *DoctorController) Login(c echo.Context) error {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 	doctorResponse := doctorResult.ToResponse()
-	return c.JSON(base.ConvertResponseCode(err), base.NewSuccessResponse("Success Login", doctorResponse))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Login", doctorResponse))
 }
 
 func (controller *DoctorController) GetByID(c echo.Context) error {
@@ -58,7 +58,7 @@ func (controller *DoctorController) GetByID(c echo.Context) error {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 	doctorResponse := doctorResult.ToDoctorResponse()
-	return c.JSON(base.ConvertResponseCode(err), base.NewSuccessResponse("Success Get Doctor By ID", doctorResponse))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Doctor By ID", doctorResponse))
 }
 
 func (controller *DoctorController) GetAll(c echo.Context) error {
@@ -76,7 +76,7 @@ func (controller *DoctorController) GetAll(c echo.Context) error {
 	for _, doctor := range *doctorResult {
 		doctorResponse = append(doctorResponse, *doctor.ToDoctorResponse())
 	}
-	return c.JSON(base.ConvertResponseCode(err), base.NewMetadataSuccessResponse("Success Get All Doctor", metadata, doctorResponse))
+	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get All Doctor", metadata, doctorResponse))
 }
 
 func (controller *DoctorController) GetActive(c echo.Context) error {
@@ -94,5 +94,5 @@ func (controller *DoctorController) GetActive(c echo.Context) error {
 	for _, doctor := range *doctorResult {
 		doctorResponse = append(doctorResponse, *doctor.ToDoctorResponse())
 	}
-	return c.JSON(base.ConvertResponseCode(err), base.NewMetadataSuccessResponse("Success Get Active Doctor", metadata, doctorResponse))
+	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get Active Doctor", metadata, doctorResponse))
 }
