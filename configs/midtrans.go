@@ -7,9 +7,9 @@ type Midtrans struct {
 	IsProd bool
 }
 
-func (m *Midtrans) GetKey() *Midtrans {
+func MidtransConfig() *Midtrans {
 	return &Midtrans{
 		Key:    os.Getenv("MIDTRANS_KEY"),
-		IsProd: os.Getenv("MIDTRANS_IS_PROD") == "production",
+		IsProd: os.Getenv("MIDTRANS_ENV") == "production",
 	}
 }
