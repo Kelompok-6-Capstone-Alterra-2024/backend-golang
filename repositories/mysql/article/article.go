@@ -4,7 +4,6 @@ import (
 	"capstone/entities"
 	articleEntities "capstone/entities/article"
 	doctorEntities "capstone/entities/doctor"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -24,7 +23,7 @@ func (repository *ArticleRepo) CreateArticle(article *articleEntities.Article) (
 		DoctorID: article.DoctorID,
 		Title:    article.Title,
 		Content:  article.Content,
-		Date:     time.Now(),
+		Date:     article.Date,
 		ImageUrl: article.ImageUrl,
 	}
 
@@ -35,14 +34,6 @@ func (repository *ArticleRepo) CreateArticle(article *articleEntities.Article) (
 	articleEntity := articleDB.ToEntities()
 	return articleEntity, nil
 }
-
-// func (repository *ArticleRepo) GetAllArticle() ([]*articleEntities.Article, error) {
-// 	var articles []*articleEntities.Article
-// 	if err := repository.db.Find(&articles).Error; err != nil {
-// 		return nil, err
-// 	}
-// 	return articles, nil
-// }
 
 func (repository *ArticleRepo) GetAllArticle(metadata entities.Metadata, userId int) ([]articleEntities.Article, error) {
 	var articlesDb []Article

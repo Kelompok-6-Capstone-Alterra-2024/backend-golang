@@ -27,7 +27,7 @@ func (controller *ArticleController) CreateArticle(c echo.Context) error {
 	var createRequest request.CreateArticleRequest
 
 	token := c.Request().Header.Get("Authorization")
-	doctorId, err := utilities.GetUserIdFromToken(token)
+	doctorId, _ := utilities.GetUserIdFromToken(token)
 
 	if err := c.Bind(&createRequest); err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
@@ -51,9 +51,18 @@ func (controller *ArticleController) CreateArticle(c echo.Context) error {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse("Failed to upload image"))
 	}
 
+	// Set the timezone to Asia/Jakarta
+	loc, err := time.LoadLocation("Asia/Jakarta")
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse("Failed to load timezone"))
+	}
+
+	// Get the current time in the specified timezone
+	currentTime := time.Now().In(loc)
+
 	articleRequest := createRequest.ToArticleEntities()
 	articleRequest.ImageUrl = imageUpload
-	articleRequest.Date = time.Now()
+	articleRequest.Date = currentTime
 	articleRequest.DoctorID = uint(doctorId)
 
 	// Create article in repository
@@ -63,7 +72,7 @@ func (controller *ArticleController) CreateArticle(c echo.Context) error {
 	}
 
 	articleResponse := createdArticle.ToResponse()
-	return c.JSON(base.ConvertResponseCode(err), base.NewSuccessResponse("Success Create Article", articleResponse))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Create Article", articleResponse))
 }
 
 func (controller *ArticleController) GetAllArticle(c echo.Context) error {
