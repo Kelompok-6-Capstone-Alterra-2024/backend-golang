@@ -22,3 +22,11 @@ func (storiesUseCase *StoryUseCase) GetAllStories(metadata entities.Metadata, us
 	}
 	return stories, nil
 }
+
+func (storiesUseCase *StoryUseCase) GetStoryById(id int) (storyEntities.Story, error) {
+	story, err := storiesUseCase.storyRepository.GetStoryById(id)
+	if err != nil {
+		return storyEntities.Story{}, err
+	}
+	return story, nil
+}

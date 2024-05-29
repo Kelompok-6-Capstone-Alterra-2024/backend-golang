@@ -70,3 +70,27 @@ func (repository *StoriesRepo) GetAllStories(metadata entities.Metadata, userId 
 
 	return storiesEnt, nil
 }
+
+func (repository *StoriesRepo) GetStoryById(id int) (storyEntities.Story, error) {
+	var storyDb Story
+	err := repository.DB.Where("id = ?", id).Preload("Doctor").First(&storyDb).Error
+	if err != nil {
+		return storyEntities.Story{}, constants.ErrDataNotFound
+	}
+
+	storyResp := storyEntities.Story{
+		Id:       storyDb.ID,
+		Title:    storyDb.Title,
+		Content:  storyDb.Content,
+		Date:     storyDb.Date,
+		ImageUrl: storyDb.ImageUrl,
+		ViewCount: storyDb.ViewCount,
+		DoctorId: storyDb.DoctorId,
+		Doctor: doctorEntities.Doctor{
+			ID:   storyDb.Doctor.ID,
+			Name: storyDb.Doctor.Name,
+		},
+	}
+
+	return storyResp, nil
+}

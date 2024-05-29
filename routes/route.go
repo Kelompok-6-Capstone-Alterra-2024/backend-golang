@@ -61,6 +61,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	// Inspirational Stories
 	userRoute.GET("stories", r.storyController.GetAllStories) //Get All Stories
+	userRoute.GET("stories/:id", r.storyController.GetStoryById)   //Get Story By ID
 
 	// Complaint
 	userRoute.POST("complaint", r.complaintController.Create) // Create Complaint
