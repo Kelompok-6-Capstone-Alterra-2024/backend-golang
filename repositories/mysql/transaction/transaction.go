@@ -1,1 +1,45 @@
 package transaction
+
+import (
+	"capstone/entities"
+	transactionEntities "capstone/entities/transaction"
+	"gorm.io/gorm"
+)
+
+type TransactionRepo struct {
+	db *gorm.DB
+}
+
+func NewTransactionRepo(db *gorm.DB) transactionEntities.TransactionRepository {
+	return &TransactionRepo{db}
+}
+
+func (repository *TransactionRepo) Insert(transaction *transactionEntities.Transaction) (*transactionEntities.Transaction, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (repository *TransactionRepo) FindByID(ID uint) (*transactionEntities.Transaction, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (repository *TransactionRepo) FindByConsultationID(consultationID uint) (*transactionEntities.Transaction, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (repository *TransactionRepo) FindAll(metadata *entities.Metadata, userID uint) (*[]transactionEntities.Transaction, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (repository *TransactionRepo) Update(transaction *transactionEntities.Transaction) (*transactionEntities.Transaction, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (repository *TransactionRepo) Delete(ID uint) error {
+	//TODO implement me
+	panic("implement me")
+}
