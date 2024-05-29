@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"capstone/controllers/article"
 	"capstone/controllers/complaint"
 	"capstone/controllers/consultation"
 	"capstone/controllers/doctor"
@@ -18,9 +19,10 @@ type RouteController struct {
 	userController         *user.UserController
 	doctorController       *doctor.DoctorController
 	consultationController *consultation.ConsultationController
-	storyController      *story.StoryController
+	storyController        *story.StoryController
 	complaintController    *complaint.ComplaintController
 	transactionController  *transaction.TransactionController
+	articleController      *article.ArticleController
 }
 
 func NewRoute(
@@ -29,14 +31,15 @@ func NewRoute(
 	consultationController *consultation.ConsultationController, storyContoller *story.StoryController,
 	complaintController *complaint.ComplaintController,
 	transactionController *transaction.TransactionController,
-) *RouteController {
+	articleController *article.ArticleController) *RouteController {
 	return &RouteController{
 		userController:         userController,
 		doctorController:       doctorController,
 		consultationController: consultationController,
-		storyController:      storyContoller,
+		storyController:        storyContoller,
 		complaintController:    complaintController,
 		transactionController:  transactionController,
+		articleController:      articleController,
 	}
 }
 
@@ -73,4 +76,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor
 	doctorAuth.POST("/login", r.doctorController.Login)       //Login Doctor
 
+	articleAuth := e.Group("/v1/article")
+	articleAuth.POST("/create", r.articleController.CreateArticle)
+	articleAuth.GET("/list", r.articleController.GetAllArticle)
 }
