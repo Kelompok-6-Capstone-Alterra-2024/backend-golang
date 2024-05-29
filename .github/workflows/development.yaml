@@ -42,4 +42,4 @@ jobs:
             cd ~/
             docker pull wdinx/capstone-project:latest
             docker container rm -f capstone
-            docker run -d --name capstone -p 8080:8080 --env DBHost=${{ secrets.DBHOST }} --env DBPort=${{ secrets.DBPORT }} --env DBUser=${{ secrets.DBUSER }} --env DBPass=${{ secrets.DBPASS }} --env DBName=${{ secrets.DBNAME }} --env SECRET_JWT=${{ secrets.SECRET_JWT }}  wdinx/capstone-project:latest
+            docker run -d --name capstone -p 8080:8080 --env DBHost=${{ secrets.DBHOST }} --env DBPort=${{ secrets.DBPORT }} --env DBUser=${{ secrets.DBUSER }} --env DBPass=${{ secrets.DBPASS }} --env DBName=${{ secrets.DBNAME }} --env SECRET_JWT=${{ secrets.SECRET_JWT }} MIDTRANS_KEY=${{ secrets.MIDTRANS_KEY }} MIDTRANS_ENV=${{ secrets.MIDTRANS_ENV }}  wdinx/capstone-project:latest
