@@ -4,6 +4,7 @@ import (
 	"capstone/repositories/mysql/complaint"
 	"capstone/repositories/mysql/consultation"
 	"capstone/repositories/mysql/doctor"
+	"capstone/repositories/mysql/music"
 	"capstone/repositories/mysql/story"
 	"capstone/repositories/mysql/transaction"
 	"capstone/repositories/mysql/user"
@@ -44,7 +45,7 @@ func ConnectDB(config Config) *gorm.DB {
 }
 
 func InitMigrate(db *gorm.DB) {
-	if err := db.AutoMigrate(user.User{}, doctor.Doctor{}, consultation.Consultation{}, story.Story{}, story.StoryLikes{}, complaint.Complaint{}, transaction.Transaction{}); err != nil {
+	if err := db.AutoMigrate(user.User{}, doctor.Doctor{}, consultation.Consultation{}, story.Story{}, story.StoryLikes{}, complaint.Complaint{}, transaction.Transaction{}, music.Music{}, music.MusicLikes{}); err != nil {
 		log.Println("Error migrating user table")
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"capstone/controllers/complaint"
 	"capstone/controllers/consultation"
 	"capstone/controllers/doctor"
+	"capstone/controllers/music"
 	"capstone/controllers/story"
 	"capstone/controllers/transaction"
 	"capstone/controllers/user"
@@ -21,14 +22,17 @@ type RouteController struct {
 	storyController      *story.StoryController
 	complaintController    *complaint.ComplaintController
 	transactionController  *transaction.TransactionController
+	musicController        *music.MusicController
 }
 
 func NewRoute(
 	userController *user.UserController,
 	doctorController *doctor.DoctorController,
-	consultationController *consultation.ConsultationController, storyContoller *story.StoryController,
+	consultationController *consultation.ConsultationController,
+	storyContoller *story.StoryController,
 	complaintController *complaint.ComplaintController,
 	transactionController *transaction.TransactionController,
+	musicController *music.MusicController,
 ) *RouteController {
 	return &RouteController{
 		userController:         userController,
@@ -37,6 +41,7 @@ func NewRoute(
 		storyController:      storyContoller,
 		complaintController:    complaintController,
 		transactionController:  transactionController,
+		musicController:        musicController,
 	}
 }
 
@@ -61,6 +66,11 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	// Inspirational Stories
 	userRoute.GET("stories", r.storyController.GetAllStories) //Get All Stories
+	userRoute.GET("stories/:id", r.storyController.GetStoryById)   //Get Story By ID
+
+	// Music
+	userRoute.GET("musics", r.musicController.GetAllMusics)
+	userRoute.GET("musics/:id", r.musicController.GetMusicByID)
 
 	// Complaint
 	userRoute.POST("complaint", r.complaintController.Create) // Create Complaint

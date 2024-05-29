@@ -70,3 +70,44 @@ func (repository *StoriesRepo) GetAllStories(metadata entities.Metadata, userId 
 
 	return storiesEnt, nil
 }
+
+func (repository *StoriesRepo) GetStoryById(storyId int, userId int) (storyEntities.Story, error) {
+	var storyDb Story
+	err := repository.DB.Where("id = ?", storyId).Preload("Doctor").First(&storyDb).Error
+	if err != nil {
+		return storyEntities.Story{}, constants.ErrDataNotFound
+	}
+
+	var storyLikes StoryLikes
+	var isLiked bool
+	var counter int64
+
+	err = repository.DB.Model(&storyLikes).Where("user_id = ? AND story_id = ?", userId, storyId).Count(&counter).Error
+
+	if err != nil {
+		return storyEntities.Story{}, constants.ErrServer
+	}
+
+	if counter > 0 {
+		isLiked = true
+	} else {
+		isLiked = false
+	}
+
+	storyResp := storyEntities.Story{
+		Id:       storyDb.ID,
+		Title:    storyDb.Title,
+		Content:  storyDb.Content,
+		Date:     storyDb.Date,
+		ImageUrl: storyDb.ImageUrl,
+		ViewCount: storyDb.ViewCount,
+		DoctorId: storyDb.DoctorId,
+		Doctor: doctorEntities.Doctor{
+			ID:   storyDb.Doctor.ID,
+			Name: storyDb.Doctor.Name,
+		},
+		IsLiked: isLiked,
+	}
+
+	return storyResp, nil
+}

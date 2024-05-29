@@ -6,6 +6,7 @@ import (
 	"capstone/utilities"
 	"capstone/utilities/base"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -53,4 +54,33 @@ func (storyController *StoryController) GetAllStories(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get All Stories", metadata, storiesResp))
+}
+
+func (storyController *StoryController) GetStoryById(c echo.Context) error {
+	strId := c.Param("id")
+	storyId, _ := strconv.Atoi(strId)
+
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	story, err := storyController.storyUseCase.GetStoryById(storyId, userId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	storyResp := response.StoriesGetAllResponse{
+		ID:       story.Id,
+		Title:    story.Title,
+		Content:  story.Content,
+		Date:     story.Date,
+		ImageUrl: story.ImageUrl,
+		ViewCount: story.ViewCount,
+		IsLiked:  story.IsLiked,
+		Doctor: response.DoctorGetAllResponse{
+			ID:   story.Doctor.ID,
+			Name: story.Doctor.Name,
+		},
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Story By Id", storyResp))
 }
