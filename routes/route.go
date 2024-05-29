@@ -79,7 +79,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor
 	doctorAuth.POST("/login", r.doctorController.Login)       //Login Doctor
 
-	doctorAuth.POST("/article", r.articleController.CreateArticle)
+	doctorAuth.POST("/article", r.articleController.CreateArticle) // Create Article
+	doctorAuth.GET("article", r.articleController.GetAllArticle)   // Get All Article
 
 	articleAuth := e.Group("/v1/article")
 	articleAuth.GET("/list", r.articleController.GetAllArticle)
