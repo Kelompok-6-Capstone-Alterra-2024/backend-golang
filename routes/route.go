@@ -4,18 +4,21 @@ import (
 	"capstone/controllers/complaint"
 	"capstone/controllers/consultation"
 	"capstone/controllers/doctor"
+	"capstone/controllers/story"
 	"capstone/controllers/transaction"
 	"capstone/controllers/user"
 	myMiddleware "capstone/middlewares"
+	"os"
+
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
-	"os"
 )
 
 type RouteController struct {
 	userController         *user.UserController
 	doctorController       *doctor.DoctorController
 	consultationController *consultation.ConsultationController
+	storyController      *story.StoryController
 	complaintController    *complaint.ComplaintController
 	transactionController  *transaction.TransactionController
 }
@@ -23,7 +26,7 @@ type RouteController struct {
 func NewRoute(
 	userController *user.UserController,
 	doctorController *doctor.DoctorController,
-	consultationController *consultation.ConsultationController,
+	consultationController *consultation.ConsultationController, storyContoller *story.StoryController,
 	complaintController *complaint.ComplaintController,
 	transactionController *transaction.TransactionController,
 ) *RouteController {
@@ -31,6 +34,7 @@ func NewRoute(
 		userController:         userController,
 		doctorController:       doctorController,
 		consultationController: consultationController,
+		storyController:      storyContoller,
 		complaintController:    complaintController,
 		transactionController:  transactionController,
 	}
@@ -46,14 +50,17 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute := userAuth.Group("/")
 	userRoute.Use(echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))
 	// Doctor
-	userRoute.GET("doctor/:id", r.doctorController.GetByID)         //Get Doctor By ID
-	userRoute.GET("doctor", r.doctorController.GetAll)              //Get All Doctor
-	userRoute.GET("doctor/available", r.doctorController.GetActive) //Get All Active Doctor
+	userRoute.GET("doctors/:id", r.doctorController.GetByID)         //Get Doctor By ID
+	userRoute.GET("doctors", r.doctorController.GetAll)              //Get All Doctor
+	userRoute.GET("doctors/available", r.doctorController.GetActive) //Get All Active Doctor
 
 	// Consultation
 	userRoute.POST("consultations", r.consultationController.CreateConsultation)     //Get All Consultation
 	userRoute.GET("consultations/:id", r.consultationController.GetConsultationByID) //Get Consultation By ID
 	userRoute.GET("consultations", r.consultationController.GetAllConsultation)      //Get All Consultation
+
+	// Inspirational Stories
+	userRoute.GET("stories", r.storyController.GetAllStories) //Get All Stories
 
 	// Complaint
 	userRoute.POST("complaint", r.complaintController.Create) // Create Complaint
