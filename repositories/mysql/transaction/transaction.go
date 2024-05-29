@@ -21,6 +21,10 @@ func (repository *TransactionRepo) Insert(transaction *transactionEntities.Trans
 		return nil, constants.ErrInsertDatabase
 	}
 
+	if err := repository.db.Preload("Consultation").Preload("Consultation.Doctor").First(&transactionDb, transactionDb.ID).Error; err != nil {
+		return nil, constants.ErrInsertDatabase
+	}
+
 	return transactionDb.ToEntities(), nil
 }
 

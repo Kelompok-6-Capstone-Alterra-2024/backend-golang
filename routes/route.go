@@ -4,6 +4,7 @@ import (
 	"capstone/controllers/complaint"
 	"capstone/controllers/consultation"
 	"capstone/controllers/doctor"
+	"capstone/controllers/transaction"
 	"capstone/controllers/user"
 	myMiddleware "capstone/middlewares"
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -16,6 +17,7 @@ type RouteController struct {
 	doctorController       *doctor.DoctorController
 	consultationController *consultation.ConsultationController
 	complaintController    *complaint.ComplaintController
+	transactionController  *transaction.TransactionController
 }
 
 func NewRoute(
@@ -23,12 +25,14 @@ func NewRoute(
 	doctorController *doctor.DoctorController,
 	consultationController *consultation.ConsultationController,
 	complaintController *complaint.ComplaintController,
+	transactionController *transaction.TransactionController,
 ) *RouteController {
 	return &RouteController{
 		userController:         userController,
 		doctorController:       doctorController,
 		consultationController: consultationController,
 		complaintController:    complaintController,
+		transactionController:  transactionController,
 	}
 }
 
@@ -51,9 +55,12 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("consultations/:id", r.consultationController.GetConsultationByID) //Get Consultation By ID
 	userRoute.GET("consultations", r.consultationController.GetAllConsultation)      //Get All Consultation
 
-  // Complaint
+	// Complaint
 	userRoute.POST("complaint", r.complaintController.Create) // Create Complaint
-  
+
+	// Transaction
+	userRoute.POST("transaction", r.transactionController.Insert) // Create Transaction
+
 	doctorAuth := e.Group("/v1/doctors")
 
 	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor

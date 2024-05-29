@@ -32,7 +32,7 @@ func (receiver Transaction) ToEntities() *transaction.Transaction {
 
 func ToTransactionModel(transaction *transaction.Transaction) *Transaction {
 	return &Transaction{
-		ID:             transaction.ID,
+		ID:             uuid.New(),
 		Model:          gorm.Model{CreatedAt: transaction.CreatedAt, UpdatedAt: transaction.UpdatedAt},
 		ConsultationID: transaction.ConsultationID,
 		Consultation:   *consultation.ToConsultationModel(&transaction.Consultation),
