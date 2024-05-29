@@ -20,10 +20,10 @@ type Story struct {
 
 type RepositoryInterface interface {
 	GetAllStories(metadata entities.Metadata, userId int) ([]Story, error)
-	GetStoryById(id int) (Story, error)
+	GetStoryById(storyId int, userId int) (Story, error)
 }
 
 type UseCaseInterface interface {
 	GetAllStories(metadata entities.Metadata, userId int) ([]Story, error)
-	GetStoryById(id int) (Story, error)
+	GetStoryById(storyId int, userId int) (Story, error)
 }

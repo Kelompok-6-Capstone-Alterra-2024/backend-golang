@@ -62,3 +62,38 @@ func (m *MusicRepo) GetAllMusics(metadata entities.Metadata, userId int) ([]musi
 
 	return musicsEnt, nil
 }
+
+func (m *MusicRepo) GetMusicById(musicId int, userId int) (musicEntities.Music, error) {
+	var music Music
+	err := m.db.Where("id = ?", musicId).First(&music).Error
+	if err != nil {
+		return musicEntities.Music{}, constants.ErrDataNotFound
+	}
+
+	var musicLikes MusicLikes
+	var isLiked bool
+	var counter int64
+
+	err = m.db.Model(&musicLikes).Where("user_id = ? AND music_id = ?", userId, musicId).Count(&counter).Error
+	if err != nil {
+		return musicEntities.Music{}, constants.ErrServer
+	}
+
+	if counter > 0 {
+		isLiked = true
+	} else {
+		isLiked = false
+	}
+
+	musicEnt := musicEntities.Music{
+		Id:        music.ID,
+		Title:     music.Title,
+		Singer:    music.Singer,
+		MusicUrl:  music.MusicUrl,
+		ImageUrl:  music.ImageUrl,
+		ViewCount: music.ViewCount,
+		IsLiked:   isLiked,
+	}
+
+	return musicEnt, nil
+}

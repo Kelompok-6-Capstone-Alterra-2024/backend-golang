@@ -22,3 +22,11 @@ func (musicUseCase *MusicUseCase) GetAllMusics(metadata entities.Metadata, userI
 	}
 	return musics, nil
 }
+
+func (musicUseCase *MusicUseCase) GetMusicById(musicId int, userId int) (musicEntities.Music, error) {
+	music, err := musicUseCase.musicInterface.GetMusicById(musicId, userId)
+	if err != nil {
+		return musicEntities.Music{}, err
+	}
+	return music, nil
+}

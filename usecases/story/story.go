@@ -23,8 +23,8 @@ func (storiesUseCase *StoryUseCase) GetAllStories(metadata entities.Metadata, us
 	return stories, nil
 }
 
-func (storiesUseCase *StoryUseCase) GetStoryById(id int) (storyEntities.Story, error) {
-	story, err := storiesUseCase.storyRepository.GetStoryById(id)
+func (storiesUseCase *StoryUseCase) GetStoryById(storyId int, userId int) (storyEntities.Story, error) {
+	story, err := storiesUseCase.storyRepository.GetStoryById(storyId, userId)
 	if err != nil {
 		return storyEntities.Story{}, err
 	}

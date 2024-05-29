@@ -58,9 +58,12 @@ func (storyController *StoryController) GetAllStories(c echo.Context) error {
 
 func (storyController *StoryController) GetStoryById(c echo.Context) error {
 	strId := c.Param("id")
-	id, _ := strconv.Atoi(strId)
+	storyId, _ := strconv.Atoi(strId)
 
-	story, err := storyController.storyUseCase.GetStoryById(id)
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	story, err := storyController.storyUseCase.GetStoryById(storyId, userId)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}

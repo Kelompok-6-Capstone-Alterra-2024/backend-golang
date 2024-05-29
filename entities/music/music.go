@@ -14,10 +14,10 @@ type Music struct {
 
 type RepositoryInterface interface {
 	GetAllMusics(metadata entities.Metadata, userId int) ([]Music, error)
-	// GetMusicById(id int) (Music, error)
+	GetMusicById(musicId int, userId int) (Music, error)
 }
 
 type UseCaseInterface interface {
 	GetAllMusics(metadata entities.Metadata, userId int) ([]Music, error)
-	// GetMusicById(id int) (Music, error)
+	GetMusicById(musicId int, userId int) (Music, error)
 }
