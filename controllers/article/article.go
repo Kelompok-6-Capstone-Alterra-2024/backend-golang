@@ -6,6 +6,8 @@ import (
 	articleUseCase "capstone/entities/article"
 	"capstone/utilities"
 	"capstone/utilities/base"
+	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -23,6 +25,10 @@ func NewArticleController(articleUseCase articleUseCase.ArticleUseCaseInterface)
 func (controller *ArticleController) CreateArticle(c echo.Context) error {
 	// Binding request data
 	var createRequest request.CreateArticleRequest
+
+	token := c.Request().Header.Get("Authorization")
+	doctorId, err := utilities.GetUserIdFromToken(token)
+
 	if err := c.Bind(&createRequest); err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
@@ -37,16 +43,18 @@ func (controller *ArticleController) CreateArticle(c echo.Context) error {
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse("Failed to open image file"))
 	}
-	defer fileContent.Close() // Make sure to close the file after uploading
+	defer fileContent.Close()
 
-	// Upload gambar ke Cloudinary
+	// Upload image to Cloudinary
 	imageUpload, err := utilities.UploadImage(fileContent, "article_images/"+file.Filename, "article_images")
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse("Failed to upload image"))
 	}
 
 	articleRequest := createRequest.ToArticleEntities()
-	articleRequest.ImageURL = imageUpload
+	articleRequest.ImageUrl = imageUpload
+	articleRequest.Date = time.Now()
+	articleRequest.DoctorID = uint(doctorId)
 
 	// Create article in repository
 	createdArticle, err := controller.articleUseCase.CreateArticle(articleRequest)
@@ -59,7 +67,15 @@ func (controller *ArticleController) CreateArticle(c echo.Context) error {
 }
 
 func (controller *ArticleController) GetAllArticle(c echo.Context) error {
-	articles, err := controller.articleUseCase.GetAllArticle()
+	pageParam := c.QueryParam("page")
+	limitParam := c.QueryParam("limit")
+
+	metadata := utilities.GetMetadata(pageParam, limitParam)
+
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	articles, err := controller.articleUseCase.GetAllArticle(*metadata, userId)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
@@ -69,5 +85,5 @@ func (controller *ArticleController) GetAllArticle(c echo.Context) error {
 		articleResponse = append(articleResponse, article.ToResponse())
 	}
 
-	return c.JSON(base.ConvertResponseCode(err), base.NewSuccessResponse("Success Get All Articles", articleResponse))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get All Articles", articleResponse))
 }

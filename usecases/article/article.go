@@ -2,6 +2,7 @@ package article
 
 import (
 	"capstone/constants"
+	"capstone/entities"
 	articleEntities "capstone/entities/article"
 )
 
@@ -28,6 +29,10 @@ func (useCase *ArticleUseCase) CreateArticle(article *articleEntities.Article) (
 	return createdArticle, nil
 }
 
-func (useCase *ArticleUseCase) GetAllArticle() ([]*articleEntities.Article, error) {
-	return useCase.articleRepository.GetAllArticle()
+func (useCase *ArticleUseCase) GetAllArticle(metadata entities.Metadata, userId int) ([]articleEntities.Article, error) {
+	articles, err := useCase.articleRepository.GetAllArticle(metadata, userId)
+	if err != nil {
+		return []articleEntities.Article{}, err
+	}
+	return articles, nil
 }

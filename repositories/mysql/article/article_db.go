@@ -1,6 +1,10 @@
 package article
 
 import (
+	"capstone/repositories/mysql/doctor"
+	"capstone/repositories/mysql/user"
+	"time"
+
 	"gorm.io/gorm"
 
 	articleEntities "capstone/entities/article"
@@ -8,10 +12,21 @@ import (
 
 type Article struct {
 	gorm.Model
-	DoctorID uint   `gorm:"type:int;not null"`
-	Title    string `gorm:"type:varchar(100);not null"`
-	Content  string `gorm:"type:text"`
-	ImageURL string `gorm:"type:varchar(255)"`
+	Title     string `gorm:"type:varchar(100);not null"`
+	Content   string `gorm:"type:text"`
+	Date      time.Time
+	ImageUrl  string        `gorm:"type:varchar(255)"`
+	ViewCount int           `gorm:"type:int"`
+	DoctorID  uint          `gorm:"type:int;not null"`
+	Doctor    doctor.Doctor `gorm:"foreignKey:doctor_id;references:id"`
+}
+
+type ArticleLikes struct {
+	gorm.Model
+	ArticleID uint      `gorm:"type:int;index"`
+	Article   Article   `gorm:"foreignKey:article_id;references:id"`
+	UserId    uint      `gorm:"type:int;index"`
+	User      user.User `gorm:"foreignKey:user_id;references:id"`
 }
 
 func (article *Article) ToEntities() *articleEntities.Article {
@@ -20,7 +35,7 @@ func (article *Article) ToEntities() *articleEntities.Article {
 		DoctorID: article.DoctorID,
 		Title:    article.Title,
 		Content:  article.Content,
-		ImageURL: article.ImageURL,
+		ImageUrl: article.ImageUrl,
 	}
 }
 
@@ -29,6 +44,6 @@ func ToArticleModel(request *articleEntities.Article) *Article {
 		DoctorID: request.DoctorID,
 		Title:    request.Title,
 		Content:  request.Content,
-		ImageURL: request.ImageURL,
+		ImageUrl: request.ImageUrl,
 	}
 }

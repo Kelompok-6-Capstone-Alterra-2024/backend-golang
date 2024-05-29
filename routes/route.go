@@ -71,6 +71,9 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	// Transaction
 	userRoute.POST("transaction", r.transactionController.Insert) // Create Transaction
 
+	// Article
+	userRoute.GET("article", r.articleController.GetAllArticle) // Get All Article
+
 	doctorAuth := e.Group("/v1/doctors")
 
 	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor
