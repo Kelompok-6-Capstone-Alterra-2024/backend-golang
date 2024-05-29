@@ -3,16 +3,18 @@ package transaction
 import (
 	"capstone/entities/transaction"
 	"capstone/repositories/mysql/consultation"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type Transaction struct {
+	ID uuid.UUID `gorm:"column:id;primaryKey;type:char(100)"`
 	gorm.Model
 	ConsultationID uint                      `gorm:"column:consultation_id;not null"`
 	Consultation   consultation.Consultation `gorm:"foreignKey:consultation_id;references:id"`
 	Price          int                       `gorm:"column:price;not null"`
 	SnapURL        string                    `gorm:"column:snap_url"`
-	Status         string                    `gorm:"column:status;not null;type:enum('pending','success','failed');default:'pending'"`
+	Status         string                    `gorm:"column:status;not null;type:enum('pending','settlement','failed', 'deny');default:'pending'"`
 }
 
 func (receiver Transaction) ToEntities() *transaction.Transaction {
@@ -30,7 +32,8 @@ func (receiver Transaction) ToEntities() *transaction.Transaction {
 
 func ToTransactionModel(transaction *transaction.Transaction) *Transaction {
 	return &Transaction{
-		Model:          gorm.Model{ID: transaction.ID, CreatedAt: transaction.CreatedAt, UpdatedAt: transaction.UpdatedAt},
+		ID:             transaction.ID,
+		Model:          gorm.Model{CreatedAt: transaction.CreatedAt, UpdatedAt: transaction.UpdatedAt},
 		ConsultationID: transaction.ConsultationID,
 		Consultation:   *consultation.ToConsultationModel(&transaction.Consultation),
 		Price:          transaction.Price,

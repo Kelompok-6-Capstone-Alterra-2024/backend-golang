@@ -2,11 +2,12 @@ package transaction
 
 import (
 	"capstone/entities/consultation"
+	"github.com/google/uuid"
 	"time"
 )
 
 type Transaction struct {
-	ID             uint
+	ID             uuid.UUID
 	ConsultationID uint
 	Consultation   consultation.Consultation
 	Price          int

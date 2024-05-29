@@ -1,6 +1,7 @@
 package transaction
 
 import (
+	"capstone/constants"
 	"capstone/entities"
 	transactionEntities "capstone/entities/transaction"
 	"gorm.io/gorm"
@@ -15,8 +16,12 @@ func NewTransactionRepo(db *gorm.DB) transactionEntities.TransactionRepository {
 }
 
 func (repository *TransactionRepo) Insert(transaction *transactionEntities.Transaction) (*transactionEntities.Transaction, error) {
-	//TODO implement me
-	panic("implement me")
+	transactionDb := ToTransactionModel(transaction)
+	if err := repository.db.Create(&transactionDb).Error; err != nil {
+		return nil, constants.ErrInsertDatabase
+	}
+
+	return transactionDb.ToEntities(), nil
 }
 
 func (repository *TransactionRepo) FindByID(ID uint) (*transactionEntities.Transaction, error) {
