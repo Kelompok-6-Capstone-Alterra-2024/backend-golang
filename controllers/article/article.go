@@ -126,3 +126,37 @@ func (controller *ArticleController) GetArticleById(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Article By Id", articleResp))
 }
+
+func (controller *ArticleController) GetLikedArticle(c echo.Context) error {
+	pageParam := c.QueryParam("page")
+	limitParam := c.QueryParam("limit")
+
+	metadata := utilities.GetMetadata(pageParam, limitParam)
+
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	articles, err := controller.articleUseCase.GetLikedArticle(*metadata, userId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	articleResponse := make([]response.ArticleCreatedResponse, len(articles))
+	for i, article := range articles {
+		articleResponse[i] = response.ArticleCreatedResponse{
+			ID:        article.ID,
+			Title:     article.Title,
+			Content:   article.Content,
+			Date:      article.Date,
+			ImageURL:  article.ImageUrl,
+			ViewCount: article.ViewCount,
+			IsLiked:   article.IsLiked,
+			Doctor: response.DoctorGetAllResponse{
+				ID:   article.Doctor.ID,
+				Name: article.Doctor.Name,
+			},
+		}
+	}
+
+	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get Liked Articles", metadata, articleResponse))
+}

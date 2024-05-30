@@ -129,3 +129,42 @@ func (repository *ArticleRepo) GetArticleById(articleId int, userId int) (articl
 
 	return articleResp, nil
 }
+
+func (repository *ArticleRepo) GetLikedArticle(metadata entities.Metadata, userId int) ([]articleEntities.Article, error) {
+	var articleLikesDb []ArticleLikes
+	err := repository.db.Limit(metadata.Limit).Offset((metadata.Page-1)*metadata.Limit).Where("user_id = ?", userId).Find(&articleLikesDb).Error
+	if err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	var likedArticleIDs []int
+	for i := 0; i < len(articleLikesDb); i++ {
+		likedArticleIDs = append(likedArticleIDs, int(articleLikesDb[i].ArticleID))
+	}
+
+	var articlesDb []Article
+	err = repository.db.Where("id IN ?", likedArticleIDs).Preload("Doctor").Find(&articlesDb).Error
+	if err != nil {
+		return nil, constants.ErrServer
+	}
+
+	articlesEnt := make([]articleEntities.Article, len(articlesDb))
+	for i := 0; i < len(articlesDb); i++ {
+		articlesEnt[i] = articleEntities.Article{
+			ID:        articlesDb[i].ID,
+			Title:     articlesDb[i].Title,
+			Content:   articlesDb[i].Content,
+			Date:      articlesDb[i].Date,
+			ImageUrl:  articlesDb[i].ImageUrl,
+			ViewCount: articlesDb[i].ViewCount,
+			DoctorID:  articlesDb[i].DoctorID,
+			Doctor: doctorEntities.Doctor{
+				ID:   articlesDb[i].Doctor.ID,
+				Name: articlesDb[i].Doctor.Name,
+			},
+			IsLiked: true,
+		}
+	}
+
+	return articlesEnt, nil
+}

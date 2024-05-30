@@ -44,3 +44,11 @@ func (useCase *ArticleUseCase) GetArticleById(articleId int, userId int) (articl
 	}
 	return article, nil
 }
+
+func (useCase *ArticleUseCase) GetLikedArticle(metadata entities.Metadata, userId int) ([]articleEntities.Article, error) {
+	articles, err := useCase.articleRepository.GetLikedArticle(metadata, userId)
+	if err != nil {
+		return []articleEntities.Article{}, err
+	}
+	return articles, nil
+}

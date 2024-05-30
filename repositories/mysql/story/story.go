@@ -22,7 +22,7 @@ func NewStoryRepo(db *gorm.DB) *StoriesRepo {
 func (repository *StoriesRepo) GetAllStories(metadata entities.Metadata, userId int) ([]storyEntities.Story, error) {
 	var storiesDb []Story
 
-	err := repository.DB.Limit(metadata.Limit).Offset((metadata.Page-1)*metadata.Limit).Preload("Doctor").Find(&storiesDb).Error
+	err := repository.DB.Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Preload("Doctor").Find(&storiesDb).Error
 
 	if err != nil {
 		return nil, constants.ErrDataNotFound
@@ -53,13 +53,13 @@ func (repository *StoriesRepo) GetAllStories(metadata entities.Metadata, userId 
 	storiesEnt := make([]storyEntities.Story, len(storiesDb))
 	for i := 0; i < len(storiesDb); i++ {
 		storiesEnt[i] = storyEntities.Story{
-			Id:       storiesDb[i].ID,
-			Title:    storiesDb[i].Title,
-			Content:  storiesDb[i].Content,
-			Date:     storiesDb[i].Date,
-			ImageUrl: storiesDb[i].ImageUrl,
+			Id:        storiesDb[i].ID,
+			Title:     storiesDb[i].Title,
+			Content:   storiesDb[i].Content,
+			Date:      storiesDb[i].Date,
+			ImageUrl:  storiesDb[i].ImageUrl,
 			ViewCount: storiesDb[i].ViewCount,
-			DoctorId: storiesDb[i].DoctorId,
+			DoctorId:  storiesDb[i].DoctorId,
 			Doctor: doctorEntities.Doctor{
 				ID:   storiesDb[i].Doctor.ID,
 				Name: storiesDb[i].Doctor.Name,
@@ -95,13 +95,13 @@ func (repository *StoriesRepo) GetStoryById(storyId int, userId int) (storyEntit
 	}
 
 	storyResp := storyEntities.Story{
-		Id:       storyDb.ID,
-		Title:    storyDb.Title,
-		Content:  storyDb.Content,
-		Date:     storyDb.Date,
-		ImageUrl: storyDb.ImageUrl,
+		Id:        storyDb.ID,
+		Title:     storyDb.Title,
+		Content:   storyDb.Content,
+		Date:      storyDb.Date,
+		ImageUrl:  storyDb.ImageUrl,
 		ViewCount: storyDb.ViewCount,
-		DoctorId: storyDb.DoctorId,
+		DoctorId:  storyDb.DoctorId,
 		Doctor: doctorEntities.Doctor{
 			ID:   storyDb.Doctor.ID,
 			Name: storyDb.Doctor.Name,
@@ -133,13 +133,13 @@ func (repository *StoriesRepo) GetLikedStories(metadata entities.Metadata, userI
 	storiesEnt := make([]storyEntities.Story, len(storiesDb))
 	for i := 0; i < len(storiesDb); i++ {
 		storiesEnt[i] = storyEntities.Story{
-			Id:       storiesDb[i].ID,
-			Title:    storiesDb[i].Title,
-			Content:  storiesDb[i].Content,
-			Date:     storiesDb[i].Date,
-			ImageUrl: storiesDb[i].ImageUrl,
+			Id:        storiesDb[i].ID,
+			Title:     storiesDb[i].Title,
+			Content:   storiesDb[i].Content,
+			Date:      storiesDb[i].Date,
+			ImageUrl:  storiesDb[i].ImageUrl,
 			ViewCount: storiesDb[i].ViewCount,
-			DoctorId: storiesDb[i].DoctorId,
+			DoctorId:  storiesDb[i].DoctorId,
 			Doctor: doctorEntities.Doctor{
 				ID:   storiesDb[i].Doctor.ID,
 				Name: storiesDb[i].Doctor.Name,
