@@ -22,11 +22,13 @@ type Article struct {
 type ArticleRepositoryInterface interface {
 	CreateArticle(article *Article) (*Article, error)
 	GetAllArticle(metadata entities.Metadata, userId int) ([]Article, error)
+	GetArticleById(articleId int, userId int) (Article, error)
 }
 
 type ArticleUseCaseInterface interface {
 	CreateArticle(article *Article) (*Article, error)
 	GetAllArticle(metadata entities.Metadata, userId int) ([]Article, error)
+	GetArticleById(articleId int, userId int) (Article, error)
 }
 
 func (ar *Article) ToResponse() response.ArticleCreatedResponse {

@@ -35,17 +35,17 @@ func (storyController *StoryController) GetAllStories(c echo.Context) error {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 
-	storiesResp := make([]response.StoriesGetAllResponse, len(stories)) 
+	storiesResp := make([]response.StoriesGetAllResponse, len(stories))
 
 	for i, story := range stories {
 		storiesResp[i] = response.StoriesGetAllResponse{
-			ID:       story.Id,
-			Title:    story.Title,
-			Content:  story.Content,
-			Date:     story.Date,
-			ImageUrl: story.ImageUrl,
+			ID:        story.Id,
+			Title:     story.Title,
+			Content:   story.Content,
+			Date:      story.Date,
+			ImageUrl:  story.ImageUrl,
 			ViewCount: story.ViewCount,
-			IsLiked:  story.IsLiked,
+			IsLiked:   story.IsLiked,
 			Doctor: response.DoctorGetAllResponse{
 				ID:   story.Doctor.ID,
 				Name: story.Doctor.Name,
@@ -69,13 +69,13 @@ func (storyController *StoryController) GetStoryById(c echo.Context) error {
 	}
 
 	storyResp := response.StoriesGetAllResponse{
-		ID:       story.Id,
-		Title:    story.Title,
-		Content:  story.Content,
-		Date:     story.Date,
-		ImageUrl: story.ImageUrl,
+		ID:        story.Id,
+		Title:     story.Title,
+		Content:   story.Content,
+		Date:      story.Date,
+		ImageUrl:  story.ImageUrl,
 		ViewCount: story.ViewCount,
-		IsLiked:  story.IsLiked,
+		IsLiked:   story.IsLiked,
 		Doctor: response.DoctorGetAllResponse{
 			ID:   story.Doctor.ID,
 			Name: story.Doctor.Name,
@@ -103,13 +103,13 @@ func (storyController *StoryController) GetLikedStories(c echo.Context) error {
 
 	for i, story := range stories {
 		storiesResp[i] = response.StoriesGetAllResponse{
-			ID:       story.Id,
-			Title:    story.Title,
-			Content:  story.Content,
-			Date:     story.Date,
-			ImageUrl: story.ImageUrl,
+			ID:        story.Id,
+			Title:     story.Title,
+			Content:   story.Content,
+			Date:      story.Date,
+			ImageUrl:  story.ImageUrl,
 			ViewCount: story.ViewCount,
-			IsLiked:  story.IsLiked,
+			IsLiked:   story.IsLiked,
 			Doctor: response.DoctorGetAllResponse{
 				ID:   story.Doctor.ID,
 				Name: story.Doctor.Name,

@@ -1,6 +1,7 @@
 package article
 
 import (
+	"capstone/constants"
 	"capstone/entities"
 	articleEntities "capstone/entities/article"
 	doctorEntities "capstone/entities/doctor"
@@ -86,4 +87,45 @@ func (repository *ArticleRepo) GetAllArticle(metadata entities.Metadata, userId 
 	}
 
 	return articlesEnt, nil
+}
+
+func (repository *ArticleRepo) GetArticleById(articleId int, userId int) (articleEntities.Article, error) {
+	var articleDb Article
+	err := repository.db.Where("id = ?", articleId).Preload("Doctor").First(&articleDb).Error
+	if err != nil {
+		return articleEntities.Article{}, constants.ErrDataNotFound
+	}
+
+	var articleLikes ArticleLikes
+	var isLiked bool
+	var counter int64
+
+	err = repository.db.Model(&articleLikes).Where("user_id = ? AND article_id = ?", userId, articleId).Count(&counter).Error
+
+	if err != nil {
+		return articleEntities.Article{}, constants.ErrServer
+	}
+
+	if counter > 0 {
+		isLiked = true
+	} else {
+		isLiked = false
+	}
+
+	articleResp := articleEntities.Article{
+		ID:        articleDb.ID,
+		Title:     articleDb.Title,
+		Content:   articleDb.Content,
+		Date:      articleDb.Date,
+		ImageUrl:  articleDb.ImageUrl,
+		ViewCount: articleDb.ViewCount,
+		DoctorID:  articleDb.DoctorID,
+		Doctor: doctorEntities.Doctor{
+			ID:   articleDb.Doctor.ID,
+			Name: articleDb.Doctor.Name,
+		},
+		IsLiked: isLiked,
+	}
+
+	return articleResp, nil
 }

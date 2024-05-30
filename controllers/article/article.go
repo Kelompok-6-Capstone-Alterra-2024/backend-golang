@@ -7,6 +7,7 @@ import (
 	"capstone/utilities"
 	"capstone/utilities/base"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -95,4 +96,33 @@ func (controller *ArticleController) GetAllArticle(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get All Articles", articleResponse))
+}
+
+func (controller *ArticleController) GetArticleById(c echo.Context) error {
+	strId := c.Param("id")
+	articleId, _ := strconv.Atoi(strId)
+
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	article, err := controller.articleUseCase.GetArticleById(articleId, userId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	articleResp := response.ArticleCreatedResponse{
+		ID:        article.ID,
+		Title:     article.Title,
+		Content:   article.Content,
+		Date:      article.Date,
+		ImageURL:  article.ImageUrl,
+		ViewCount: article.ViewCount,
+		IsLiked:   article.IsLiked,
+		Doctor: response.DoctorGetAllResponse{
+			ID:   article.Doctor.ID,
+			Name: article.Doctor.Name,
+		},
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Article By Id", articleResp))
 }

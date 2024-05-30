@@ -92,6 +92,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	// Article
 	userRoute.GET("article", r.articleController.GetAllArticle) // Get All Article
+	userRoute.GET("article/:id", r.articleController.GetArticleById)
 
 	doctorAuth := e.Group("/v1/doctors")
 

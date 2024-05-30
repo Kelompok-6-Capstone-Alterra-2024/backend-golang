@@ -36,3 +36,11 @@ func (useCase *ArticleUseCase) GetAllArticle(metadata entities.Metadata, userId 
 	}
 	return articles, nil
 }
+
+func (useCase *ArticleUseCase) GetArticleById(articleId int, userId int) (articleEntities.Article, error) {
+	article, err := useCase.articleRepository.GetArticleById(articleId, userId)
+	if err != nil {
+		return articleEntities.Article{}, err
+	}
+	return article, nil
+}
