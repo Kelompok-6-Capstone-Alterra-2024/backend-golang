@@ -67,11 +67,12 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	// Inspirational Stories
 	userRoute.GET("stories", r.storyController.GetAllStories) //Get All Stories
 	userRoute.GET("stories/:id", r.storyController.GetStoryById)   //Get Story By ID
-	userRoute.GET("stories/liked", r.storyController.GetLikedStories)
+	userRoute.GET("stories/liked", r.storyController.GetLikedStories) //Get Liked Stories
 
 	// Music
-	userRoute.GET("musics", r.musicController.GetAllMusics)
-	userRoute.GET("musics/:id", r.musicController.GetMusicByID)
+	userRoute.GET("musics", r.musicController.GetAllMusics) //Get All Music
+	userRoute.GET("musics/:id", r.musicController.GetMusicByID)   //Get Music By ID
+	userRoute.GET("musics/liked", r.musicController.GetLikedMusics) //Get Liked Music
 
 	// Complaint
 	userRoute.POST("complaint", r.complaintController.Create) // Create Complaint

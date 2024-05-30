@@ -30,3 +30,11 @@ func (musicUseCase *MusicUseCase) GetMusicById(musicId int, userId int) (musicEn
 	}
 	return music, nil
 }
+
+func (musicUseCase *MusicUseCase) GetLikedMusics(metadata entities.Metadata, userId int) ([]musicEntities.Music, error) {
+	musics, err := musicUseCase.musicInterface.GetLikedMusics(metadata, userId)
+	if err != nil {
+		return []musicEntities.Music{}, err
+	}
+	return musics, nil
+}
