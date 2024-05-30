@@ -6,6 +6,7 @@ import (
 	consultationController "capstone/controllers/consultation"
 	doctorController "capstone/controllers/doctor"
 	musicController "capstone/controllers/music"
+	ratingController "capstone/controllers/rating"
 	storyController "capstone/controllers/story"
 	transactionController "capstone/controllers/transaction"
 	userController "capstone/controllers/user"
@@ -14,6 +15,7 @@ import (
 	consultationRepositories "capstone/repositories/mysql/consultation"
 	doctorRepositories "capstone/repositories/mysql/doctor"
 	musicRepositories "capstone/repositories/mysql/music"
+	ratingRepositories "capstone/repositories/mysql/rating"
 	storyRepositories "capstone/repositories/mysql/story"
 	transactionRepositories "capstone/repositories/mysql/transaction"
 	userRepositories "capstone/repositories/mysql/user"
@@ -23,6 +25,7 @@ import (
 	doctorUseCase "capstone/usecases/doctor"
 	midtransUseCase "capstone/usecases/midtrans"
 	musicUseCase "capstone/usecases/music"
+	ratingUseCase "capstone/usecases/rating"
 	storyUseCase "capstone/usecases/story"
 	transactionUseCase "capstone/usecases/transaction"
 	userUseCase "capstone/usecases/user"
@@ -42,6 +45,7 @@ func main() {
 	complaintRepo := complaintRepositories.NewComplaintRepo(db)
 	transactionRepo := transactionRepositories.NewTransactionRepo(db)
 	musicRepo := musicRepositories.NewMusicRepo(db)
+	ratingRepo := ratingRepositories.NewRatingRepo(db)
 
 	userUC := userUseCase.NewUserUseCase(userRepo)
 	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo)
@@ -51,6 +55,7 @@ func main() {
 	midtransUC := midtransUseCase.NewMidtransUseCase(midtransConfig)
 	transactionUC := transactionUseCase.NewTransactionUseCase(transactionRepo, midtransUC)
 	musicUC := musicUseCase.NewMusicUseCase(musicRepo)
+	ratingUC := ratingUseCase.NewRatingUseCase(ratingRepo)
 
 	userCont := userController.NewUserController(userUC)
 	doctorCont := doctorController.NewDoctorController(doctorUC)
@@ -59,8 +64,9 @@ func main() {
 	complaintCont := complaintController.NewComplaintController(complaintUC)
 	transactionCont := transactionController.NewTransactionController(transactionUC)
 	musicCont := musicController.NewMusicController(musicUC)
+	ratingCont := ratingController.NewRatingController(ratingUC)
 
-	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont)
+	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont, ratingCont)
 
 	e := echo.New()
 	route.InitRoute(e)
