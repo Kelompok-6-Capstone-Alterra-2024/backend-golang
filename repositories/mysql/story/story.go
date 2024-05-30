@@ -111,3 +111,42 @@ func (repository *StoriesRepo) GetStoryById(storyId int, userId int) (storyEntit
 
 	return storyResp, nil
 }
+
+func (repository *StoriesRepo) GetLikedStories(metadata entities.Metadata, userId int) ([]storyEntities.Story, error) {
+	var storyLikesDb []StoryLikes
+	err := repository.DB.Limit(metadata.Limit).Offset((metadata.Page-1)*metadata.Limit).Where("user_id = ?", userId).Find(&storyLikesDb).Error
+	if err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	var likedStoryIDs []int
+	for i := 0; i < len(storyLikesDb); i++ {
+		likedStoryIDs = append(likedStoryIDs, int(storyLikesDb[i].StoryId))
+	}
+
+	var storiesDb []Story
+	err = repository.DB.Where("id IN ?", likedStoryIDs).Preload("Doctor").Find(&storiesDb).Error
+	if err != nil {
+		return nil, constants.ErrServer
+	}
+
+	storiesEnt := make([]storyEntities.Story, len(storiesDb))
+	for i := 0; i < len(storiesDb); i++ {
+		storiesEnt[i] = storyEntities.Story{
+			Id:       storiesDb[i].ID,
+			Title:    storiesDb[i].Title,
+			Content:  storiesDb[i].Content,
+			Date:     storiesDb[i].Date,
+			ImageUrl: storiesDb[i].ImageUrl,
+			ViewCount: storiesDb[i].ViewCount,
+			DoctorId: storiesDb[i].DoctorId,
+			Doctor: doctorEntities.Doctor{
+				ID:   storiesDb[i].Doctor.ID,
+				Name: storiesDb[i].Doctor.Name,
+			},
+			IsLiked: true,
+		}
+	}
+
+	return storiesEnt, nil
+}

@@ -60,13 +60,14 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("doctors/available", r.doctorController.GetActive) //Get All Active Doctor
 
 	// Consultation
-	userRoute.POST("consultations", r.consultationController.CreateConsultation)     //Get All Consultation
+	userRoute.POST("consultations", r.consultationController.CreateConsultation)     //Create Consultation
 	userRoute.GET("consultations/:id", r.consultationController.GetConsultationByID) //Get Consultation By ID
 	userRoute.GET("consultations", r.consultationController.GetAllConsultation)      //Get All Consultation
 
 	// Inspirational Stories
 	userRoute.GET("stories", r.storyController.GetAllStories) //Get All Stories
 	userRoute.GET("stories/:id", r.storyController.GetStoryById)   //Get Story By ID
+	userRoute.GET("stories/liked", r.storyController.GetLikedStories)
 
 	// Music
 	userRoute.GET("musics", r.musicController.GetAllMusics)

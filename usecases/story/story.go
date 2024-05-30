@@ -30,3 +30,11 @@ func (storiesUseCase *StoryUseCase) GetStoryById(storyId int, userId int) (story
 	}
 	return story, nil
 }
+
+func (storiesUseCase *StoryUseCase) GetLikedStories(metadata entities.Metadata, userId int) ([]storyEntities.Story, error) {
+	stories, err := storiesUseCase.storyRepository.GetLikedStories(metadata, userId)
+	if err != nil {
+		return []storyEntities.Story{}, err
+	}
+	return stories, nil
+}
