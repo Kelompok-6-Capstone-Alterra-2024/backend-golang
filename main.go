@@ -6,6 +6,8 @@ import (
 	complaintController "capstone/controllers/complaint"
 	consultationController "capstone/controllers/consultation"
 	doctorController "capstone/controllers/doctor"
+	musicController "capstone/controllers/music"
+	ratingController "capstone/controllers/rating"
 	storyController "capstone/controllers/story"
 	transactionController "capstone/controllers/transaction"
 	userController "capstone/controllers/user"
@@ -14,6 +16,8 @@ import (
 	complaintRepositories "capstone/repositories/mysql/complaint"
 	consultationRepositories "capstone/repositories/mysql/consultation"
 	doctorRepositories "capstone/repositories/mysql/doctor"
+	musicRepositories "capstone/repositories/mysql/music"
+	ratingRepositories "capstone/repositories/mysql/rating"
 	storyRepositories "capstone/repositories/mysql/story"
 	transactionRepositories "capstone/repositories/mysql/transaction"
 	userRepositories "capstone/repositories/mysql/user"
@@ -23,6 +27,8 @@ import (
 	consultationUseCase "capstone/usecases/consultation"
 	doctorUseCase "capstone/usecases/doctor"
 	midtransUseCase "capstone/usecases/midtrans"
+	musicUseCase "capstone/usecases/music"
+	ratingUseCase "capstone/usecases/rating"
 	storyUseCase "capstone/usecases/story"
 	transactionUseCase "capstone/usecases/transaction"
 	userUseCase "capstone/usecases/user"
@@ -38,18 +44,22 @@ func main() {
 	userRepo := userRepositories.NewUserRepo(db)
 	doctorRepo := doctorRepositories.NewDoctorRepo(db)
 	consultationRepo := consultationRepositories.NewConsultationRepo(db)
-	StoryRepo := storyRepositories.NewStoryRepo(db)
+	storyRepo := storyRepositories.NewStoryRepo(db)
 	complaintRepo := complaintRepositories.NewComplaintRepo(db)
 	transactionRepo := transactionRepositories.NewTransactionRepo(db)
+	musicRepo := musicRepositories.NewMusicRepo(db)
+	ratingRepo := ratingRepositories.NewRatingRepo(db)
 	articleRepo := articleRepositories.NewArticleRepo(db)
 
 	userUC := userUseCase.NewUserUseCase(userRepo)
 	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo)
 	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo)
-	storyUC := storyUseCase.NewStoryUseCase(StoryRepo)
+	storyUC := storyUseCase.NewStoryUseCase(storyRepo)
 	complaintUC := complaintUseCase.NewComplaintUseCase(complaintRepo)
 	midtransUC := midtransUseCase.NewMidtransUseCase(midtransConfig)
 	transactionUC := transactionUseCase.NewTransactionUseCase(transactionRepo, midtransUC)
+	musicUC := musicUseCase.NewMusicUseCase(musicRepo)
+	ratingUC := ratingUseCase.NewRatingUseCase(ratingRepo)
 	articleUC := articleUseCase.NewArticleUseCase(articleRepo)
 
 	userCont := userController.NewUserController(userUC)
@@ -58,9 +68,11 @@ func main() {
 	storyCont := storyController.NewStoryController(storyUC)
 	complaintCont := complaintController.NewComplaintController(complaintUC)
 	transactionCont := transactionController.NewTransactionController(transactionUC)
+	musicCont := musicController.NewMusicController(musicUC)
+	ratingCont := ratingController.NewRatingController(ratingUC)
 	articleCont := articleController.NewArticleController(articleUC)
 
-	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, articleCont)
+	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont, ratingCont, articleCont)
 
 	e := echo.New()
 	route.InitRoute(e)

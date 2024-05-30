@@ -21,3 +21,7 @@ var ErrDataNotFound error = errors.New("data not found")
 var ErrInvalidToken error = errors.New("invalid token")
 
 var ErrEmptyInputArticle error = errors.New("title or content cannot be empty")
+
+var ErrServer error = errors.New("server error")
+
+var ErrInvalidRate error = errors.New("rate must be between 1 and 5")

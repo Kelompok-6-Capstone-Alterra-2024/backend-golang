@@ -5,6 +5,8 @@ import (
 	"capstone/controllers/complaint"
 	"capstone/controllers/consultation"
 	"capstone/controllers/doctor"
+	"capstone/controllers/music"
+	"capstone/controllers/rating"
 	"capstone/controllers/story"
 	"capstone/controllers/transaction"
 	"capstone/controllers/user"
@@ -22,15 +24,20 @@ type RouteController struct {
 	storyController        *story.StoryController
 	complaintController    *complaint.ComplaintController
 	transactionController  *transaction.TransactionController
+	musicController        *music.MusicController
+	ratingController       *rating.RatingController
 	articleController      *article.ArticleController
 }
 
 func NewRoute(
 	userController *user.UserController,
 	doctorController *doctor.DoctorController,
-	consultationController *consultation.ConsultationController, storyContoller *story.StoryController,
+	consultationController *consultation.ConsultationController,
+	storyContoller *story.StoryController,
 	complaintController *complaint.ComplaintController,
 	transactionController *transaction.TransactionController,
+	musicController *music.MusicController,
+	ratingController *rating.RatingController,
 	articleController *article.ArticleController) *RouteController {
 	return &RouteController{
 		userController:         userController,
@@ -39,6 +46,8 @@ func NewRoute(
 		storyController:        storyContoller,
 		complaintController:    complaintController,
 		transactionController:  transactionController,
+		musicController:        musicController,
+		ratingController:       ratingController,
 		articleController:      articleController,
 	}
 }
@@ -58,18 +67,28 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("doctors/available", r.doctorController.GetActive) //Get All Active Doctor
 
 	// Consultation
-	userRoute.POST("consultations", r.consultationController.CreateConsultation)     //Get All Consultation
+	userRoute.POST("consultations", r.consultationController.CreateConsultation)     //Create Consultation
 	userRoute.GET("consultations/:id", r.consultationController.GetConsultationByID) //Get Consultation By ID
 	userRoute.GET("consultations", r.consultationController.GetAllConsultation)      //Get All Consultation
 
 	// Inspirational Stories
-	userRoute.GET("stories", r.storyController.GetAllStories) //Get All Stories
+	userRoute.GET("stories", r.storyController.GetAllStories)         //Get All Stories
+	userRoute.GET("stories/:id", r.storyController.GetStoryById)      //Get Story By ID
+	userRoute.GET("stories/liked", r.storyController.GetLikedStories) //Get Liked Stories
+
+	// Music
+	userRoute.GET("musics", r.musicController.GetAllMusics)         //Get All Music
+	userRoute.GET("musics/:id", r.musicController.GetMusicByID)     //Get Music By ID
+	userRoute.GET("musics/liked", r.musicController.GetLikedMusics) //Get Liked Music
 
 	// Complaint
 	userRoute.POST("complaint", r.complaintController.Create) // Create Complaint
 
 	// Transaction
 	userRoute.POST("transaction", r.transactionController.Insert) // Create Transaction
+
+	// Rating
+	userRoute.POST("feedbacks", r.ratingController.SendFeedback) // Create Rating
 
 	// Article
 	userRoute.GET("article", r.articleController.GetAllArticle) // Get All Article
