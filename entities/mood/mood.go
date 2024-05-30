@@ -21,8 +21,12 @@ type MoodType struct {
 
 type RepositoryInterface interface {
 	SendMood(mood Mood) (Mood, error)
+	GetAllMoods(userId int, startDate string, endDate string) ([]Mood, error)
+	GetMoodById(moodId int) (Mood, error)
 }
 
 type UseCaseInterface interface {
 	SendMood(file *multipart.FileHeader, mood Mood) (Mood, error)
+	GetAllMoods(userId int, startDate string, endDate string) ([]Mood, error)
+	GetMoodById(moodId int) (Mood, error)
 }

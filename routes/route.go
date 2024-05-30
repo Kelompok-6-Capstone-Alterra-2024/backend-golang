@@ -92,7 +92,9 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.POST("feedbacks", r.ratingController.SendFeedback) // Create Rating
 
 	// Mood
-	userRoute.POST("moods", r.moodController.CreateMood)
+	userRoute.POST("moods", r.moodController.CreateMood) // Create Mood
+	userRoute.GET("moods", r.moodController.GetAllMoods) // Get All Moods
+	userRoute.GET("moods/:id", r.moodController.GetMoodById)
 
 	doctorAuth := e.Group("/v1/doctors")
 
