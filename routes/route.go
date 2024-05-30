@@ -4,6 +4,7 @@ import (
 	"capstone/controllers/complaint"
 	"capstone/controllers/consultation"
 	"capstone/controllers/doctor"
+	"capstone/controllers/mood"
 	"capstone/controllers/music"
 	"capstone/controllers/rating"
 	"capstone/controllers/story"
@@ -25,6 +26,7 @@ type RouteController struct {
 	transactionController  *transaction.TransactionController
 	musicController        *music.MusicController
 	ratingController       *rating.RatingController
+	moodController         *mood.MoodController
 }
 
 func NewRoute(
@@ -36,6 +38,7 @@ func NewRoute(
 	transactionController *transaction.TransactionController,
 	musicController *music.MusicController,
 	ratingController *rating.RatingController,
+	moodController *mood.MoodController,
 ) *RouteController {
 	return &RouteController{
 		userController:         userController,
@@ -46,6 +49,7 @@ func NewRoute(
 		transactionController:  transactionController,
 		musicController:        musicController,
 		ratingController:       ratingController,
+		moodController:         moodController,
 	}
 }
 
@@ -86,6 +90,9 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	// Rating
 	userRoute.POST("feedbacks", r.ratingController.SendFeedback) // Create Rating
+
+	// Mood
+	userRoute.POST("moods", r.moodController.CreateMood)
 
 	doctorAuth := e.Group("/v1/doctors")
 

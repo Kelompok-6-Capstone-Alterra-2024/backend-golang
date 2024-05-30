@@ -23,3 +23,9 @@ var ErrInvalidToken error = errors.New("invalid token")
 var ErrServer error = errors.New("server error")
 
 var ErrInvalidRate error = errors.New("rate must be between 1 and 5")
+
+var ErrCloudinary error = errors.New("cloudinary url not found")
+
+var ErrEmptyInputMood error = errors.New("mood type id or date cannot be empty")
+
+var ErrUploadImage error = errors.New("failed upload image")
