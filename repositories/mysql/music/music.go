@@ -97,3 +97,37 @@ func (m *MusicRepo) GetMusicById(musicId int, userId int) (musicEntities.Music, 
 
 	return musicEnt, nil
 }
+
+func (m *MusicRepo) GetLikedMusics(metadata entities.Metadata, userId int) ([]musicEntities.Music, error) {
+	var musicLikesDB []MusicLikes
+	err := m.db.Limit(metadata.Limit).Offset((metadata.Page-1)*metadata.Limit).Where("user_id = ?", userId).Find(&musicLikesDB).Error
+	if err != nil {
+		return []musicEntities.Music{}, constants.ErrDataNotFound
+	}
+
+	var musicIds []int
+	for _, musicLike := range musicLikesDB {
+		musicIds = append(musicIds, int(musicLike.MusicId))
+	}
+
+	var musics []Music
+	err = m.db.Where("id IN ?", musicIds).Find(&musics).Error
+	if err != nil {
+		return []musicEntities.Music{}, constants.ErrDataNotFound
+	}
+
+	musicsEnt := make([]musicEntities.Music, len(musics))
+	for i := 0; i < len(musics); i++ {
+		musicsEnt[i] = musicEntities.Music{
+			Id:        musics[i].ID,
+			Title:     musics[i].Title,
+			Singer:    musics[i].Singer,
+			MusicUrl:  musics[i].MusicUrl,
+			ImageUrl:  musics[i].ImageUrl,
+			ViewCount: musics[i].ViewCount,
+			IsLiked:   true,
+		}
+	}
+
+	return musicsEnt, nil
+}
