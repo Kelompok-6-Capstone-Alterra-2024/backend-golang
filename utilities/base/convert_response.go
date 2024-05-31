@@ -61,6 +61,9 @@ func ConvertResponseCode(err error) int {
 		case constants.ErrStartDateGreater:
 			return http.StatusBadRequest
 
+		case constants.ErrAlreadyLiked:
+			return http.StatusConflict
+
 		default:
 			return http.StatusInternalServerError
 	}

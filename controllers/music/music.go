@@ -1,6 +1,7 @@
 package music
 
 import (
+	"capstone/controllers/music/request"
 	"capstone/controllers/music/response"
 	musicEntities "capstone/entities/music"
 	"capstone/utilities"
@@ -106,4 +107,23 @@ func (musicController *MusicController) GetLikedMusics(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get Liked Musics", metadata, musicResp))
+}
+
+func (musicController *MusicController) LikeMusic(c echo.Context) error {
+	var req request.MusicLikeRequest
+
+	err := c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	err = musicController.musicUseCase.LikeMusic(req.MusicId, userId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success Like Music", nil))
 }

@@ -83,6 +83,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("musics", r.musicController.GetAllMusics) //Get All Music
 	userRoute.GET("musics/:id", r.musicController.GetMusicByID)   //Get Music By ID
 	userRoute.GET("musics/liked", r.musicController.GetLikedMusics) //Get Liked Music
+	userRoute.POST("musics/like", r.musicController.LikeMusic)       //Like Music
 
 	// Complaint
 	userRoute.POST("complaint", r.complaintController.Create) // Create Complaint
