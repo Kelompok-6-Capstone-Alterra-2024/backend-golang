@@ -78,6 +78,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("stories", r.storyController.GetAllStories) //Get All Stories
 	userRoute.GET("stories/:id", r.storyController.GetStoryById)   //Get Story By ID
 	userRoute.GET("stories/liked", r.storyController.GetLikedStories) //Get Liked Stories
+	userRoute.POST("stories/like", r.storyController.LikeStory)       //Like Story
 
 	// Music
 	userRoute.GET("musics", r.musicController.GetAllMusics) //Get All Music
