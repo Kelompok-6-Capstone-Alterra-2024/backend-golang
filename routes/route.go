@@ -96,7 +96,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	// Mood
 	userRoute.POST("moods", r.moodController.CreateMood) // Create Mood
 	userRoute.GET("moods", r.moodController.GetAllMoods) // Get All Moods
-	userRoute.GET("moods/:id", r.moodController.GetMoodById)
+	userRoute.GET("moods/:id", r.moodController.GetMoodById) // Get Mood By ID
 
 	doctorAuth := e.Group("/v1/doctors")
 
