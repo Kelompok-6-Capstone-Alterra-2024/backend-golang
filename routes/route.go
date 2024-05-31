@@ -52,6 +52,8 @@ func NewRoute(
 func (r *RouteController) InitRoute(e *echo.Echo) {
 	myMiddleware.LogMiddleware(e)
 
+	e.Use(myMiddleware.CORSMiddleware())
+
 	userAuth := e.Group("/v1/users")
 	userAuth.POST("/register", r.userController.Register) //Register User
 	userAuth.POST("/login", r.userController.Login)       //Login User
