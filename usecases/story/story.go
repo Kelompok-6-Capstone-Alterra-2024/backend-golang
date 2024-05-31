@@ -38,3 +38,11 @@ func (storiesUseCase *StoryUseCase) GetLikedStories(metadata entities.Metadata, 
 	}
 	return stories, nil
 }
+
+func (storiesUseCase *StoryUseCase) LikeStory(storyId int, userId int) error {
+	err := storiesUseCase.storyRepository.LikeStory(storyId, userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}

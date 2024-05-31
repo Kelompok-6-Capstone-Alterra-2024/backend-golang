@@ -37,3 +37,5 @@ var ErrInvalidStartDate error = errors.New("invalid format start date")
 var ErrInvalidEndDate error = errors.New("invalid format end date")
 
 var ErrStartDateGreater error = errors.New("start date must be less than end date")
+
+var ErrAlreadyLiked error = errors.New("already liked")

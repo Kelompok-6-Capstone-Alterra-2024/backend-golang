@@ -131,3 +131,22 @@ func (m *MusicRepo) GetLikedMusics(metadata entities.Metadata, userId int) ([]mu
 
 	return musicsEnt, nil
 }
+
+func (m *MusicRepo) LikeMusic(musicId int, userId int) error {
+	var musicLikesDB MusicLikes
+
+	err := m.db.Where("music_id = ? AND user_id = ?", musicId, userId).First(&musicLikesDB).Error
+	if err == nil {
+		return constants.ErrAlreadyLiked
+	}
+
+	musicLikesDB.MusicId = uint(musicId)
+	musicLikesDB.UserId = uint(userId)
+
+	err = m.db.Create(&musicLikesDB).Error
+	if err != nil {
+		return constants.ErrServer
+	}
+
+	return nil
+}
