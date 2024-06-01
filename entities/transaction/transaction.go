@@ -9,7 +9,7 @@ import (
 
 type Transaction struct {
 	ID             uuid.UUID
-	ConsultationID uint
+	ConsultationID uint `validate:"required"`
 	Consultation   consultation.Consultation
 	Price          int
 	SnapURL        string

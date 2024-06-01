@@ -20,6 +20,8 @@ var ErrDataNotFound error = errors.New("data not found")
 
 var ErrInvalidToken error = errors.New("invalid token")
 
+var ErrDataEmpty error = errors.New("data empty")
+
 var ErrServer error = errors.New("server error")
 
 var ErrInvalidRate error = errors.New("rate must be between 1 and 5")
