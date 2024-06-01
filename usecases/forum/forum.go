@@ -2,6 +2,7 @@ package forum
 
 import (
 	"capstone/constants"
+	"capstone/entities"
 	forumEntities "capstone/entities/forum"
 )
 
@@ -25,4 +26,12 @@ func (forumUseCase *ForumUseCase) JoinForum(forumId uint, userId uint) error {
 		return err
 	}
 	return nil
+}
+
+func (forumUseCase *ForumUseCase) GetJoinedForum(userId uint, metadata entities.Metadata) ([]forumEntities.Forum, error) {
+	forums, err := forumUseCase.forumInterface.GetJoinedForum(userId, metadata)
+	if err != nil {
+		return nil, err
+	}
+	return forums, nil
 }

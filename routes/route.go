@@ -106,6 +106,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	// Forum
 	userRoute.POST("forums/join", r.forumController.JoinForum) // Create Forum
+	userRoute.GET("forums", r.forumController.GetJoinedForum)     // Get All Forum
 
 	doctorAuth := e.Group("/v1/doctors")
 
