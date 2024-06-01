@@ -28,19 +28,40 @@ func (repository *TransactionRepo) Insert(transaction *transactionEntities.Trans
 	return transactionDb.ToEntities(), nil
 }
 
-func (repository *TransactionRepo) FindByID(ID uint) (*transactionEntities.Transaction, error) {
-	//TODO implement me
-	panic("implement me")
+func (repository *TransactionRepo) FindByID(ID string) (*transactionEntities.Transaction, error) {
+	transactionDB := new(Transaction)
+	if err := repository.db.Preload("Consultation").Preload("Consultation.Doctor").First(&transactionDB, "id LIKE ?", ID).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+	return transactionDB.ToEntities(), nil
 }
 
 func (repository *TransactionRepo) FindByConsultationID(consultationID uint) (*transactionEntities.Transaction, error) {
-	//TODO implement me
-	panic("implement me")
+	transactionDB := new(Transaction)
+	if err := repository.db.Preload("Consultation").Preload("Consultation.Doctor").Where("consultation_id = ?", consultationID).First(&transactionDB).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+	return transactionDB.ToEntities(), nil
 }
 
 func (repository *TransactionRepo) FindAll(metadata *entities.Metadata, userID uint) (*[]transactionEntities.Transaction, error) {
-	//TODO implement me
-	panic("implement me")
+	transactionDB := new([]Transaction)
+	if err := repository.db.
+		Joins("JOIN consultations ON consultations.id = transactions.consultation_id").
+		Joins("JOIN users ON consultations.user_id = users.id").
+		Where("users.id LIKE ?", userID).
+		Preload("Consultation").
+		Preload("Consultation.Doctor").
+		Limit(metadata.Limit).
+		Offset(metadata.Offset()).
+		Find(&transactionDB).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+	var transactions []transactionEntities.Transaction
+	for _, transaction := range *transactionDB {
+		transactions = append(transactions, *transaction.ToEntities())
+	}
+	return &transactions, nil
 }
 
 func (repository *TransactionRepo) Update(transaction *transactionEntities.Transaction) (*transactionEntities.Transaction, error) {

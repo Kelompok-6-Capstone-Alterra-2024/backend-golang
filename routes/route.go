@@ -7,6 +7,7 @@ import (
 	"capstone/controllers/transaction"
 	"capstone/controllers/user"
 	myMiddleware "capstone/middlewares"
+	"capstone/utilities/base"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"os"
@@ -39,6 +40,8 @@ func NewRoute(
 func (r *RouteController) InitRoute(e *echo.Echo) {
 	myMiddleware.LogMiddleware(e)
 
+	e.HTTPErrorHandler = base.ErrorHandler
+
 	userAuth := e.Group("/v1/users")
 	userAuth.POST("/register", r.userController.Register) //Register User
 	userAuth.POST("/login", r.userController.Login)       //Login User
@@ -59,7 +62,10 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.POST("complaint", r.complaintController.Create) // Create Complaint
 
 	// Transaction
-	userRoute.POST("transaction", r.transactionController.Insert) // Create Transaction
+	userRoute.POST("transaction", r.transactionController.Insert)                               // Create Transaction
+	userRoute.GET("transaction/:id", r.transactionController.FindByID)                          // Get Transaction By ID
+	userRoute.GET("transaction/consultation/:id", r.transactionController.FindByConsultationID) // Get Transaction By Consultation ID
+	userRoute.GET("transactions", r.transactionController.FindAll)                              // Get All Transaction
 
 	doctorAuth := e.Group("/v1/doctors")
 

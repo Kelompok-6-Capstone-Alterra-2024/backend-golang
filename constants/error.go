@@ -19,3 +19,5 @@ var ErrUserNotFound error = errors.New("user not found")
 var ErrDataNotFound error = errors.New("data not found")
 
 var ErrInvalidToken error = errors.New("invalid token")
+
+var ErrDataEmpty error = errors.New("data empty")
