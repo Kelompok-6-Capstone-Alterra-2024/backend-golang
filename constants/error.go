@@ -21,3 +21,23 @@ var ErrDataNotFound error = errors.New("data not found")
 var ErrInvalidToken error = errors.New("invalid token")
 
 var ErrDataEmpty error = errors.New("data empty")
+
+var ErrServer error = errors.New("server error")
+
+var ErrInvalidRate error = errors.New("rate must be between 1 and 5")
+
+var ErrCloudinary error = errors.New("cloudinary url not found")
+
+var ErrEmptyInputMood error = errors.New("mood type id or date cannot be empty")
+
+var ErrUploadImage error = errors.New("failed upload image")
+
+var ErrEmptyRangeDateMood error = errors.New("start date or end date cannot be empty")
+
+var ErrInvalidStartDate error = errors.New("invalid format start date")
+
+var ErrInvalidEndDate error = errors.New("invalid format end date")
+
+var ErrStartDateGreater error = errors.New("start date must be less than end date")
+
+var ErrAlreadyLiked error = errors.New("already liked")

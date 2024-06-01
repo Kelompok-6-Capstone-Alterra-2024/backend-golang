@@ -38,7 +38,7 @@ func (repository *TransactionRepo) FindByID(ID string) (*transactionEntities.Tra
 
 func (repository *TransactionRepo) FindByConsultationID(consultationID uint) (*transactionEntities.Transaction, error) {
 	transactionDB := new(Transaction)
-	if err := repository.db.Preload("Consultation").Preload("Consultation.Doctor").Where("consultation_id = ?", consultationID).First(&transactionDB).Error; err != nil {
+	if err := repository.db.Preload("Consultation", "id = ?", consultationID).Preload("Consultation.Doctor").First(&transactionDB).Error; err != nil {
 		return nil, constants.ErrDataNotFound
 	}
 	return transactionDB.ToEntities(), nil

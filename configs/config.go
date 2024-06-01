@@ -29,9 +29,9 @@ func InitConfigJWT() string {
 	return os.Getenv("SECRET_JWT")
 }
 
-// func InitConfigCloudinary() string {
-// 	return os.Getenv("CLOUDINARY_URL")
-// }
+func InitConfigCloudinary() string {
+	return os.Getenv("CLOUDINARY_URL")
+}
 
 // func InitConfigKeyChatbot() string {
 // 	return os.Getenv("KEY_AI")

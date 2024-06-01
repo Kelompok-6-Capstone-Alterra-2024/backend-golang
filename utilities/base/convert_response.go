@@ -30,6 +30,42 @@ func ConvertResponseCode(err error) int {
 	case constants.ErrUserNotFound:
 		return http.StatusNotFound
 
+	case constants.ErrDataNotFound:
+		return http.StatusNotFound
+
+	case constants.ErrInvalidToken:
+		return http.StatusUnauthorized
+
+	case constants.ErrServer:
+		return http.StatusInternalServerError
+
+	case constants.ErrInvalidRate:
+		return http.StatusBadRequest
+
+	case constants.ErrCloudinary:
+		return http.StatusInternalServerError
+
+	case constants.ErrEmptyInputMood:
+		return http.StatusBadRequest
+
+	case constants.ErrUploadImage:
+		return http.StatusInternalServerError
+
+	case constants.ErrEmptyRangeDateMood:
+		return http.StatusBadRequest
+
+	case constants.ErrInvalidStartDate:
+		return http.StatusBadRequest
+
+	case constants.ErrInvalidEndDate:
+		return http.StatusBadRequest
+
+	case constants.ErrStartDateGreater:
+		return http.StatusBadRequest
+
+	case constants.ErrAlreadyLiked:
+		return http.StatusConflict
+
 	default:
 		return http.StatusInternalServerError
 	}
