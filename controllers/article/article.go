@@ -24,56 +24,55 @@ func NewArticleController(articleUseCase articleUseCase.ArticleUseCaseInterface)
 }
 
 func (controller *ArticleController) CreateArticle(c echo.Context) error {
-	// Binding request data
-	var createRequest request.CreateArticleRequest
+	var articleReq request.CreateArticleRequest
+	if err := c.Bind(&articleReq); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("Invalid request format"))
+	}
 
 	token := c.Request().Header.Get("Authorization")
-	doctorId, _ := utilities.GetUserIdFromToken(token)
-
-	if err := c.Bind(&createRequest); err != nil {
-		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	userId, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse("Unauthorized"))
 	}
 
 	file, err := c.FormFile("image")
 	if err != nil {
-		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse("Failed to get image from form"))
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("Invalid image format"))
 	}
 
-	// Open the file
-	fileContent, err := file.Open()
+	imageURL, err := utilities.UploadImage(file)
 	if err != nil {
-		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse("Failed to open image file"))
-	}
-	defer fileContent.Close()
-
-	// Upload image to Cloudinary
-	imageUpload, err := utilities.UploadImage(fileContent, "article_images/"+file.Filename, "article_images")
-	if err != nil {
-		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse("Failed to upload image"))
+		return c.JSON(http.StatusInternalServerError, base.NewErrorResponse("Failed to upload image"))
 	}
 
-	// Set the timezone to Asia/Jakarta
-	loc, err := time.LoadLocation("Asia/Jakarta")
-	if err != nil {
-		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse("Failed to load timezone"))
+	newArticle := &articleUseCase.Article{
+		DoctorID: uint(userId),
+		Title:    articleReq.Title,
+		Content:  articleReq.Content,
+		Date:     time.Now(),
+		ImageUrl: imageURL,
 	}
 
-	// Get the current time in the specified timezone
-	currentTime := time.Now().In(loc)
-
-	articleRequest := createRequest.ToArticleEntities()
-	articleRequest.ImageUrl = imageUpload
-	articleRequest.Date = currentTime
-	articleRequest.DoctorID = uint(doctorId)
-
-	// Create article in repository
-	createdArticle, err := controller.articleUseCase.CreateArticle(articleRequest)
+	createdArticle, err := controller.articleUseCase.CreateArticle(newArticle)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 
-	articleResponse := createdArticle.ToResponse()
-	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Create Article", articleResponse))
+	articleResp := response.ArticleCreatedResponse{
+		ID:        createdArticle.ID,
+		Title:     createdArticle.Title,
+		Content:   createdArticle.Content,
+		Date:      createdArticle.Date,
+		ImageUrl:  createdArticle.ImageUrl,
+		ViewCount: createdArticle.ViewCount,
+		IsLiked:   createdArticle.IsLiked,
+		Doctor: response.DoctorInfoResponse{
+			ID:   createdArticle.Doctor.ID,
+			Name: createdArticle.Doctor.Name,
+		},
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Article created successfully", articleResp))
 }
 
 func (controller *ArticleController) GetAllArticle(c echo.Context) error {
@@ -118,7 +117,7 @@ func (controller *ArticleController) GetArticleById(c echo.Context) error {
 		ImageUrl:  article.ImageUrl,
 		ViewCount: article.ViewCount,
 		IsLiked:   article.IsLiked,
-		Doctor: response.DoctorGetAllResponse{
+		Doctor: response.DoctorInfoResponse{
 			ID:   article.Doctor.ID,
 			Name: article.Doctor.Name,
 		},
@@ -151,7 +150,7 @@ func (controller *ArticleController) GetLikedArticle(c echo.Context) error {
 			ImageUrl:  article.ImageUrl,
 			ViewCount: article.ViewCount,
 			IsLiked:   article.IsLiked,
-			Doctor: response.DoctorGetAllResponse{
+			Doctor: response.DoctorInfoResponse{
 				ID:   article.Doctor.ID,
 				Name: article.Doctor.Name,
 			},

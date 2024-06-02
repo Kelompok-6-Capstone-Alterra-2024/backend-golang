@@ -22,10 +22,12 @@ type RepositoryInterface interface {
 	GetAllStories(metadata entities.Metadata, userId int) ([]Story, error)
 	GetStoryById(storyId int, userId int) (Story, error)
 	GetLikedStories(metadata entities.Metadata, userId int) ([]Story, error)
+	LikeStory(storyId int, userId int) error
 }
 
 type UseCaseInterface interface {
 	GetAllStories(metadata entities.Metadata, userId int) ([]Story, error)
 	GetStoryById(storyId int, userId int) (Story, error)
 	GetLikedStories(metadata entities.Metadata, userId int) ([]Story, error)
+	LikeStory(storyId int, userId int) error
 }

@@ -5,13 +5,16 @@ import (
 	"capstone/controllers/complaint"
 	"capstone/controllers/consultation"
 	"capstone/controllers/doctor"
+	"capstone/controllers/forum"
 	"capstone/controllers/mood"
 	"capstone/controllers/music"
+	"capstone/controllers/post"
 	"capstone/controllers/rating"
 	"capstone/controllers/story"
 	"capstone/controllers/transaction"
 	"capstone/controllers/user"
 	myMiddleware "capstone/middlewares"
+	"capstone/utilities/base"
 	"os"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -28,6 +31,8 @@ type RouteController struct {
 	musicController        *music.MusicController
 	ratingController       *rating.RatingController
 	moodController         *mood.MoodController
+	forumController        *forum.ForumController
+	postController         *post.PostController
 	articleController      *article.ArticleController
 }
 
@@ -41,6 +46,8 @@ func NewRoute(
 	musicController *music.MusicController,
 	ratingController *rating.RatingController,
 	moodController *mood.MoodController,
+	forumController *forum.ForumController,
+	postController *post.PostController,
 	articleController *article.ArticleController) *RouteController {
 	return &RouteController{
 		userController:         userController,
@@ -52,6 +59,8 @@ func NewRoute(
 		musicController:        musicController,
 		ratingController:       ratingController,
 		moodController:         moodController,
+		forumController:        forumController,
+		postController:         postController,
 		articleController:      articleController,
 	}
 }
@@ -59,6 +68,7 @@ func NewRoute(
 func (r *RouteController) InitRoute(e *echo.Echo) {
 	myMiddleware.LogMiddleware(e)
 
+	e.HTTPErrorHandler = base.ErrorHandler
 	e.Use(myMiddleware.CORSMiddleware())
 
 	userAuth := e.Group("/v1/users")
@@ -81,17 +91,22 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("stories", r.storyController.GetAllStories)         //Get All Stories
 	userRoute.GET("stories/:id", r.storyController.GetStoryById)      //Get Story By ID
 	userRoute.GET("stories/liked", r.storyController.GetLikedStories) //Get Liked Stories
+	userRoute.POST("stories/like", r.storyController.LikeStory)       //Like Story
 
 	// Music
 	userRoute.GET("musics", r.musicController.GetAllMusics)         //Get All Music
 	userRoute.GET("musics/:id", r.musicController.GetMusicByID)     //Get Music By ID
 	userRoute.GET("musics/liked", r.musicController.GetLikedMusics) //Get Liked Music
+	userRoute.POST("musics/like", r.musicController.LikeMusic)      //Like Music
 
 	// Complaint
 	userRoute.POST("complaint", r.complaintController.Create) // Create Complaint
 
 	// Transaction
-	userRoute.POST("transaction", r.transactionController.Insert) // Create Transaction
+	userRoute.POST("transaction", r.transactionController.Insert)                               // Create Transaction
+	userRoute.GET("transaction/:id", r.transactionController.FindByID)                          // Get Transaction By ID
+	userRoute.GET("transaction/consultation/:id", r.transactionController.FindByConsultationID) // Get Transaction By Consultation ID
+	userRoute.GET("transactions", r.transactionController.FindAll)                              // Get All Transaction
 
 	// Rating
 	userRoute.POST("feedbacks", r.ratingController.SendFeedback) // Create Rating
@@ -100,6 +115,21 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.POST("moods", r.moodController.CreateMood)     // Create Mood
 	userRoute.GET("moods", r.moodController.GetAllMoods)     // Get All Moods
 	userRoute.GET("moods/:id", r.moodController.GetMoodById) // Get Mood By ID
+
+	// Forum
+	userRoute.POST("forums/join", r.forumController.JoinForum)                       // Join Forum
+	userRoute.DELETE("forums/:id", r.forumController.LeaveForum)                     // Leave Forum
+	userRoute.GET("forums", r.forumController.GetJoinedForum)                        // Get All Forum
+	userRoute.GET("forums/recommendation", r.forumController.GetRecommendationForum) // Get Recommendation Forum
+	userRoute.GET("forums/:id", r.forumController.GetForumById)                      // Get Forum By ID
+
+	// Posts
+	userRoute.GET("forums/:forumId/posts", r.postController.GetAllPostsByForumId)   // Get All Posts By Forum ID
+	userRoute.GET("posts/:id", r.postController.GetPostById)                        // Get Post By ID
+	userRoute.POST("posts", r.postController.SendPost)                              // Create Post
+	userRoute.POST("posts/like", r.postController.LikePost)                         // Like Post
+	userRoute.POST("comments", r.postController.SendComment)                        // Create Comment
+	userRoute.GET("posts/:postId/comments", r.postController.GetAllCommentByPostId) // Get All Comment By Post ID
 
 	// Article
 	userRoute.GET("article", r.articleController.GetAllArticle) // Get All Article
@@ -114,6 +144,4 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorAuth.POST("/article", r.articleController.CreateArticle) // Create Article
 	doctorAuth.GET("article", r.articleController.GetAllArticle)   // Get All Article
 
-	articleAuth := e.Group("/v1/article")
-	articleAuth.GET("/list", r.articleController.GetAllArticle)
 }

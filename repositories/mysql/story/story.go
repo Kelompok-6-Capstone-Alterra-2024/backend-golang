@@ -150,3 +150,22 @@ func (repository *StoriesRepo) GetLikedStories(metadata entities.Metadata, userI
 
 	return storiesEnt, nil
 }
+
+func (repository *StoriesRepo) LikeStory(storyId int, userId int) error {
+	var storyLikesDb StoryLikes
+
+	err := repository.DB.Where("user_id = ? AND story_id = ?", userId, storyId).First(&storyLikesDb).Error
+	if err == nil {
+		return constants.ErrAlreadyLiked
+	}
+
+	storyLikesDb.UserId = uint(userId)
+	storyLikesDb.StoryId = uint(storyId)
+
+	err = repository.DB.Create(&storyLikesDb).Error
+	if err != nil {
+		return constants.ErrServer
+	}
+
+	return nil
+}

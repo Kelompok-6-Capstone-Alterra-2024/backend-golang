@@ -10,7 +10,7 @@ import (
 type Transaction struct {
 	ID uuid.UUID `gorm:"column:id;primaryKey;type:char(100)"`
 	gorm.Model
-	ConsultationID uint                      `gorm:"column:consultation_id;not null"`
+	ConsultationID uint                      `gorm:"column:consultation_id;not null;unique"`
 	Consultation   consultation.Consultation `gorm:"foreignKey:consultation_id;references:id"`
 	Price          int                       `gorm:"column:price;not null"`
 	SnapURL        string                    `gorm:"column:snap_url"`

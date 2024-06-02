@@ -38,3 +38,11 @@ func (musicUseCase *MusicUseCase) GetLikedMusics(metadata entities.Metadata, use
 	}
 	return musics, nil
 }
+
+func (musicUseCase *MusicUseCase) LikeMusic(musicId int, userId int) error {
+	err := musicUseCase.musicInterface.LikeMusic(musicId, userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}

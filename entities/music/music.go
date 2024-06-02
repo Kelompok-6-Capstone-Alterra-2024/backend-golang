@@ -16,10 +16,12 @@ type RepositoryInterface interface {
 	GetAllMusics(metadata entities.Metadata, userId int) ([]Music, error)
 	GetMusicById(musicId int, userId int) (Music, error)
 	GetLikedMusics(metadata entities.Metadata, userId int) ([]Music, error)
+	LikeMusic(musicId int, userId int) error
 }
 
 type UseCaseInterface interface {
 	GetAllMusics(metadata entities.Metadata, userId int) ([]Music, error)
 	GetMusicById(musicId int, userId int) (Music, error)
 	GetLikedMusics(metadata entities.Metadata, userId int) ([]Music, error)
+	LikeMusic(musicId int, userId int) error
 }
