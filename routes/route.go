@@ -109,7 +109,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("moods/:id", r.moodController.GetMoodById) // Get Mood By ID
 
 	// Forum
-	userRoute.POST("forums/join", r.forumController.JoinForum) // Create Forum
+	userRoute.POST("forums/join", r.forumController.JoinForum) // Join Forum
+	userRoute.DELETE("forums/:id", r.forumController.LeaveForum) // Leave Forum
 	userRoute.GET("forums", r.forumController.GetJoinedForum)     // Get All Forum
 	userRoute.GET("forums/recommendation", r.forumController.GetRecommendationForum) // Get Recommendation Forum
 	userRoute.GET("forums/:id", r.forumController.GetForumById)                       // Get Forum By ID

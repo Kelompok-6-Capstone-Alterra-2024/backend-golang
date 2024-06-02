@@ -32,6 +32,14 @@ func (f *ForumRepo) JoinForum(forumId uint, userId uint) error {
 	return nil
 }
 
+func (f *ForumRepo) LeaveForum(forumId uint, userId uint) error {
+	err := f.db.Where("forum_id = ? AND user_id = ?", forumId, userId).Delete(&ForumMember{}).Error
+	if err != nil {
+		return constants.ErrServer
+	}
+	return nil
+}
+
 func (f *ForumRepo) GetJoinedForum(userId uint, metadata entities.Metadata) ([]forum.Forum, error) {
 	var forumMemberDB []ForumMember
 

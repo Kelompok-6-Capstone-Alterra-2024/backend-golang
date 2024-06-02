@@ -36,6 +36,18 @@ func (forumUseCase *ForumUseCase) GetJoinedForum(userId uint, metadata entities.
 	return forums, nil
 }
 
+func (forumUseCase *ForumUseCase) LeaveForum(forumId uint, userId uint) error {
+	if forumId == 0 {
+		return constants.ErrEmptyInputForum
+	}
+
+	err := forumUseCase.forumInterface.LeaveForum(forumId, userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (forumUseCase *ForumUseCase) GetRecommendationForum(userId uint, metadata entities.Metadata) ([]forumEntities.Forum, error) {
 	forums, err := forumUseCase.forumInterface.GetRecommendationForum(userId, metadata)
 	if err != nil {

@@ -119,3 +119,18 @@ func (forumController *ForumController) GetForumById(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Forum By Id", resp))
 }
+
+func (forumController *ForumController) LeaveForum(c echo.Context) error {
+	forumId := c.Param("id")
+	forumIdInt, _ := strconv.Atoi(forumId)
+
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	err := forumController.forumUseCase.LeaveForum(uint(forumIdInt), uint(userId))
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Leave Forum", nil))
+}
