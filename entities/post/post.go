@@ -13,6 +13,16 @@ type Post struct {
 	Content  string
 	ImageUrl string
 	User     user.User
+	Comments []PostComment
+}
+
+type PostComment struct {
+	ID       uint
+	Content  string
+	PostID   uint
+	UserID   uint
+	User     user.User
+	CreatedAt string
 }
 
 type RepositoryInterface interface {
@@ -20,6 +30,7 @@ type RepositoryInterface interface {
 	GetPostById(postId uint) (Post, error)
 	SendPost(post Post) (Post, error)
 	LikePost(postId uint, userId uint) error
+	SendComment(comment PostComment) (PostComment, error)
 }
 
 type UseCaseInterface interface {
@@ -27,4 +38,5 @@ type UseCaseInterface interface {
 	GetPostById(postId uint) (Post, error)
 	SendPost(post Post, file *multipart.FileHeader) (Post, error)
 	LikePost(postId uint, userId uint) error
+	SendComment(comment PostComment) (PostComment, error)
 }

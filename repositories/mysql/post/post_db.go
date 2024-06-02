@@ -24,3 +24,12 @@ type PostLike struct {
 	UserID uint 	 `gorm:"type:int;index"`
 	User   user.User `gorm:"foreignKey:user_id;references:id"`
 }
+
+type PostComment struct {
+	gorm.Model
+	PostID uint 	 `gorm:"type:int;index"`
+	Post   Post 	 `gorm:"foreignKey:post_id;references:id"`
+	UserID uint 	 `gorm:"type:int;index"`
+	User   user.User `gorm:"foreignKey:user_id;references:id"`
+	Content string 	 `gorm:"type:text"`
+}

@@ -5,6 +5,7 @@ import (
 	postEntities "capstone/entities/post"
 	userEntities "capstone/entities/user"
 	"capstone/repositories/mysql/user"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -106,4 +107,35 @@ func (postRepo *PostRepo) LikePost(postId uint, userId uint) error {
 		return err
 	}
 	return nil
+}
+
+func (postRepo *PostRepo) SendComment(comment postEntities.PostComment) (postEntities.PostComment, error) {
+	var commentDB PostComment
+	commentDB.Content = comment.Content
+	commentDB.PostID = comment.PostID
+	commentDB.UserID = comment.UserID
+	err := postRepo.db.Create(&commentDB).Error
+	if err != nil {
+		return postEntities.PostComment{}, err
+	}
+
+	var userDB user.User
+	err = postRepo.db.Where("id = ?", commentDB.UserID).Find(&userDB).Error
+	if err != nil {
+		return postEntities.PostComment{}, err
+	}
+	
+	var commentEnt postEntities.PostComment
+	commentEnt.ID = commentDB.ID
+	commentEnt.Content = commentDB.Content
+	commentEnt.PostID = commentDB.PostID
+	commentEnt.UserID = commentDB.UserID
+	commentEnt.CreatedAt = commentDB.CreatedAt.Format(time.RFC3339)
+	commentEnt.User = userEntities.User{
+		Id:             userDB.Id,
+		Username:       userDB.Username,
+		ProfilePicture: userDB.ProfilePicture,
+	}
+
+	return commentEnt, nil
 }

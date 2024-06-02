@@ -55,9 +55,25 @@ func (postUseCase *PostUseCase) SendPost(post postEntities.Post, file *multipart
 }
 
 func (postUseCase *PostUseCase) LikePost(postId uint, userId uint) error {
+	if postId == 0 {
+		return constants.ErrEmptyInputLike
+	}
+
 	err := postUseCase.postRepository.LikePost(postId, userId)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (postUseCase *PostUseCase) SendComment(comment postEntities.PostComment) (postEntities.PostComment, error) {
+	if comment.PostID == 0 || comment.Content == "" {
+		return postEntities.PostComment{}, constants.ErrEmptyInputComment
+	}
+
+	comment, err := postUseCase.postRepository.SendComment(comment)
+	if err != nil {
+		return postEntities.PostComment{}, err
+	}
+	return comment, nil
 }

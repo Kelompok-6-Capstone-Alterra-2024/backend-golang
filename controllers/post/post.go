@@ -123,5 +123,36 @@ func (postController *PostController) LikePost(c echo.Context) error {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Like Post", nil))
+	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success Like Post", nil))
+}
+
+func (postController *PostController) SendComment(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	var postCommentReq request.PostCommentRequest
+	c.Bind(&postCommentReq)
+
+	var postCommentEnt postEntities.PostComment
+	postCommentEnt.PostID = postCommentReq.PostId
+	postCommentEnt.UserID = uint(userId)
+	postCommentEnt.Content = postCommentReq.Content
+
+	result, err := postController.postUseCase.SendComment(postCommentEnt)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var resp response.PostCommentResponse
+	resp.ID = result.ID
+	resp.Content = result.Content
+	resp.PostId = result.PostID
+	resp.CreatedAt = result.CreatedAt
+	resp.User = response.UserPostCommentResponse{
+		Id:             uint(result.User.Id),
+		Username:       result.User.Username,
+		ProfilePicture: result.User.ProfilePicture,
+	}
+
+	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success Send Comment", resp))
 }
