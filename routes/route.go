@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"capstone/controllers/chatbot"
 	"capstone/controllers/complaint"
 	"capstone/controllers/consultation"
 	"capstone/controllers/doctor"
@@ -14,9 +15,10 @@ import (
 	"capstone/controllers/user"
 	myMiddleware "capstone/middlewares"
 	"capstone/utilities/base"
+	"os"
+
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
-	"os"
 )
 
 type RouteController struct {
@@ -31,6 +33,7 @@ type RouteController struct {
 	moodController         *mood.MoodController
 	forumController        *forum.ForumController
 	postController         *post.PostController
+	chatbotController      *chatbot.ChatbotController
 }
 
 func NewRoute(
@@ -45,6 +48,7 @@ func NewRoute(
 	moodController *mood.MoodController,
 	forumController *forum.ForumController,
 	postController *post.PostController,
+	chatbotController *chatbot.ChatbotController,
 ) *RouteController {
 	return &RouteController{
 		userController:         userController,
@@ -58,6 +62,7 @@ func NewRoute(
 		moodController:         moodController,
 		forumController:        forumController,
 		postController:         postController,
+		chatbotController:      chatbotController,
 	}
 }
 
@@ -66,6 +71,10 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	e.HTTPErrorHandler = base.ErrorHandler
 	e.Use(myMiddleware.CORSMiddleware())
+
+	// chatbot
+	e.GET("/v1/users/chatbots/customer-service", r.chatbotController.ChatbotCS) //customer service chatbot
+	e.GET("/v1/users/chatbots/mental-health", r.chatbotController.ChatbotMentalHealth) //mental health chatbot
 
 	userAuth := e.Group("/v1/users")
 	userAuth.POST("/register", r.userController.Register) //Register User

@@ -2,6 +2,7 @@ package main
 
 import (
 	"capstone/configs"
+	chatbotController "capstone/controllers/chatbot"
 	complaintController "capstone/controllers/complaint"
 	consultationController "capstone/controllers/consultation"
 	doctorController "capstone/controllers/doctor"
@@ -26,6 +27,7 @@ import (
 	transactionRepositories "capstone/repositories/mysql/transaction"
 	userRepositories "capstone/repositories/mysql/user"
 	"capstone/routes"
+	chatbotUseCase "capstone/usecases/chatbot"
 	complaintUseCase "capstone/usecases/complaint"
 	consultationUseCase "capstone/usecases/consultation"
 	doctorUseCase "capstone/usecases/doctor"
@@ -38,6 +40,7 @@ import (
 	storyUseCase "capstone/usecases/story"
 	transactionUseCase "capstone/usecases/transaction"
 	userUseCase "capstone/usecases/user"
+
 	"github.com/go-playground/validator/v10"
 
 	"github.com/labstack/echo/v4"
@@ -73,6 +76,7 @@ func main() {
 	moodUC := moodUseCase.NewMoodUseCase(moodRepo)
 	forumUC := forumUseCase.NewForumUseCase(forumRepo)
 	postUC := postUseCase.NewPostUseCase(postRepo)
+	chatbotUC := chatbotUseCase.NewChatbotUsecase()
 
 	userCont := userController.NewUserController(userUC)
 	doctorCont := doctorController.NewDoctorController(doctorUC)
@@ -85,8 +89,9 @@ func main() {
 	moodCont := moodController.NewMoodController(moodUC)
 	forumCont := forumController.NewForumController(forumUC)
 	postCont := postController.NewPostController(postUC)
+	chatbotCont := chatbotController.NewChatbotController(chatbotUC)
 
-	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont, ratingCont, moodCont, forumCont, postCont)
+	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont, ratingCont, moodCont, forumCont, postCont, chatbotCont)
 
 	e := echo.New()
 	route.InitRoute(e)
