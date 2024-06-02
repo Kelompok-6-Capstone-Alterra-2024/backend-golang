@@ -35,3 +35,11 @@ func (forumUseCase *ForumUseCase) GetJoinedForum(userId uint, metadata entities.
 	}
 	return forums, nil
 }
+
+func (forumUseCase *ForumUseCase) GetRecommendationForum(userId uint, metadata entities.Metadata) ([]forumEntities.Forum, error) {
+	forums, err := forumUseCase.forumInterface.GetRecommendationForum(userId, metadata)
+	if err != nil {
+		return nil, err
+	}
+	return forums, nil
+}

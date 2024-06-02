@@ -28,9 +28,11 @@ type ForumMember struct {
 type RepositoryInterface interface {
 	JoinForum(forumId uint, userId uint) (error)
 	GetJoinedForum(userId uint, metadata entities.Metadata) ([]Forum, error)
+	GetRecommendationForum(userId uint, metadata entities.Metadata) ([]Forum, error)
 }
 
 type UseCaseInterface interface {
 	JoinForum(forumId uint, userId uint) (error)
 	GetJoinedForum(userId uint, metadata entities.Metadata) ([]Forum, error)
+	GetRecommendationForum(userId uint, metadata entities.Metadata) ([]Forum, error)
 }

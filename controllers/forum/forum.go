@@ -73,3 +73,30 @@ func (forumController *ForumController) GetJoinedForum(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get Joined Forum", metadata, resp))
 }
+
+func (forumController *ForumController) GetRecommendationForum(c echo.Context) error {
+	pageParam := c.QueryParam("page")
+	limitParam := c.QueryParam("limit")
+
+	metadata := utilities.GetMetadata(pageParam, limitParam)
+
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	forums, err := forumController.forumUseCase.GetRecommendationForum(uint(userId), *metadata)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var resp []response.ForumRecommendationResponse
+	for _, forum := range forums {
+		resp = append(resp, response.ForumRecommendationResponse{
+			ForumID:         forum.ID,
+			Name:            forum.Name,
+			ImageUrl:        forum.ImageUrl,
+			NumberOfMembers: forum.NumberOfMembers,
+		})
+	}
+
+	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get Recommendation Forum", metadata, resp))
+}

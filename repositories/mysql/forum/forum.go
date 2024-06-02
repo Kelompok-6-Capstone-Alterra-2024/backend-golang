@@ -79,3 +79,42 @@ func (f *ForumRepo) GetJoinedForum(userId uint, metadata entities.Metadata) ([]f
 
 	return forumEnts, nil
 }
+
+func (f *ForumRepo) GetRecommendationForum(userId uint, metadata entities.Metadata) ([]forum.Forum, error) {
+	var forumMemberDB []ForumMember
+	err := f.db.Preload("Forum").Where("user_id = ?", userId).Find(&forumMemberDB).Error
+	if err != nil {
+		return nil, constants.ErrServer
+	}
+
+	var forumIDs []uint
+	for _, forumMemberDBTemp := range forumMemberDB {
+		forumIDs = append(forumIDs, forumMemberDBTemp.Forum.ID)
+	}
+
+	var forumDB []Forum
+	err = f.db.Model(&Forum{}).Where("id NOT IN ?", forumIDs).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&forumDB).Error
+	if err != nil {
+		return nil, constants.ErrServer
+	}
+
+	counter := make([]int64, len(forumDB))
+	for i, forumDBtemp := range forumDB {
+		err = f.db.Model(&ForumMember{}).Where("forum_id = ?", forumDBtemp.ID).Count(&counter[i]).Error
+		if err != nil {
+			return nil, constants.ErrServer
+		}
+	}
+
+	var forumEnts []forum.Forum
+	for i, forumDBTemp := range forumDB {
+		forumEnts = append(forumEnts, forum.Forum{
+			ID:               forumDBTemp.ID,
+			Name:             forumDBTemp.Name,
+			ImageUrl:         forumDBTemp.ImageUrl,
+			NumberOfMembers:  int(counter[i]),
+		})
+	}
+
+	return forumEnts, nil
+}
