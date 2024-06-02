@@ -5,6 +5,7 @@ import (
 	"capstone/controllers/complaint"
 	"capstone/controllers/consultation"
 	"capstone/controllers/doctor"
+	"capstone/controllers/mood"
 	"capstone/controllers/music"
 	"capstone/controllers/rating"
 	"capstone/controllers/story"
@@ -26,6 +27,7 @@ type RouteController struct {
 	transactionController  *transaction.TransactionController
 	musicController        *music.MusicController
 	ratingController       *rating.RatingController
+	moodController         *mood.MoodController
 	articleController      *article.ArticleController
 }
 
@@ -38,6 +40,7 @@ func NewRoute(
 	transactionController *transaction.TransactionController,
 	musicController *music.MusicController,
 	ratingController *rating.RatingController,
+	moodController *mood.MoodController,
 	articleController *article.ArticleController) *RouteController {
 	return &RouteController{
 		userController:         userController,
@@ -48,12 +51,15 @@ func NewRoute(
 		transactionController:  transactionController,
 		musicController:        musicController,
 		ratingController:       ratingController,
+		moodController:         moodController,
 		articleController:      articleController,
 	}
 }
 
 func (r *RouteController) InitRoute(e *echo.Echo) {
 	myMiddleware.LogMiddleware(e)
+
+	e.Use(myMiddleware.CORSMiddleware())
 
 	userAuth := e.Group("/v1/users")
 	userAuth.POST("/register", r.userController.Register) //Register User
@@ -89,6 +95,11 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	// Rating
 	userRoute.POST("feedbacks", r.ratingController.SendFeedback) // Create Rating
+
+	// Mood
+	userRoute.POST("moods", r.moodController.CreateMood)     // Create Mood
+	userRoute.GET("moods", r.moodController.GetAllMoods)     // Get All Moods
+	userRoute.GET("moods/:id", r.moodController.GetMoodById) // Get Mood By ID
 
 	// Article
 	userRoute.GET("article", r.articleController.GetAllArticle) // Get All Article

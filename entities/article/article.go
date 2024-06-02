@@ -39,7 +39,7 @@ func (ar *Article) ToResponse() response.ArticleCreatedResponse {
 		DoctorID:  ar.DoctorID,
 		Title:     ar.Title,
 		Content:   ar.Content,
-		ImageURL:  ar.ImageUrl,
+		ImageUrl:  ar.ImageUrl,
 		Date:      ar.Date,
 		ViewCount: ar.ViewCount,
 		IsLiked:   ar.IsLiked,

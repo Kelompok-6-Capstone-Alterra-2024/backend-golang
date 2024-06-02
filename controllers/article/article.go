@@ -115,7 +115,7 @@ func (controller *ArticleController) GetArticleById(c echo.Context) error {
 		Title:     article.Title,
 		Content:   article.Content,
 		Date:      article.Date,
-		ImageURL:  article.ImageUrl,
+		ImageUrl:  article.ImageUrl,
 		ViewCount: article.ViewCount,
 		IsLiked:   article.IsLiked,
 		Doctor: response.DoctorGetAllResponse{
@@ -148,7 +148,7 @@ func (controller *ArticleController) GetLikedArticle(c echo.Context) error {
 			Title:     article.Title,
 			Content:   article.Content,
 			Date:      article.Date,
-			ImageURL:  article.ImageUrl,
+			ImageUrl:  article.ImageUrl,
 			ViewCount: article.ViewCount,
 			IsLiked:   article.IsLiked,
 			Doctor: response.DoctorGetAllResponse{
