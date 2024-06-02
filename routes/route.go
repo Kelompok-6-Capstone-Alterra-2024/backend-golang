@@ -120,6 +120,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.POST("posts", r.postController.SendPost)                            // Create Post
 	userRoute.POST("posts/like", r.postController.LikePost)                       // Like Post
 	userRoute.POST("comments", r.postController.SendComment)                      // Create Comment
+	userRoute.GET("posts/:postId/comments", r.postController.GetAllCommentByPostId) // Get All Comment By Post ID
 
 	doctorAuth := e.Group("/v1/doctors")
 

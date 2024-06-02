@@ -156,3 +156,35 @@ func (postController *PostController) SendComment(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success Send Comment", resp))
 }
+
+func (postController *PostController) GetAllCommentByPostId(c echo.Context) error {
+	pageParam := c.QueryParam("page")
+	limitParam := c.QueryParam("limit")
+
+	metadata := utilities.GetMetadata(pageParam, limitParam)
+
+	postId := c.Param("postId")
+	postIdInt, _ := strconv.Atoi(postId)
+
+	comments, err := postController.postUseCase.GetAllCommentByPostId(uint(postIdInt), *metadata)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var resp []response.PostCommentResponse
+	for _, comment := range comments {
+		var respComment response.PostCommentResponse
+		respComment.ID = comment.ID
+		respComment.Content = comment.Content
+		respComment.PostId = comment.PostID
+		respComment.CreatedAt = comment.CreatedAt
+		respComment.User = response.UserPostCommentResponse{
+			Id:             uint(comment.User.Id),
+			Username:       comment.User.Username,
+			ProfilePicture: comment.User.ProfilePicture,
+		}
+		resp = append(resp, respComment)
+	}
+
+	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get All Comment By Post Id", metadata, resp))
+}

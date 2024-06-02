@@ -139,3 +139,27 @@ func (postRepo *PostRepo) SendComment(comment postEntities.PostComment) (postEnt
 
 	return commentEnt, nil
 }
+
+func (postRepo *PostRepo) GetAllCommentByPostId(postId uint, metadata entities.Metadata) ([]postEntities.PostComment, error) {
+	var comments []PostComment
+	err := postRepo.db.Limit(metadata.Limit).Offset((metadata.Page-1)*metadata.Limit).Where("post_id = ?", postId).Preload("User").Find(&comments).Error
+	if err != nil {
+		return []postEntities.PostComment{}, err
+	}
+	var commentEnts []postEntities.PostComment
+	for _, comment := range comments {
+		var commentEnt postEntities.PostComment
+		commentEnt.ID = comment.ID
+		commentEnt.Content = comment.Content
+		commentEnt.PostID = comment.PostID
+		commentEnt.UserID = comment.UserID
+		commentEnt.CreatedAt = comment.CreatedAt.Format(time.RFC3339)
+		commentEnt.User = userEntities.User{
+			Id:             comment.User.Id,
+			Username:       comment.User.Username,
+			ProfilePicture: comment.User.ProfilePicture,
+		}
+		commentEnts = append(commentEnts, commentEnt)
+	}
+	return commentEnts, nil
+}

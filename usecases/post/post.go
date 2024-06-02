@@ -77,3 +77,11 @@ func (postUseCase *PostUseCase) SendComment(comment postEntities.PostComment) (p
 	}
 	return comment, nil
 }
+
+func (postUseCase *PostUseCase) GetAllCommentByPostId(postId uint, metadata entities.Metadata) ([]postEntities.PostComment, error) {
+	comments, err := postUseCase.postRepository.GetAllCommentByPostId(postId, metadata)
+	if err != nil {
+		return []postEntities.PostComment{}, err
+	}
+	return comments, nil
+}
