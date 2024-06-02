@@ -117,6 +117,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	// Posts
 	userRoute.GET("forums/:forumId/posts", r.postController.GetAllPostsByForumId) // Get All Posts By Forum ID
 	userRoute.GET("posts/:id", r.postController.GetPostById)                     // Get Post By ID
+	userRoute.POST("posts", r.postController.SendPost)                            // Create Post
+	userRoute.POST("posts/like", r.postController.LikePost)                       // Like Post
 
 	doctorAuth := e.Group("/v1/doctors")
 

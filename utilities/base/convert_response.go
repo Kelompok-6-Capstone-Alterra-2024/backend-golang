@@ -64,6 +64,12 @@ func ConvertResponseCode(err error) int {
 		case constants.ErrAlreadyLiked:
 			return http.StatusConflict
 
+		case constants.ErrEmptyInputForum:
+			return http.StatusBadRequest
+
+		case constants.ErrEmptyInputPost:
+			return http.StatusBadRequest
+			
 		default:
 			return http.StatusInternalServerError
 	}

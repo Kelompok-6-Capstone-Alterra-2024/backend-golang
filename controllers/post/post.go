@@ -1,6 +1,7 @@
 package post
 
 import (
+	"capstone/controllers/post/request"
 	"capstone/controllers/post/response"
 	postEntities "capstone/entities/post"
 	"capstone/utilities"
@@ -73,4 +74,54 @@ func (postController *PostController) GetPostById(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Post By Id", resp))
+}
+
+func (postController *PostController) SendPost(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	var postReq request.PostSendRequest
+	c.Bind(&postReq)
+
+	file, _ := c.FormFile("image")
+
+	postEnt := postEntities.Post{
+		ForumId:  postReq.ForumId,
+		UserId:   uint(userId),
+		Content:  postReq.Content,
+		ImageUrl: postReq.ImageUrl,
+	}
+
+	result, err := postController.postUseCase.SendPost(postEnt, file)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var resp response.PostCreateResponse
+	resp.ID = result.ID
+	resp.ForumId = result.ForumId
+	resp.Content = result.Content
+	resp.ImageUrl = result.ImageUrl
+	resp.User = response.UserPostResponse{
+		ID:             uint(result.User.Id),
+		Username:       result.User.Username,
+		ProfilePicture: result.User.ProfilePicture,
+	}
+
+	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success Send Post", resp))
+}
+
+func (postController *PostController) LikePost(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	var postLikeReq request.PostLikeRequest
+	c.Bind(&postLikeReq)
+
+	err := postController.postUseCase.LikePost(uint(postLikeReq.PostId), uint(userId))
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Like Post", nil))
 }

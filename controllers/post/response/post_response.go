@@ -7,6 +7,14 @@ type PostResponse struct {
 	User     UserPostResponse `json:"user"`
 }
 
+type PostCreateResponse struct {
+	ID       uint             `json:"id"`
+	ForumId  uint             `json:"forum_id"`
+	Content  string           `json:"content"`
+	ImageUrl string           `json:"image_url"`
+	User     UserPostResponse `json:"user"`
+}
+
 type UserPostResponse struct {
 	ID             uint   `json:"id"`
 	Username       string `json:"username"`

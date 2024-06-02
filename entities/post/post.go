@@ -3,6 +3,7 @@ package post
 import (
 	"capstone/entities"
 	"capstone/entities/user"
+	"mime/multipart"
 )
 
 type Post struct {
@@ -17,9 +18,13 @@ type Post struct {
 type RepositoryInterface interface {
 	GetAllPostsByForumId(forumId uint, metadata entities.Metadata) ([]Post, error)
 	GetPostById(postId uint) (Post, error)
+	SendPost(post Post) (Post, error)
+	LikePost(postId uint, userId uint) error
 }
 
 type UseCaseInterface interface {
 	GetAllPostsByForumId(forumId uint, metadata entities.Metadata) ([]Post, error)
 	GetPostById(postId uint) (Post, error)
+	SendPost(post Post, file *multipart.FileHeader) (Post, error)
+	LikePost(postId uint, userId uint) error
 }

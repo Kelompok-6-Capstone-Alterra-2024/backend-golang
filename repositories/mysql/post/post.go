@@ -3,7 +3,8 @@ package post
 import (
 	"capstone/entities"
 	postEntities "capstone/entities/post"
-	"capstone/entities/user"
+	userEntities "capstone/entities/user"
+	"capstone/repositories/mysql/user"
 
 	"gorm.io/gorm"
 )
@@ -32,7 +33,7 @@ func (postRepo *PostRepo) GetAllPostsByForumId(forumId uint, metadata entities.M
 			ForumId:  post.ForumID,
 			Content:  post.Content,
 			ImageUrl: post.ImageUrl,
-			User:     user.User{
+			User:     userEntities.User{
 				Id:             post.User.Id,
 				Username:       post.User.Username,
 				ProfilePicture: post.User.ProfilePicture,
@@ -55,10 +56,54 @@ func (postRepo *PostRepo) GetPostById(postId uint) (postEntities.Post, error) {
 	postEnt.ForumId = post.ForumID
 	postEnt.Content = post.Content
 	postEnt.ImageUrl = post.ImageUrl
-	postEnt.User = user.User{
+	postEnt.User = userEntities.User{
 		Id:             post.User.Id,
 		Username:       post.User.Username,
 		ProfilePicture: post.User.ProfilePicture,
 	}
 	return postEnt, nil
+}
+
+func (postRepo *PostRepo) SendPost(post postEntities.Post) (postEntities.Post, error) {
+	var postDB Post
+	postDB.ForumID = post.ForumId
+	postDB.Content = post.Content
+	postDB.ImageUrl = post.ImageUrl
+	postDB.UserID = post.UserId
+	err := postRepo.db.Create(&postDB).Error
+	if err != nil {
+		return postEntities.Post{}, err
+	}
+
+	var userDB user.User
+	err = postRepo.db.Where("id = ?", postDB.UserID).Find(&userDB).Error
+	if err != nil {
+		return postEntities.Post{}, err
+	}
+	
+	var postEnt postEntities.Post
+	postEnt.ID = postDB.ID
+	postEnt.ForumId = postDB.ForumID
+	postEnt.Content = postDB.Content
+	postEnt.ImageUrl = postDB.ImageUrl
+	postEnt.UserId = postDB.UserID
+	postEnt.User = userEntities.User{
+		Id:             userDB.Id,
+		Username:       userDB.Username,
+		ProfilePicture: userDB.ProfilePicture,
+	}
+
+	return postEnt, nil
+}
+
+func (postRepo *PostRepo) LikePost(postId uint, userId uint) error {
+	var postLikeDB PostLike
+	postLikeDB.PostID = postId
+	postLikeDB.UserID = userId
+
+	err := postRepo.db.Create(&postLikeDB).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
