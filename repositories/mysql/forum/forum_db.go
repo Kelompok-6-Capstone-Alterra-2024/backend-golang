@@ -23,3 +23,13 @@ type ForumMember struct {
 	UserID  uint `gorm:"type:int;index"`
 	User    user.User  `gorm:"foreignKey:user_id;references:id"`
 }
+
+type Post struct {
+	gorm.Model
+	Content 	string 		`gorm:"type:text"`
+	UserID  	uint 		`gorm:"type:int;index"`
+	User    	user.User 	`gorm:"foreignKey:user_id;references:id"`
+	ForumID 	uint 		`gorm:"type:int;index"`
+	Forum   	Forum `gorm:"foreignKey:forum_id;references:id"`
+	ImageUrl 	string 		`gorm:"type:varchar(255)"`
+}

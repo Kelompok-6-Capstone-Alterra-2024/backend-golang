@@ -43,3 +43,11 @@ func (forumUseCase *ForumUseCase) GetRecommendationForum(userId uint, metadata e
 	}
 	return forums, nil
 }
+
+func (forumUseCase *ForumUseCase) GetForumById(forumId uint) (forumEntities.Forum, error) {
+	forum, err := forumUseCase.forumInterface.GetForumById(forumId)
+	if err != nil {
+		return forumEntities.Forum{}, err
+	}
+	return forum, nil
+}

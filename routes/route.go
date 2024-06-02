@@ -107,7 +107,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	// Forum
 	userRoute.POST("forums/join", r.forumController.JoinForum) // Create Forum
 	userRoute.GET("forums", r.forumController.GetJoinedForum)     // Get All Forum
-	userRoute.GET("forums/recommendation", r.forumController.GetRecommendationForum)
+	userRoute.GET("forums/recommendation", r.forumController.GetRecommendationForum) // Get Recommendation Forum
+	userRoute.GET("forums/:id", r.forumController.GetForumById)                       // Get Forum By ID
 
 	doctorAuth := e.Group("/v1/doctors")
 
