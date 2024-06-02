@@ -7,6 +7,7 @@ import (
 	"capstone/controllers/forum"
 	"capstone/controllers/mood"
 	"capstone/controllers/music"
+	"capstone/controllers/post"
 	"capstone/controllers/rating"
 	"capstone/controllers/story"
 	"capstone/controllers/transaction"
@@ -29,6 +30,7 @@ type RouteController struct {
 	ratingController       *rating.RatingController
 	moodController         *mood.MoodController
 	forumController        *forum.ForumController
+	postController         *post.PostController
 }
 
 func NewRoute(
@@ -42,6 +44,7 @@ func NewRoute(
 	ratingController *rating.RatingController,
 	moodController *mood.MoodController,
 	forumController *forum.ForumController,
+	postController *post.PostController,
 ) *RouteController {
 	return &RouteController{
 		userController:         userController,
@@ -54,6 +57,7 @@ func NewRoute(
 		ratingController:       ratingController,
 		moodController:         moodController,
 		forumController:        forumController,
+		postController:         postController,
 	}
 }
 
@@ -109,6 +113,10 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("forums", r.forumController.GetJoinedForum)     // Get All Forum
 	userRoute.GET("forums/recommendation", r.forumController.GetRecommendationForum) // Get Recommendation Forum
 	userRoute.GET("forums/:id", r.forumController.GetForumById)                       // Get Forum By ID
+
+	// Posts
+	userRoute.GET("forums/:forumId/posts", r.postController.GetAllPostsByForumId) // Get All Posts By Forum ID
+	userRoute.GET("posts/:id", r.postController.GetPostById)                     // Get Post By ID
 
 	doctorAuth := e.Group("/v1/doctors")
 

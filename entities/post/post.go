@@ -1,6 +1,9 @@
 package post
 
-import "capstone/entities/user"
+import (
+	"capstone/entities"
+	"capstone/entities/user"
+)
 
 type Post struct {
 	ID       uint
@@ -12,7 +15,11 @@ type Post struct {
 }
 
 type RepositoryInterface interface {
+	GetAllPostsByForumId(forumId uint, metadata entities.Metadata) ([]Post, error)
+	GetPostById(postId uint) (Post, error)
 }
 
 type UseCaseInterface interface {
+	GetAllPostsByForumId(forumId uint, metadata entities.Metadata) ([]Post, error)
+	GetPostById(postId uint) (Post, error)
 }
