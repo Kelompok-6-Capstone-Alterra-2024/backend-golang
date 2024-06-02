@@ -38,6 +38,7 @@ import (
 	storyUseCase "capstone/usecases/story"
 	transactionUseCase "capstone/usecases/transaction"
 	userUseCase "capstone/usecases/user"
+	"github.com/go-playground/validator/v10"
 
 	"github.com/labstack/echo/v4"
 )
@@ -46,6 +47,7 @@ func main() {
 	configs.LoadEnv()
 	db := mysql.ConnectDB(configs.InitConfigMySQL())
 	midtransConfig := configs.MidtransConfig()
+	validate := validator.New()
 
 	userRepo := userRepositories.NewUserRepo(db)
 	doctorRepo := doctorRepositories.NewDoctorRepo(db)
@@ -65,7 +67,7 @@ func main() {
 	storyUC := storyUseCase.NewStoryUseCase(storyRepo)
 	complaintUC := complaintUseCase.NewComplaintUseCase(complaintRepo)
 	midtransUC := midtransUseCase.NewMidtransUseCase(midtransConfig)
-	transactionUC := transactionUseCase.NewTransactionUseCase(transactionRepo, midtransUC)
+	transactionUC := transactionUseCase.NewTransactionUseCase(transactionRepo, midtransUC, validate)
 	musicUC := musicUseCase.NewMusicUseCase(musicRepo)
 	ratingUC := ratingUseCase.NewRatingUseCase(ratingRepo)
 	moodUC := moodUseCase.NewMoodUseCase(moodRepo)

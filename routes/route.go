@@ -13,17 +13,17 @@ import (
 	"capstone/controllers/transaction"
 	"capstone/controllers/user"
 	myMiddleware "capstone/middlewares"
-	"os"
-
+	"capstone/utilities/base"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
+	"os"
 )
 
 type RouteController struct {
 	userController         *user.UserController
 	doctorController       *doctor.DoctorController
 	consultationController *consultation.ConsultationController
-	storyController      *story.StoryController
+	storyController        *story.StoryController
 	complaintController    *complaint.ComplaintController
 	transactionController  *transaction.TransactionController
 	musicController        *music.MusicController
@@ -50,7 +50,7 @@ func NewRoute(
 		userController:         userController,
 		doctorController:       doctorController,
 		consultationController: consultationController,
-		storyController:      storyContoller,
+		storyController:        storyContoller,
 		complaintController:    complaintController,
 		transactionController:  transactionController,
 		musicController:        musicController,
@@ -64,6 +64,7 @@ func NewRoute(
 func (r *RouteController) InitRoute(e *echo.Echo) {
 	myMiddleware.LogMiddleware(e)
 
+	e.HTTPErrorHandler = base.ErrorHandler
 	e.Use(myMiddleware.CORSMiddleware())
 
 	userAuth := e.Group("/v1/users")
@@ -83,29 +84,32 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("consultations", r.consultationController.GetAllConsultation)      //Get All Consultation
 
 	// Inspirational Stories
-	userRoute.GET("stories", r.storyController.GetAllStories) //Get All Stories
-	userRoute.GET("stories/:id", r.storyController.GetStoryById)   //Get Story By ID
+	userRoute.GET("stories", r.storyController.GetAllStories)         //Get All Stories
+	userRoute.GET("stories/:id", r.storyController.GetStoryById)      //Get Story By ID
 	userRoute.GET("stories/liked", r.storyController.GetLikedStories) //Get Liked Stories
 	userRoute.POST("stories/like", r.storyController.LikeStory)       //Like Story
 
 	// Music
-	userRoute.GET("musics", r.musicController.GetAllMusics) //Get All Music
-	userRoute.GET("musics/:id", r.musicController.GetMusicByID)   //Get Music By ID
+	userRoute.GET("musics", r.musicController.GetAllMusics)         //Get All Music
+	userRoute.GET("musics/:id", r.musicController.GetMusicByID)     //Get Music By ID
 	userRoute.GET("musics/liked", r.musicController.GetLikedMusics) //Get Liked Music
-	userRoute.POST("musics/like", r.musicController.LikeMusic)       //Like Music
+	userRoute.POST("musics/like", r.musicController.LikeMusic)      //Like Music
 
 	// Complaint
 	userRoute.POST("complaint", r.complaintController.Create) // Create Complaint
 
 	// Transaction
-	userRoute.POST("transaction", r.transactionController.Insert) // Create Transaction
+	userRoute.POST("transaction", r.transactionController.Insert)                               // Create Transaction
+	userRoute.GET("transaction/:id", r.transactionController.FindByID)                          // Get Transaction By ID
+	userRoute.GET("transaction/consultation/:id", r.transactionController.FindByConsultationID) // Get Transaction By Consultation ID
+	userRoute.GET("transactions", r.transactionController.FindAll)                              // Get All Transaction
 
 	// Rating
 	userRoute.POST("feedbacks", r.ratingController.SendFeedback) // Create Rating
 
 	// Mood
-	userRoute.POST("moods", r.moodController.CreateMood) // Create Mood
-	userRoute.GET("moods", r.moodController.GetAllMoods) // Get All Moods
+	userRoute.POST("moods", r.moodController.CreateMood)     // Create Mood
+	userRoute.GET("moods", r.moodController.GetAllMoods)     // Get All Moods
 	userRoute.GET("moods/:id", r.moodController.GetMoodById) // Get Mood By ID
 
 	// Forum
