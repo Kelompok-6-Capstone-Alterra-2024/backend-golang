@@ -4,7 +4,6 @@ import (
 	"capstone/constants"
 	"capstone/entities"
 	"capstone/entities/forum"
-	postEntities "capstone/entities/post"
 	userEntities "capstone/entities/user"
 	"capstone/repositories/mysql/user"
 
@@ -122,13 +121,8 @@ func (f *ForumRepo) GetRecommendationForum(userId uint, metadata entities.Metada
 
 func (f *ForumRepo) GetForumById(forumId uint) (forum.Forum, error) {
 	var forumDB Forum
+
 	err := f.db.Where("id = ?", forumId).First(&forumDB).Error
-	if err != nil {
-		return forum.Forum{}, constants.ErrServer
-	}
-	
-	var postDB []Post
-	err = f.db.Preload("User").Where("forum_id = ?", forumId).Find(&postDB).Error
 	if err != nil {
 		return forum.Forum{}, constants.ErrServer
 	}
@@ -138,18 +132,6 @@ func (f *ForumRepo) GetForumById(forumId uint) (forum.Forum, error) {
 	forumEnt.Name = forumDB.Name
 	forumEnt.Description = forumDB.Description
 	forumEnt.ImageUrl = forumDB.ImageUrl
-	for _, postDBTemp := range postDB {
-		forumEnt.Post = append(forumEnt.Post, postEntities.Post{
-			ID:      postDBTemp.ID,
-			Content: postDBTemp.Content,
-			ImageUrl: postDBTemp.ImageUrl,
-			User:    userEntities.User{
-				Id:   postDBTemp.User.Id,
-				Username: postDBTemp.User.Username,
-				ProfilePicture: postDBTemp.User.ProfilePicture,
-			},
-		})
-	}
 
 	return forumEnt, nil
 }

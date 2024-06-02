@@ -111,31 +111,11 @@ func (forumController *ForumController) GetForumById(c echo.Context) error {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 
-	var resp []response.ForumDetailResponse
-
-	respForum := response.ForumDetailResponse{
-		ForumID:     forum.ID,
-		Name:        forum.Name,
-		Description: forum.Description,
-		ImageUrl:    forum.ImageUrl,
-		Post:        []response.PostResponse{}, // Initialize Post slice
-	}
-
-	for _, post := range forum.Post {
-		respPost := response.PostResponse{
-			PostID:   post.ID,
-			Content:  post.Content,
-			ImageUrl: post.ImageUrl,
-			User: response.UserPostResponse{
-				UserID:   uint(post.User.Id),
-				Username: post.User.Username,
-				ImageUrl: post.User.ProfilePicture,
-			},
-		}
-		respForum.Post = append(respForum.Post, respPost)
-	}
-
-	resp = append(resp, respForum)
+	var resp response.ForumDetailResponse
+	resp.ForumID = forum.ID
+	resp.Name = forum.Name
+	resp.Description = forum.Description
+	resp.ImageUrl = forum.ImageUrl
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Forum By Id", resp))
 }
