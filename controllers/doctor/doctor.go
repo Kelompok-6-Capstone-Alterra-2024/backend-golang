@@ -25,7 +25,14 @@ func (controller *DoctorController) Register(c echo.Context) error {
 	var doctorFromRequest request.DoctorRegisterRequest
 	c.Bind(&doctorFromRequest)
 
-	doctorRequest := doctorFromRequest.ToDoctorEntities()
+	imageFromRequest, err := c.FormFile("profile_picture")
+	doctorFromRequest.ProfilePicture = imageFromRequest
+
+	doctorRequest, err := doctorFromRequest.ToDoctorEntities()
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
 	doctorResult, err := controller.doctorUseCase.Register(doctorRequest)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
