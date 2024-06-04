@@ -2,6 +2,7 @@ package routes
 
 import (
 	"capstone/controllers/article"
+	"capstone/controllers/chatbot"
 	"capstone/controllers/complaint"
 	"capstone/controllers/consultation"
 	"capstone/controllers/doctor"
@@ -33,6 +34,7 @@ type RouteController struct {
 	moodController         *mood.MoodController
 	forumController        *forum.ForumController
 	postController         *post.PostController
+	chatbotController      *chatbot.ChatbotController
 	articleController      *article.ArticleController
 }
 
@@ -48,6 +50,7 @@ func NewRoute(
 	moodController *mood.MoodController,
 	forumController *forum.ForumController,
 	postController *post.PostController,
+	chatbotController *chatbot.ChatbotController,
 	articleController *article.ArticleController) *RouteController {
 	return &RouteController{
 		userController:         userController,
@@ -61,6 +64,7 @@ func NewRoute(
 		moodController:         moodController,
 		forumController:        forumController,
 		postController:         postController,
+		chatbotController:      chatbotController,
 		articleController:      articleController,
 	}
 }
@@ -70,6 +74,10 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	e.HTTPErrorHandler = base.ErrorHandler
 	e.Use(myMiddleware.CORSMiddleware())
+
+	// chatbot
+	e.GET("/v1/users/chatbots/customer-service", r.chatbotController.ChatbotCS)        //customer service chatbot
+	e.GET("/v1/users/chatbots/mental-health", r.chatbotController.ChatbotMentalHealth) //mental health chatbot
 
 	userAuth := e.Group("/v1/users")
 	userAuth.POST("/register", r.userController.Register) //Register User
@@ -142,6 +150,6 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorAuth.POST("/login", r.doctorController.Login)       //Login Doctor
 
 	doctorAuth.POST("/article", r.articleController.CreateArticle) // Create Article
-	doctorAuth.GET("article", r.articleController.GetAllArticle)   // Get All Article
+	doctorAuth.GET("/article", r.articleController.GetAllArticle)  // Get All Article
 
 }

@@ -8,7 +8,6 @@ import (
 	"capstone/utilities/base"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -24,15 +23,15 @@ func NewArticleController(articleUseCase articleUseCase.ArticleUseCaseInterface)
 }
 
 func (controller *ArticleController) CreateArticle(c echo.Context) error {
-	var articleReq request.CreateArticleRequest
-	if err := c.Bind(&articleReq); err != nil {
-		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("Invalid request format"))
+	newArticle := new(request.CreateArticleRequest)
+	if err := c.Bind(newArticle); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("Invalid request body"))
 	}
 
 	token := c.Request().Header.Get("Authorization")
 	userId, err := utilities.GetUserIdFromToken(token)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse("Unauthorized"))
+		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse("Invalid token"))
 	}
 
 	file, err := c.FormFile("image")
@@ -45,36 +44,35 @@ func (controller *ArticleController) CreateArticle(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, base.NewErrorResponse("Failed to upload image"))
 	}
 
-	newArticle := &articleUseCase.Article{
-		DoctorID: uint(userId),
-		Title:    articleReq.Title,
-		Content:  articleReq.Content,
-		Date:     time.Now(),
-		ImageUrl: imageURL,
+	articleEntity := articleUseCase.Article{
+		Title:     newArticle.Title,
+		Content:   newArticle.Content,
+		ImageUrl:  imageURL,
+		DoctorID:  uint(userId),
+		ViewCount: 0,
 	}
 
-	createdArticle, err := controller.articleUseCase.CreateArticle(newArticle)
+	createdArticle, err := controller.articleUseCase.CreateArticle(&articleEntity, userId)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 
-	articleResp := response.ArticleCreatedResponse{
+	articleResponse := response.ArticleCreatedResponse{
 		ID:        createdArticle.ID,
+		DoctorID:  createdArticle.DoctorID,
 		Title:     createdArticle.Title,
 		Content:   createdArticle.Content,
 		Date:      createdArticle.Date,
 		ImageUrl:  createdArticle.ImageUrl,
 		ViewCount: createdArticle.ViewCount,
-		IsLiked:   createdArticle.IsLiked,
 		Doctor: response.DoctorInfoResponse{
 			ID:   createdArticle.Doctor.ID,
 			Name: createdArticle.Doctor.Name,
 		},
 	}
 
-	return c.JSON(http.StatusOK, base.NewSuccessResponse("Article created successfully", articleResp))
+	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Article created successfully", articleResponse))
 }
-
 func (controller *ArticleController) GetAllArticle(c echo.Context) error {
 	pageParam := c.QueryParam("page")
 	limitParam := c.QueryParam("limit")
@@ -89,7 +87,7 @@ func (controller *ArticleController) GetAllArticle(c echo.Context) error {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 
-	articleResponse := make([]response.ArticleCreatedResponse, 0, len(articles))
+	articleResponse := make([]response.ArticleListResponse, 0, len(articles))
 	for _, article := range articles {
 		articleResponse = append(articleResponse, article.ToResponse())
 	}
@@ -111,6 +109,7 @@ func (controller *ArticleController) GetArticleById(c echo.Context) error {
 
 	articleResp := response.ArticleCreatedResponse{
 		ID:        article.ID,
+		DoctorID:  article.DoctorID,
 		Title:     article.Title,
 		Content:   article.Content,
 		Date:      article.Date,

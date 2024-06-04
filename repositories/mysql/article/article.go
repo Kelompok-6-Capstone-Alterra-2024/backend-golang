@@ -5,6 +5,7 @@ import (
 	"capstone/entities"
 	articleEntities "capstone/entities/article"
 	doctorEntities "capstone/entities/doctor"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -19,28 +20,52 @@ func NewArticleRepo(db *gorm.DB) *ArticleRepo {
 	}
 }
 
-func (repository *ArticleRepo) CreateArticle(article *articleEntities.Article) (*articleEntities.Article, error) {
+func (repository *ArticleRepo) CreateArticle(article *articleEntities.Article, userId int) (*articleEntities.Article, error) {
 	articleDB := Article{
-		DoctorID: article.DoctorID,
-		Title:    article.Title,
-		Content:  article.Content,
-		Date:     article.Date,
-		ImageUrl: article.ImageUrl,
+		Title:     article.Title,
+		Content:   article.Content,
+		ImageUrl:  article.ImageUrl,
+		DoctorID:  uint(userId), // Assuming userId is the ID of the doctor creating the article
+		ViewCount: 0,            // Initialize view count to 0
+		Date:      time.Now(),
 	}
 
-	if err := repository.db.Create(&articleDB).Error; err != nil {
+	err := repository.db.Create(&articleDB).Error
+	if err != nil {
 		return nil, err
 	}
 
-	articleEntity := articleDB.ToEntities()
-	return articleEntity, nil
+	// Retrieve the created article with doctor details
+	err = repository.db.Where("id = ?", articleDB.ID).Preload("Doctor").First(&articleDB).Error
+	if err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	articleResp := articleEntities.Article{
+		ID:        articleDB.ID,
+		Title:     articleDB.Title,
+		Content:   articleDB.Content,
+		Date:      articleDB.Date,
+		ImageUrl:  articleDB.ImageUrl,
+		ViewCount: articleDB.ViewCount,
+		DoctorID:  articleDB.DoctorID,
+		Doctor: doctorEntities.Doctor{
+			ID:   articleDB.Doctor.ID,
+			Name: articleDB.Doctor.Name,
+		},
+	}
+
+	return &articleResp, nil
 }
 
 func (repository *ArticleRepo) GetAllArticle(metadata entities.Metadata, userId int) ([]articleEntities.Article, error) {
 	var articlesDb []Article
 
 	// Pagination
-	err := repository.db.Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&articlesDb).Error
+	err := repository.db.Limit(metadata.Limit).
+		Offset((metadata.Page - 1) * metadata.Limit).
+		Preload("Doctor"). // Preload doctor data
+		Find(&articlesDb).Error
 	if err != nil {
 		return nil, err
 	}

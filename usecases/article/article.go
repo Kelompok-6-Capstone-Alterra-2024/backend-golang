@@ -16,12 +16,12 @@ func NewArticleUseCase(articleRepository articleEntities.ArticleRepositoryInterf
 	}
 }
 
-func (useCase *ArticleUseCase) CreateArticle(article *articleEntities.Article) (*articleEntities.Article, error) {
+func (useCase *ArticleUseCase) CreateArticle(article *articleEntities.Article, userId int) (*articleEntities.Article, error) {
 	if article.Title == "" || article.Content == "" {
 		return nil, constants.ErrEmptyInputArticle
 	}
 
-	createdArticle, err := useCase.articleRepository.CreateArticle(article)
+	createdArticle, err := useCase.articleRepository.CreateArticle(article, userId)
 	if err != nil {
 		return nil, err
 	}

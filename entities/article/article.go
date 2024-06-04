@@ -20,21 +20,21 @@ type Article struct {
 }
 
 type ArticleRepositoryInterface interface {
-	CreateArticle(article *Article) (*Article, error)
+	CreateArticle(article *Article, userId int) (*Article, error)
 	GetAllArticle(metadata entities.Metadata, userId int) ([]Article, error)
 	GetArticleById(articleId int, userId int) (Article, error)
 	GetLikedArticle(metadata entities.Metadata, userId int) ([]Article, error)
 }
 
 type ArticleUseCaseInterface interface {
-	CreateArticle(article *Article) (*Article, error)
+	CreateArticle(article *Article, userId int) (*Article, error)
 	GetAllArticle(metadata entities.Metadata, userId int) ([]Article, error)
 	GetArticleById(articleId int, userId int) (Article, error)
 	GetLikedArticle(metadata entities.Metadata, userId int) ([]Article, error)
 }
 
-func (ar *Article) ToResponse() response.ArticleCreatedResponse {
-	return response.ArticleCreatedResponse{
+func (ar *Article) ToResponse() response.ArticleListResponse {
+	return response.ArticleListResponse{
 		ID:        ar.ID,
 		DoctorID:  ar.DoctorID,
 		Title:     ar.Title,
@@ -43,5 +43,9 @@ func (ar *Article) ToResponse() response.ArticleCreatedResponse {
 		Date:      ar.Date,
 		ViewCount: ar.ViewCount,
 		IsLiked:   ar.IsLiked,
+		Doctor: response.DoctorInfoResponse{
+			ID:   ar.Doctor.ID,
+			Name: ar.Doctor.Name,
+		},
 	}
 }

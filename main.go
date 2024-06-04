@@ -3,6 +3,7 @@ package main
 import (
 	"capstone/configs"
 	articleController "capstone/controllers/article"
+	chatbotController "capstone/controllers/chatbot"
 	complaintController "capstone/controllers/complaint"
 	consultationController "capstone/controllers/consultation"
 	doctorController "capstone/controllers/doctor"
@@ -29,6 +30,7 @@ import (
 	userRepositories "capstone/repositories/mysql/user"
 	"capstone/routes"
 	articleUseCase "capstone/usecases/article"
+	chatbotUseCase "capstone/usecases/chatbot"
 	complaintUseCase "capstone/usecases/complaint"
 	consultationUseCase "capstone/usecases/consultation"
 	doctorUseCase "capstone/usecases/doctor"
@@ -78,6 +80,7 @@ func main() {
 	moodUC := moodUseCase.NewMoodUseCase(moodRepo)
 	forumUC := forumUseCase.NewForumUseCase(forumRepo)
 	postUC := postUseCase.NewPostUseCase(postRepo)
+	chatbotUC := chatbotUseCase.NewChatbotUsecase()
 	articleUC := articleUseCase.NewArticleUseCase(articleRepo)
 
 	userCont := userController.NewUserController(userUC)
@@ -91,9 +94,10 @@ func main() {
 	moodCont := moodController.NewMoodController(moodUC)
 	forumCont := forumController.NewForumController(forumUC)
 	postCont := postController.NewPostController(postUC)
+	chatbotCont := chatbotController.NewChatbotController(chatbotUC)
 	articleCont := articleController.NewArticleController(articleUC)
 
-	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont, ratingCont, moodCont, forumCont, postCont, articleCont)
+	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont, ratingCont, moodCont, forumCont, postCont, chatbotCont, articleCont)
 
 	e := echo.New()
 	route.InitRoute(e)
