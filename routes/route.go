@@ -140,16 +140,16 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("posts/:postId/comments", r.postController.GetAllCommentByPostId) // Get All Comment By Post ID
 
 	// Article
-	userRoute.GET("article", r.articleController.GetAllArticle) // Get All Article
-	userRoute.GET("article/:id", r.articleController.GetArticleById)
-	userRoute.GET("article/liked", r.articleController.GetLikedArticle)
+	userRoute.GET("articles", r.articleController.GetAllArticle) // Get All Article
+	userRoute.GET("articles/:id", r.articleController.GetArticleById)
+	userRoute.GET("articles/liked", r.articleController.GetLikedArticle)
 
 	doctorAuth := e.Group("/v1/doctors")
 
 	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor
 	doctorAuth.POST("/login", r.doctorController.Login)       //Login Doctor
 
-	doctorAuth.POST("/article", r.articleController.CreateArticle) // Create Article
-	doctorAuth.GET("/article", r.articleController.GetAllArticle)  // Get All Article
+	doctorAuth.POST("/articles", r.articleController.CreateArticle) // Create Article
+	doctorAuth.GET("/articles", r.articleController.GetAllArticle)  // Get All Article
 
 }
