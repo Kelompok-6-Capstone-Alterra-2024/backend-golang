@@ -11,7 +11,7 @@ import (
 func LoadEnv() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Error loading .env file, using default value")
 	}
 }
 
@@ -29,10 +29,10 @@ func InitConfigJWT() string {
 	return os.Getenv("SECRET_JWT")
 }
 
-// func InitConfigCloudinary() string {
-// 	return os.Getenv("CLOUDINARY_URL")
-// }
+func InitConfigCloudinary() string {
+	return os.Getenv("CLOUDINARY_URL")
+}
 
-// func InitConfigKeyChatbot() string {
-// 	return os.Getenv("KEY_AI")
-// }
+func InitConfigKeyChatbot() string {
+	return os.Getenv("AI_KEY")
+}
