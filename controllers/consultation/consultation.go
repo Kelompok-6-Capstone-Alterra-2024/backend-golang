@@ -84,6 +84,9 @@ func (controller *ConsultationController) UpdateStatusConsultation(c echo.Contex
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("Invalid ID"))
 	}
 	c.Bind(&consultationRequest)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
 	consultationRequest.ID = uint(consultationID)
 	consultationResponse, err := controller.consultationUseCase.UpdateStatusConsultation(consultationRequest.ToEntities())
 	if err != nil {

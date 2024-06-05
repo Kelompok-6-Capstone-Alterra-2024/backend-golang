@@ -53,12 +53,14 @@ func (repository *ConsultationRepo) GetAllConsultation(metadata *entities.Metada
 }
 
 func (repository *ConsultationRepo) UpdateStatusConsultation(consultation *consultationEntities.Consultation) (*consultationEntities.Consultation, error) {
-	consultationDB := ToConsultationModel(consultation)
-	if err := repository.db.First(&consultationDB, consultationDB.ID).Error; err != nil {
+	var consultationDB Consultation
+	if err := repository.db.First(&consultationDB, "id LIKE ?", consultation.ID).Error; err != nil {
 		return nil, constants.ErrDataNotFound
 	}
 
-	if err := repository.db.Model(consultationDB).Update("status", consultationDB.Status).Error; err != nil {
+	consultationDB.Status = consultation.Status
+
+	if err := repository.db.Model(&consultationDB).Save(&consultationDB).Error; err != nil {
 		return nil, err
 	}
 

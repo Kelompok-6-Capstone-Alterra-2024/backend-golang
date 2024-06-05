@@ -38,6 +38,7 @@ func (receiver Consultation) ToEntities() *consultation.Consultation {
 
 func ToConsultationModel(request *consultation.Consultation) *Consultation {
 	return &Consultation{
+		Model:         gorm.Model{ID: request.ID},
 		DoctorID:      request.DoctorID,
 		UserID:        request.UserID,
 		Status:        request.Status,
