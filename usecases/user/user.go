@@ -98,15 +98,15 @@ func (u *UserUseCase) HandleGoogleCallback(ctx context.Context, code string) (us
     result, err := u.repository.FindByEmail(userInfo.Email)
     if err != nil {
         // Jika pengguna belum ada, buat pengguna baru
-        result = userEntitites.User{
+        newUser := userEntitites.User{
             Email:          userInfo.Email,
             Name:           userInfo.Name,
             ProfilePicture: userInfo.Picture,
             IsOauth:        true,
         }
-        res, err := u.repository.Create(result)
-		if  err != nil {
-            return result, constants.ErrInsertOAuth
+        res, err := u.repository.Create(newUser)
+		if err != nil {
+            return userEntitites.User{}, constants.ErrInsertOAuth
         }
 
 		tokenJWT, _ := middlewares.CreateToken(res.Id)
