@@ -78,6 +78,15 @@ func ConvertResponseCode(err error) int {
 
 		case constants.ErrEmptyInputComment:
 			return http.StatusBadRequest
+
+		case constants.ErrExcange:
+			return http.StatusInternalServerError
+
+		case constants.ErrNewServiceGoogle:
+			return http.StatusInternalServerError
+
+		case constants.ErrNewUserInfo:
+			return http.StatusInternalServerError
 			
 	default:
 		return http.StatusInternalServerError

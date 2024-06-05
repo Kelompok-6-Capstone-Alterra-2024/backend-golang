@@ -51,3 +51,9 @@ var ErrEmptyInputPost error = errors.New("forum id or content cannot be empty")
 var ErrEmptyInputLike error = errors.New("post id cannot be empty")
 
 var ErrEmptyInputComment error = errors.New("post id or content cannot be empty")
+
+var ErrExcange error = errors.New("failed excange")
+
+var ErrNewServiceGoogle error = errors.New("failed new service google")
+
+var ErrNewUserInfo error = errors.New("failed new user info")

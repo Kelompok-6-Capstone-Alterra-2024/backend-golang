@@ -79,19 +79,19 @@ func (u *UserUseCase) HandleGoogleLogin() string {
 func (u *UserUseCase) HandleGoogleCallback(ctx context.Context, code string) (userEntitites.User, error) {
     token, err := u.oauthConfig.Exchange(ctx, code)
     if err != nil {
-        return userEntitites.User{}, constants.ErrServer
+        return userEntitites.User{}, constants.ErrExcange
     }
 
     // Membuat layanan OAuth2
     oauth2Service, err := oauth2.NewService(ctx, option.WithTokenSource(u.oauthConfig.TokenSource(ctx, token)))
     if err != nil {
-        return userEntitites.User{}, constants.ErrServer
+        return userEntitites.User{}, constants.ErrNewServiceGoogle
     }
 
     userInfoService := oauth2.NewUserinfoV2MeService(oauth2Service)
     userInfo, err := userInfoService.Get().Do()
     if err != nil {
-        return userEntitites.User{}, constants.ErrServer
+        return userEntitites.User{}, constants.ErrNewUserInfo
     }
 
     // Cek apakah pengguna sudah ada di database
