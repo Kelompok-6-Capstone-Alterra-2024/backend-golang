@@ -106,7 +106,7 @@ func (u *UserUseCase) HandleGoogleCallback(ctx context.Context, code string) (us
         }
         res, err := u.repository.Create(result)
 		if  err != nil {
-            return result, constants.ErrServer
+            return result, constants.ErrInsertOAuth
         }
 
 		tokenJWT, _ := middlewares.CreateToken(res.Id)
