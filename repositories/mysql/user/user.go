@@ -94,3 +94,41 @@ func (userRepo *UserRepo) Login(user *userEntities.User) (userEntities.User, err
 
 	return userResult, nil
 }
+
+func (r *UserRepo) Create(user userEntities.User) (userEntities.User ,error) {
+	var userDB User
+	userDB.Name = user.Name
+	userDB.Email = user.Email
+	userDB.ProfilePicture = user.ProfilePicture
+	userDB.IsOauth = user.IsOauth
+    
+	err := r.DB.Create(&userDB).Error
+	if err != nil {
+		return userEntities.User{}, err
+	}
+
+	var userEnt userEntities.User
+	userEnt.Id = userDB.Id
+	userEnt.Name = userDB.Name
+	userEnt.Email = userDB.Email
+	userEnt.ProfilePicture = userDB.ProfilePicture
+	userEnt.IsOauth = userDB.IsOauth
+
+	return userEnt, nil
+}
+
+func (r *UserRepo) FindByEmail(email string) (userEntities.User, error) {
+    var userDB User
+    if err := r.DB.Where("email = ?", email).First(&userDB).Error; err != nil {
+        return userEntities.User{}, err
+    }
+
+	var userEnt userEntities.User
+	userEnt.Id = userDB.Id
+	userEnt.Name = userDB.Name
+	userEnt.Email = userDB.Email
+	userEnt.ProfilePicture = userDB.ProfilePicture
+	userEnt.IsOauth = userDB.IsOauth
+
+    return userEnt, nil
+}
