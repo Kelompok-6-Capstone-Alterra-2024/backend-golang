@@ -87,7 +87,9 @@ func ConvertResponseCode(err error) int {
 
 		case constants.ErrNewUserInfo:
 			return http.StatusInternalServerError
-			
+
+		case constants.ErrInsertOAuth:
+			return http.StatusInternalServerError
 	default:
 		return http.StatusInternalServerError
 	}
