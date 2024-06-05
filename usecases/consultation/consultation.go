@@ -38,3 +38,11 @@ func (usecase *ConsultationUseCase) GetAllConsultation(metadata *entities.Metada
 	}
 	return result, nil
 }
+
+func (usecase *ConsultationUseCase) UpdateStatusConsultation(consultation *consultationEntities.Consultation) (*consultationEntities.Consultation, error) {
+	result, err := usecase.consultationRepo.UpdateStatusConsultation(consultation)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}

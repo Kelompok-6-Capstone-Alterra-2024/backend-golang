@@ -25,12 +25,14 @@ type ConsultationRepository interface {
 	CreateConsultation(consultation *Consultation) (*Consultation, error)
 	GetConsultationByID(consultationID int) (*Consultation, error)
 	GetAllConsultation(metadata *entities.Metadata, userID int) (*[]Consultation, error)
+	UpdateStatusConsultation(consultation *Consultation) (*Consultation, error)
 }
 
 type ConsultationUseCase interface {
 	CreateConsultation(consultation *Consultation) (*Consultation, error)
 	GetConsultationByID(consultationID int) (*Consultation, error)
 	GetAllConsultation(metadata *entities.Metadata, userID int) (*[]Consultation, error)
+	UpdateStatusConsultation(consultation *Consultation) (*Consultation, error)
 }
 
 func (r *Consultation) ToResponse() *response.ConsultationResponse {

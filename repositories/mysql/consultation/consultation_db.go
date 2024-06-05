@@ -15,8 +15,8 @@ type Consultation struct {
 	UserID        int           `gorm:"column:user_id;not null"`
 	User          user.User     `gorm:"foreignKey:user_id;references:id"`
 	ComplaintID   int           `gorm:"column:complaint_id;unique;default:NULL"`
-	Status        string        `gorm:"column:status;not null;default:'pending'"`
-	PaymentStatus string        `gorm:"column:payment_status;not null;default:'pending'"`
+	Status        string        `gorm:"column:status;not null;default:'pending';type:enum('pending', 'accepted', 'rejected')"`
+	PaymentStatus string        `gorm:"column:payment_status;not null;type:enum('pending', 'paid', 'canceled');default:'pending'"`
 	IsAccepted    bool          `gorm:"column:is_accepted"`
 	IsActive      bool          `json:"is_active"`
 	Date          time.Time     `json:"date"`

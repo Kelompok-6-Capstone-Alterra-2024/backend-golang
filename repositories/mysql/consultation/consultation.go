@@ -30,7 +30,7 @@ func (repository *ConsultationRepo) CreateConsultation(consultation *consultatio
 
 func (repository *ConsultationRepo) GetConsultationByID(consultationID int) (consultation *consultationEntities.Consultation, err error) {
 	var consultationResult Consultation
-	if err := repository.db.Preload("User").Preload("Doctor").First(&consultationResult, consultationID).Error; err != nil {
+	if err = repository.db.Preload("User").Preload("Doctor").First(&consultationResult, consultationID).Error; err != nil {
 		return nil, constants.ErrDataNotFound
 	}
 
@@ -50,4 +50,17 @@ func (repository *ConsultationRepo) GetAllConsultation(metadata *entities.Metada
 	}
 
 	return &consultations, nil
+}
+
+func (repository *ConsultationRepo) UpdateStatusConsultation(consultation *consultationEntities.Consultation) (*consultationEntities.Consultation, error) {
+	consultationDB := ToConsultationModel(consultation)
+	if err := repository.db.First(&consultationDB, consultationDB.ID).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	if err := repository.db.Model(consultationDB).Update("status", consultationDB.Status).Error; err != nil {
+		return nil, err
+	}
+
+	return consultationDB.ToEntities(), nil
 }
