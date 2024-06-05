@@ -95,8 +95,8 @@ func (u *UserUseCase) HandleGoogleCallback(ctx context.Context, code string) (us
     }
 
     // Cek apakah pengguna sudah ada di database
-    result, err := u.repository.FindByEmail(userInfo.Email)
-    if err != nil {
+	result, myCode, err := u.repository.OauthFindByEmail(userInfo.Email)
+    if err != nil && myCode == 0 {
         newUser, err := u.repository.Create(userInfo.Email, userInfo.Picture, userInfo.Name)
 		if err != nil {
             return userEntitites.User{}, constants.ErrInsertOAuth
@@ -107,6 +107,10 @@ func (u *UserUseCase) HandleGoogleCallback(ctx context.Context, code string) (us
 
 		return newUser, nil
     }
+
+	if err != nil && myCode == 1 {
+		return userEntitites.User{}, err
+	}
 
 	tokenJWT, _ := middlewares.CreateToken(result.Id)
 	result.Token = tokenJWT
