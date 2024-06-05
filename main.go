@@ -54,6 +54,7 @@ func main() {
 	db := mysql.ConnectDB(configs.InitConfigMySQL())
 	midtransConfig := configs.MidtransConfig()
 	validate := validator.New()
+	oauthConfig := configs.GetGoogleOAuthConfig()
 
 	userRepo := userRepositories.NewUserRepo(db)
 	doctorRepo := doctorRepositories.NewDoctorRepo(db)
@@ -68,7 +69,7 @@ func main() {
 	postRepo := postRepositories.NewPostRepo(db)
 	articleRepo := articleRepositories.NewArticleRepo(db)
 
-	userUC := userUseCase.NewUserUseCase(userRepo)
+	userUC := userUseCase.NewUserUseCase(userRepo, oauthConfig)
 	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo)
 	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo)
 	storyUC := storyUseCase.NewStoryUseCase(storyRepo)
