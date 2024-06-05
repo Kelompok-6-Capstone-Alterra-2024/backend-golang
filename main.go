@@ -2,6 +2,7 @@ package main
 
 import (
 	"capstone/configs"
+	articleController "capstone/controllers/article"
 	chatbotController "capstone/controllers/chatbot"
 	complaintController "capstone/controllers/complaint"
 	consultationController "capstone/controllers/consultation"
@@ -15,6 +16,7 @@ import (
 	transactionController "capstone/controllers/transaction"
 	userController "capstone/controllers/user"
 	"capstone/repositories/mysql"
+	articleRepositories "capstone/repositories/mysql/article"
 	complaintRepositories "capstone/repositories/mysql/complaint"
 	consultationRepositories "capstone/repositories/mysql/consultation"
 	doctorRepositories "capstone/repositories/mysql/doctor"
@@ -27,6 +29,7 @@ import (
 	transactionRepositories "capstone/repositories/mysql/transaction"
 	userRepositories "capstone/repositories/mysql/user"
 	"capstone/routes"
+	articleUseCase "capstone/usecases/article"
 	chatbotUseCase "capstone/usecases/chatbot"
 	complaintUseCase "capstone/usecases/complaint"
 	consultationUseCase "capstone/usecases/consultation"
@@ -64,6 +67,7 @@ func main() {
 	moodRepo := moodRepositories.NewMoodRepo(db)
 	forumRepo := forumRepositories.NewForumRepo(db)
 	postRepo := postRepositories.NewPostRepo(db)
+	articleRepo := articleRepositories.NewArticleRepo(db)
 
 	userUC := userUseCase.NewUserUseCase(userRepo, oauthConfig)
 	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo)
@@ -78,6 +82,7 @@ func main() {
 	forumUC := forumUseCase.NewForumUseCase(forumRepo)
 	postUC := postUseCase.NewPostUseCase(postRepo)
 	chatbotUC := chatbotUseCase.NewChatbotUsecase()
+	articleUC := articleUseCase.NewArticleUseCase(articleRepo)
 
 	userCont := userController.NewUserController(userUC)
 	doctorCont := doctorController.NewDoctorController(doctorUC)
@@ -91,8 +96,9 @@ func main() {
 	forumCont := forumController.NewForumController(forumUC)
 	postCont := postController.NewPostController(postUC)
 	chatbotCont := chatbotController.NewChatbotController(chatbotUC)
+	articleCont := articleController.NewArticleController(articleUC)
 
-	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont, ratingCont, moodCont, forumCont, postCont, chatbotCont)
+	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont, ratingCont, moodCont, forumCont, postCont, chatbotCont, articleCont)
 
 	e := echo.New()
 	route.InitRoute(e)

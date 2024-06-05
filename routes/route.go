@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"capstone/controllers/article"
 	"capstone/controllers/chatbot"
 	"capstone/controllers/complaint"
 	"capstone/controllers/consultation"
@@ -34,6 +35,7 @@ type RouteController struct {
 	forumController        *forum.ForumController
 	postController         *post.PostController
 	chatbotController      *chatbot.ChatbotController
+	articleController      *article.ArticleController
 }
 
 func NewRoute(
@@ -49,7 +51,7 @@ func NewRoute(
 	forumController *forum.ForumController,
 	postController *post.PostController,
 	chatbotController *chatbot.ChatbotController,
-) *RouteController {
+	articleController *article.ArticleController) *RouteController {
 	return &RouteController{
 		userController:         userController,
 		doctorController:       doctorController,
@@ -63,6 +65,7 @@ func NewRoute(
 		forumController:        forumController,
 		postController:         postController,
 		chatbotController:      chatbotController,
+		articleController:      articleController,
 	}
 }
 
@@ -73,7 +76,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	e.Use(myMiddleware.CORSMiddleware())
 
 	// chatbot
-	e.GET("/v1/users/chatbots/customer-service", r.chatbotController.ChatbotCS) //customer service chatbot
+	e.GET("/v1/users/chatbots/customer-service", r.chatbotController.ChatbotCS)        //customer service chatbot
 	e.GET("/v1/users/chatbots/mental-health", r.chatbotController.ChatbotMentalHealth) //mental health chatbot
 
 	userAuth := e.Group("/v1/users")
@@ -125,23 +128,31 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("moods/:id", r.moodController.GetMoodById) // Get Mood By ID
 
 	// Forum
-	userRoute.POST("forums/join", r.forumController.JoinForum) // Join Forum
-	userRoute.DELETE("forums/:id", r.forumController.LeaveForum) // Leave Forum
-	userRoute.GET("forums", r.forumController.GetJoinedForum)     // Get All Forum
+	userRoute.POST("forums/join", r.forumController.JoinForum)                       // Join Forum
+	userRoute.DELETE("forums/:id", r.forumController.LeaveForum)                     // Leave Forum
+	userRoute.GET("forums", r.forumController.GetJoinedForum)                        // Get All Forum
 	userRoute.GET("forums/recommendation", r.forumController.GetRecommendationForum) // Get Recommendation Forum
-	userRoute.GET("forums/:id", r.forumController.GetForumById)                       // Get Forum By ID
+	userRoute.GET("forums/:id", r.forumController.GetForumById)                      // Get Forum By ID
 
 	// Posts
-	userRoute.GET("forums/:forumId/posts", r.postController.GetAllPostsByForumId) // Get All Posts By Forum ID
-	userRoute.GET("posts/:id", r.postController.GetPostById)                     // Get Post By ID
-	userRoute.POST("posts", r.postController.SendPost)                            // Create Post
-	userRoute.POST("posts/like", r.postController.LikePost)                       // Like Post
-	userRoute.POST("comments", r.postController.SendComment)                      // Create Comment
+	userRoute.GET("forums/:forumId/posts", r.postController.GetAllPostsByForumId)   // Get All Posts By Forum ID
+	userRoute.GET("posts/:id", r.postController.GetPostById)                        // Get Post By ID
+	userRoute.POST("posts", r.postController.SendPost)                              // Create Post
+	userRoute.POST("posts/like", r.postController.LikePost)                         // Like Post
+	userRoute.POST("comments", r.postController.SendComment)                        // Create Comment
 	userRoute.GET("posts/:postId/comments", r.postController.GetAllCommentByPostId) // Get All Comment By Post ID
+
+	// Article
+	userRoute.GET("articles", r.articleController.GetAllArticle) // Get All Article
+	userRoute.GET("articles/:id", r.articleController.GetArticleById)
+	userRoute.GET("articles/liked", r.articleController.GetLikedArticle)
 
 	doctorAuth := e.Group("/v1/doctors")
 
 	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor
 	doctorAuth.POST("/login", r.doctorController.Login)       //Login Doctor
+
+	doctorAuth.POST("/articles", r.articleController.CreateArticle) // Create Article
+	doctorAuth.GET("/articles", r.articleController.GetAllArticle)  // Get All Article
 
 }
