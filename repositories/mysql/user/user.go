@@ -95,12 +95,12 @@ func (userRepo *UserRepo) Login(user *userEntities.User) (userEntities.User, err
 	return userResult, nil
 }
 
-func (r *UserRepo) Create(user userEntities.User) (userEntities.User ,error) {
+func (r *UserRepo) Create(email string, picture string, name string) (userEntities.User ,error) {
 	var userDB User
-	// userDB.Name = user.Name
-	userDB.Email = user.Email
-	// userDB.ProfilePicture = user.ProfilePicture
-	// userDB.IsOauth = user.IsOauth
+	userDB.Email = email
+	userDB.ProfilePicture = picture
+	userDB.Name = name
+	userDB.IsOauth = true
     
 	err := r.DB.Create(&userDB).Error
 	if err != nil {
