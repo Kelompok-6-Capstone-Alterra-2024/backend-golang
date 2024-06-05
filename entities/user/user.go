@@ -22,7 +22,7 @@ type RepositoryInterface interface {
 	Register(user *User) (User, int64, error)
 	Login(user *User) (User, error)
 	Create(email string, picture string, name string) (User ,error)
-	FindByEmail(email string) (User, error)
+	OauthFindByEmail(email string) (User, int, error)
 }
 
 type UseCaseInterface interface {

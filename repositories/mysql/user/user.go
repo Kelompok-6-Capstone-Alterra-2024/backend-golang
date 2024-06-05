@@ -1,6 +1,7 @@
 package user
 
 import (
+	"capstone/constants"
 	userEntities "capstone/entities/user"
 	"fmt"
 
@@ -117,11 +118,15 @@ func (r *UserRepo) Create(email string, picture string, name string) (userEntiti
 	return userEnt, nil
 }
 
-func (r *UserRepo) FindByEmail(email string) (userEntities.User, error) {
+func (r *UserRepo) OauthFindByEmail(email string) (userEntities.User, int, error) {
     var userDB User
     if err := r.DB.Where("email = ?", email).First(&userDB).Error; err != nil {
-        return userEntities.User{}, err
+        return userEntities.User{}, 0, err
     }
+
+	if !userDB.IsOauth {
+		return userEntities.User{}, 1, constants.ErrEmailAlreadyExist
+	}
 
 	var userEnt userEntities.User
 	userEnt.Id = userDB.Id
@@ -130,5 +135,5 @@ func (r *UserRepo) FindByEmail(email string) (userEntities.User, error) {
 	userEnt.ProfilePicture = userDB.ProfilePicture
 	userEnt.IsOauth = userDB.IsOauth
 
-    return userEnt, nil
+    return userEnt, 0, nil
 }
