@@ -1,8 +1,11 @@
 package stories
 
 import (
+	"capstone/constants"
 	"capstone/entities"
 	storyEntities "capstone/entities/story"
+	"capstone/utilities"
+	"mime/multipart"
 )
 
 type StoryUseCase struct {
@@ -45,4 +48,64 @@ func (storiesUseCase *StoryUseCase) LikeStory(storyId int, userId int) error {
 		return err
 	}
 	return nil
+}
+
+func (storiesUseCase *StoryUseCase) CountStoriesByDoctorId(doctorId int) (int, error) {
+	count, err := storiesUseCase.storyRepository.CountStoriesByDoctorId(doctorId)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (storiesUseCase *StoryUseCase) CountStoryLikesByDoctorId(doctorId int) (int, error) {
+	count, err := storiesUseCase.storyRepository.CountStoryLikesByDoctorId(doctorId)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (storiesUseCase *StoryUseCase) CountStoryViewByDoctorId(doctorId int) (int, error) {
+	count, err := storiesUseCase.storyRepository.CountStoryViewByDoctorId(doctorId)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (storiesUseCase *StoryUseCase) PostStory(story storyEntities.Story, file *multipart.FileHeader) (storyEntities.Story, error) {
+	if story.Title == "" || story.Content == "" {
+		return storyEntities.Story{}, constants.ErrEmptyInputStory
+	}
+
+	if file != nil {
+		secureUrl, err := utilities.UploadImage(file)
+		if err != nil {
+			return storyEntities.Story{}, constants.ErrUploadImage
+		}
+		story.ImageUrl = secureUrl
+	}
+
+	story, err := storiesUseCase.storyRepository.PostStory(story)
+	if err != nil {
+		return storyEntities.Story{}, err
+	}
+	return story, nil
+}
+
+func (storiesUseCase *StoryUseCase) GetStoryByIdForDoctor(storyId int) (storyEntities.Story, error) {
+	story, err := storiesUseCase.storyRepository.GetStoryByIdForDoctor(storyId)
+	if err != nil {
+		return storyEntities.Story{}, err
+	}
+	return story, nil
+}
+
+func (storiesUseCase *StoryUseCase) GetAllStoriesByDoctorId(metadata entities.MetadataFull, doctorId int) ([]storyEntities.Story, error) {
+	stories, err := storiesUseCase.storyRepository.GetAllStoriesByDoctorId(metadata, doctorId)
+	if err != nil {
+		return []storyEntities.Story{}, err
+	}
+	return stories, nil
 }

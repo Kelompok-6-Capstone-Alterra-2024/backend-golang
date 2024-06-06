@@ -109,6 +109,11 @@ func (repository *StoriesRepo) GetStoryById(storyId int, userId int) (storyEntit
 		IsLiked: isLiked,
 	}
 
+	err = repository.DB.Model(&storyDb).Where("id = ?", storyId).Update("view_count", storyDb.ViewCount+1).Error
+	if err != nil {
+		return storyEntities.Story{}, constants.ErrServer
+	}
+
 	return storyResp, nil
 }
 
@@ -168,4 +173,111 @@ func (repository *StoriesRepo) LikeStory(storyId int, userId int) error {
 	}
 
 	return nil
+}
+
+func (repository *StoriesRepo) CountStoriesByDoctorId(doctorId int) (int, error) {
+	var counter int64
+	err := repository.DB.Model(&Story{}).Where("doctor_id = ?", doctorId).Count(&counter).Error
+	if err != nil {
+		return 0, constants.ErrServer
+	}
+
+	return int(counter), nil
+}
+
+func (repository *StoriesRepo) CountStoryLikesByDoctorId(doctorId int) (int, error) {
+	var counter int64
+	err := repository.DB.Table("story_likes").
+		Joins("JOIN stories ON story_likes.story_id = stories.id").
+		Where("stories.doctor_id = ?", doctorId).
+		Count(&counter).Error
+	if err != nil {
+		return 0, constants.ErrServer
+	}
+
+	return int(counter), nil
+}
+
+func (repository *StoriesRepo) CountStoryViewByDoctorId(doctorId int) (int, error) {
+	var counter int64
+	err := repository.DB.Model(&Story{}).Where("doctor_id = ?", doctorId).Select("SUM(view_count)").Scan(&counter).Error
+	if err != nil {
+		return 0, constants.ErrServer
+	}
+
+	return int(counter), nil
+}
+
+func (repository *StoriesRepo) PostStory(story storyEntities.Story) (storyEntities.Story, error) {
+	storyDb := Story{
+		Title:     story.Title,
+		Content:   story.Content,
+		Date:      story.Date,
+		ImageUrl:  story.ImageUrl,
+		ViewCount: story.ViewCount,
+		DoctorId:  story.DoctorId,
+	}
+
+	err := repository.DB.Create(&storyDb).Error
+	if err != nil {
+		return storyEntities.Story{}, constants.ErrServer
+	}
+
+	return storyEntities.Story{
+		Id:        storyDb.ID,
+		Title:     storyDb.Title,
+		Content:   storyDb.Content,
+		Date:      storyDb.Date,
+		ImageUrl:  storyDb.ImageUrl,
+		ViewCount: storyDb.ViewCount,
+		DoctorId:  storyDb.DoctorId,
+	}, nil
+}
+
+func (repository *StoriesRepo) GetStoryByIdForDoctor(storyId int) (storyEntities.Story, error) {
+	var storyDb Story
+	err := repository.DB.Where("id = ?", storyId).First(&storyDb).Error
+	if err != nil {
+		return storyEntities.Story{}, constants.ErrDataNotFound
+	}
+
+	return storyEntities.Story{
+		Id:        storyDb.ID,
+		Title:     storyDb.Title,
+		Content:   storyDb.Content,
+		Date:      storyDb.Date,
+		ImageUrl:  storyDb.ImageUrl,
+		ViewCount: storyDb.ViewCount,
+		DoctorId:  storyDb.DoctorId,
+	}, nil
+}
+
+func (repository *StoriesRepo) GetAllStoriesByDoctorId(metadata entities.MetadataFull, doctorId int) ([]storyEntities.Story, error) {
+	var storiesDb []Story
+
+	query := repository.DB.Where("doctor_id = ?", doctorId).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Order(metadata.Sort + " " + metadata.Order)
+
+	if metadata.Search != "" {
+		query = query.Where("title LIKE ?", "%"+metadata.Search+"%")
+	}
+
+	err := query.Find(&storiesDb).Error
+	if err != nil {
+		return []storyEntities.Story{}, constants.ErrServer
+	}
+
+	storiesEnt := make([]storyEntities.Story, len(storiesDb))
+	for i := 0; i < len(storiesDb); i++ {
+		storiesEnt[i] = storyEntities.Story{
+			Id:        storiesDb[i].ID,
+			Title:     storiesDb[i].Title,
+			Content:   storiesDb[i].Content,
+			Date:      storiesDb[i].Date,
+			ImageUrl:  storiesDb[i].ImageUrl,
+			ViewCount: storiesDb[i].ViewCount,
+			DoctorId:  storiesDb[i].DoctorId,
+		}
+	}
+
+	return storiesEnt, nil
 }
