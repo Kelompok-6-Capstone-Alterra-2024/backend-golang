@@ -14,7 +14,11 @@ type Transaction struct {
 	validate              *validator.Validate
 }
 
-func NewTransactionUseCase(transactionRepository transactionEntities.TransactionRepository, midtransUseCase midtransEntities.MidtransUseCase, validate *validator.Validate) transactionEntities.TransactionRepository {
+func NewTransactionUseCase(
+	transactionRepository transactionEntities.TransactionRepository,
+	midtransUseCase midtransEntities.MidtransUseCase,
+	validate *validator.Validate,
+) transactionEntities.TransactionUseCase {
 	return &Transaction{
 		transactionRepository: transactionRepository,
 		midtransUseCase:       midtransUseCase,
@@ -22,7 +26,7 @@ func NewTransactionUseCase(transactionRepository transactionEntities.Transaction
 	}
 }
 
-func (usecase *Transaction) Insert(transaction *transactionEntities.Transaction) (*transactionEntities.Transaction, error) {
+func (usecase *Transaction) InsertWithBuiltIn(transaction *transactionEntities.Transaction) (*transactionEntities.Transaction, error) {
 	if err := usecase.validate.Struct(transaction); err != nil {
 		return nil, err
 	}
@@ -33,6 +37,33 @@ func (usecase *Transaction) Insert(transaction *transactionEntities.Transaction)
 	}
 
 	response, err := usecase.transactionRepository.Insert(newTransaction)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func (usecase *Transaction) InsertWithCustom(transaction *transactionEntities.Transaction) (*transactionEntities.Transaction, error) {
+	var err error
+	if err = usecase.validate.Struct(transaction); err != nil {
+		return nil, err
+	}
+
+	var newTransaction, response *transactionEntities.Transaction
+	if transaction.PaymentType == "bank_transfer" {
+		newTransaction, err = usecase.midtransUseCase.BankTransfer(transaction)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if transaction.PaymentType == "ewallet" {
+		newTransaction, err = usecase.midtransUseCase.EWallet(transaction)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	response, err = usecase.transactionRepository.Insert(newTransaction)
 	if err != nil {
 		return nil, err
 	}

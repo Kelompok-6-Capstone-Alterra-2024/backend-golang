@@ -20,13 +20,13 @@ func NewTransactionController(transactionUseCase transactionEntities.Transaction
 	}
 }
 
-func (controller *TransactionController) Insert(c echo.Context) error {
+func (controller *TransactionController) InsertWithBuiltIn(c echo.Context) error {
 	var transactionRequest request.TransactionRequest
 	if err := c.Bind(&transactionRequest); err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 
-	transactionResponse, err := controller.transactionUseCase.Insert(transactionRequest.ToEntities())
+	transactionResponse, err := controller.transactionUseCase.InsertWithBuiltIn(transactionRequest.ToEntities())
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
@@ -73,4 +73,20 @@ func (controller *TransactionController) FindAll(c echo.Context) error {
 		transactionResponses = append(transactionResponses, *transaction.ToResponse())
 	}
 	return c.JSON(http.StatusOK, transactionResponses)
+}
+
+func (controller *TransactionController) BankTransfer(c echo.Context) error {
+	var transaction request.TransactionRequest
+	if err := c.Bind(&transaction); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	bankName := c.QueryParam("bank")
+	transaction.Bank = bankName
+	transaction.PaymentType = "bank_transfer"
+	transactionRequest := transaction.ToEntities()
+	transactionResponse, err := controller.transactionUseCase.InsertWithCustom(transactionRequest)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+	return c.JSON(201, base.NewSuccessResponse("Transaction created", transactionResponse.ToResponse()))
 }

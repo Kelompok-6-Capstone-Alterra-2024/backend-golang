@@ -1,13 +1,18 @@
 package midtrans
 
 import (
+	"bytes"
 	"capstone/configs"
 	"capstone/constants"
 	midtransEntities "capstone/entities/midtrans"
+	"capstone/entities/payment"
 	"capstone/entities/transaction"
+	"encoding/json"
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
 	"github.com/midtrans/midtrans-go/snap"
+	"io"
+	"net/http"
 )
 
 type MidtransUseCase struct {
@@ -35,19 +40,19 @@ func (usecase *MidtransUseCase) GenerateSnapURL(transaction *transaction.Transac
 	}
 
 	var client snap.Client
-	client.New(usecase.midtransConfig.Key, usecase.envi)
+	client.New(usecase.midtransConfig.ClientKey, usecase.envi)
 
 	snapResponse, err := client.CreateTransaction(req)
 	if err != nil {
 		return nil, err
 	}
-	transaction.SnapURL = snapResponse.RedirectURL
+	transaction.PaymentLink = snapResponse.RedirectURL
 	return transaction, nil
 }
 
 func (usecase *MidtransUseCase) VerifyPayment(orderID string) (string, error) {
 	var client coreapi.Client
-	client.New(usecase.midtransConfig.Key, usecase.envi)
+	client.New(usecase.midtransConfig.ClientKey, usecase.envi)
 
 	// 4. Check transaction to Midtrans with param orderId
 	transactionStatusResp, e := client.CheckTransaction(orderID)
@@ -75,4 +80,44 @@ func (usecase *MidtransUseCase) VerifyPayment(orderID string) (string, error) {
 		}
 	}
 	return constants.Deny, e
+}
+
+func (usecase *MidtransUseCase) BankTransfer(transaction *transaction.Transaction) (*transaction.Transaction, error) {
+	payload, err := json.Marshal(payment.ToBankTransfer(transaction))
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", usecase.midtransConfig.BaseURL, bytes.NewBuffer(payload))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Basic "+usecase.midtransConfig.ServerKey)
+	req.Header.Set("Accept", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	body, err := io.ReadAll(resp.Body)
+
+	var responseBody midtransEntities.BankTransfer
+	err = json.Unmarshal(body, &responseBody)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	response, err := responseBody.ToTransaction(transaction)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+
+}
+
+func (usecase *MidtransUseCase) EWallet(transaction *transaction.Transaction) (*transaction.Transaction, error) {
+	//TODO implement me
+	panic("implement me")
 }

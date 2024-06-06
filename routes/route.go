@@ -91,10 +91,11 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.POST("complaint", r.complaintController.Create) // Create Complaint
 
 	// Transaction
-	userRoute.POST("transaction", r.transactionController.Insert)                               // Create Transaction
+	userRoute.POST("transaction", r.transactionController.InsertWithBuiltIn)                    // Create Transaction
 	userRoute.GET("transaction/:id", r.transactionController.FindByID)                          // Get Transaction By ID
 	userRoute.GET("transaction/consultation/:id", r.transactionController.FindByConsultationID) // Get Transaction By Consultation ID
 	userRoute.GET("transactions", r.transactionController.FindAll)                              // Get All Transaction
+	userRoute.POST("transaction/bank-transfer", r.transactionController.BankTransfer)           // Bank Transfer
 
 	// Rating
 	userRoute.POST("feedbacks", r.ratingController.SendFeedback) // Create Rating
