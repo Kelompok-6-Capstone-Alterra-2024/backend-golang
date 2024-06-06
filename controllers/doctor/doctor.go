@@ -6,9 +6,10 @@ import (
 	doctorUseCase "capstone/entities/doctor"
 	"capstone/utilities"
 	"capstone/utilities/base"
-	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
+
+	"github.com/labstack/echo/v4"
 )
 
 type DoctorController struct {
@@ -25,13 +26,20 @@ func (controller *DoctorController) Register(c echo.Context) error {
 	var doctorFromRequest request.DoctorRegisterRequest
 	c.Bind(&doctorFromRequest)
 
-	doctorRequest := doctorFromRequest.ToDoctorEntities()
+	imageFromRequest, err := c.FormFile("profile_picture")
+	doctorFromRequest.ProfilePicture = imageFromRequest
+
+	doctorRequest, err := doctorFromRequest.ToDoctorEntities()
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
 	doctorResult, err := controller.doctorUseCase.Register(doctorRequest)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 	doctorResponse := doctorResult.ToResponse()
-	return c.JSON(base.ConvertResponseCode(err), base.NewSuccessResponse("Success Register", doctorResponse))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Register", doctorResponse))
 }
 
 func (controller *DoctorController) Login(c echo.Context) error {
@@ -44,7 +52,7 @@ func (controller *DoctorController) Login(c echo.Context) error {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 	doctorResponse := doctorResult.ToResponse()
-	return c.JSON(base.ConvertResponseCode(err), base.NewSuccessResponse("Success Login", doctorResponse))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Login", doctorResponse))
 }
 
 func (controller *DoctorController) GetByID(c echo.Context) error {
@@ -58,7 +66,7 @@ func (controller *DoctorController) GetByID(c echo.Context) error {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 	doctorResponse := doctorResult.ToDoctorResponse()
-	return c.JSON(base.ConvertResponseCode(err), base.NewSuccessResponse("Success Get Doctor By ID", doctorResponse))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Doctor By ID", doctorResponse))
 }
 
 func (controller *DoctorController) GetAll(c echo.Context) error {
@@ -76,7 +84,7 @@ func (controller *DoctorController) GetAll(c echo.Context) error {
 	for _, doctor := range *doctorResult {
 		doctorResponse = append(doctorResponse, *doctor.ToDoctorResponse())
 	}
-	return c.JSON(base.ConvertResponseCode(err), base.NewMetadataSuccessResponse("Success Get All Doctor", metadata, doctorResponse))
+	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get All Doctor", metadata, doctorResponse))
 }
 
 func (controller *DoctorController) GetActive(c echo.Context) error {
@@ -94,5 +102,19 @@ func (controller *DoctorController) GetActive(c echo.Context) error {
 	for _, doctor := range *doctorResult {
 		doctorResponse = append(doctorResponse, *doctor.ToDoctorResponse())
 	}
-	return c.JSON(base.ConvertResponseCode(err), base.NewMetadataSuccessResponse("Success Get Active Doctor", metadata, doctorResponse))
+	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get Active Doctor", metadata, doctorResponse))
+}
+
+func (c *DoctorController) GoogleLogin(ctx echo.Context) error {
+    url := c.doctorUseCase.HandleGoogleLogin()
+    return ctx.Redirect(http.StatusTemporaryRedirect, url)
+}
+
+func (c *DoctorController) GoogleCallback(ctx echo.Context) error {
+    code := ctx.QueryParam("code")
+    result, err := c.doctorUseCase.HandleGoogleCallback(ctx.Request().Context(), code)
+    if err != nil {
+        return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+    }
+    return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Login Oauth", result))
 }

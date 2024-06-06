@@ -3,6 +3,7 @@ package story
 import (
 	"capstone/entities"
 	"capstone/entities/doctor"
+	"mime/multipart"
 	"time"
 )
 
@@ -23,6 +24,12 @@ type RepositoryInterface interface {
 	GetStoryById(storyId int, userId int) (Story, error)
 	GetLikedStories(metadata entities.Metadata, userId int) ([]Story, error)
 	LikeStory(storyId int, userId int) error
+	CountStoriesByDoctorId(doctorId int) (int, error)
+	CountStoryLikesByDoctorId(doctorId int) (int, error)
+	CountStoryViewByDoctorId(doctorId int) (int, error)
+	PostStory(story Story) (Story, error)
+	GetStoryByIdForDoctor(storyId int) (Story, error)
+	GetAllStoriesByDoctorId(metadata entities.MetadataFull, doctorId int) ([]Story, error)
 }
 
 type UseCaseInterface interface {
@@ -30,4 +37,10 @@ type UseCaseInterface interface {
 	GetStoryById(storyId int, userId int) (Story, error)
 	GetLikedStories(metadata entities.Metadata, userId int) ([]Story, error)
 	LikeStory(storyId int, userId int) error
+	CountStoriesByDoctorId(doctorId int) (int, error)
+	CountStoryLikesByDoctorId(doctorId int) (int, error)
+	CountStoryViewByDoctorId(doctorId int) (int, error)
+	PostStory(story Story, fileImage *multipart.FileHeader) (Story, error)
+	GetStoryByIdForDoctor(storyId int) (Story, error)
+	GetAllStoriesByDoctorId(metadata entities.MetadataFull, doctorId int) ([]Story, error)
 }

@@ -1,6 +1,7 @@
 package user
 
 import (
+	"capstone/constants"
 	userEntities "capstone/entities/user"
 	"fmt"
 
@@ -93,4 +94,46 @@ func (userRepo *UserRepo) Login(user *userEntities.User) (userEntities.User, err
 	}
 
 	return userResult, nil
+}
+
+func (r *UserRepo) Create(email string, picture string, name string) (userEntities.User ,error) {
+	var userDB User
+	userDB.Email = email
+	userDB.ProfilePicture = picture
+	userDB.Name = name
+	userDB.IsOauth = true
+    
+	err := r.DB.Create(&userDB).Error
+	if err != nil {
+		return userEntities.User{}, err
+	}
+
+	var userEnt userEntities.User
+	userEnt.Id = userDB.Id
+	userEnt.Name = userDB.Name
+	userEnt.Email = userDB.Email
+	userEnt.ProfilePicture = userDB.ProfilePicture
+	userEnt.IsOauth = userDB.IsOauth
+
+	return userEnt, nil
+}
+
+func (r *UserRepo) OauthFindByEmail(email string) (userEntities.User, int, error) {
+    var userDB User
+    if err := r.DB.Where("email = ?", email).First(&userDB).Error; err != nil {
+        return userEntities.User{}, 0, err
+    }
+
+	if !userDB.IsOauth {
+		return userEntities.User{}, 1, constants.ErrEmailAlreadyExist
+	}
+
+	var userEnt userEntities.User
+	userEnt.Id = userDB.Id
+	userEnt.Name = userDB.Name
+	userEnt.Email = userDB.Email
+	userEnt.ProfilePicture = userDB.ProfilePicture
+	userEnt.IsOauth = userDB.IsOauth
+
+    return userEnt, 0, nil
 }

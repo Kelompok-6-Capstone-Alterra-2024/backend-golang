@@ -22,6 +22,8 @@ var ErrInvalidToken error = errors.New("invalid token")
 
 var ErrDataEmpty error = errors.New("data empty")
 
+var ErrEmptyInputArticle error = errors.New("title or content cannot be empty")
+
 var ErrServer error = errors.New("server error")
 
 var ErrInvalidRate error = errors.New("rate must be between 1 and 5")
@@ -41,3 +43,23 @@ var ErrInvalidEndDate error = errors.New("invalid format end date")
 var ErrStartDateGreater error = errors.New("start date must be less than end date")
 
 var ErrAlreadyLiked error = errors.New("already liked")
+
+var ErrEmptyInputForum error = errors.New("forum id cannot be empty")
+
+var ErrEmptyInputPost error = errors.New("forum id or content cannot be empty")
+
+var ErrEmptyInputLike error = errors.New("post id cannot be empty")
+
+var ErrEmptyInputComment error = errors.New("post id or content cannot be empty")
+
+var ErrExcange error = errors.New("failed excange")
+
+var ErrNewServiceGoogle error = errors.New("failed new service google")
+
+var ErrNewUserInfo error = errors.New("failed new user info")
+
+var ErrInsertOAuth error = errors.New("failed insert oauth")
+
+var ErrEmptyInputMusic error = errors.New("title or singer cannot be empty")
+
+var ErrEmptyInputStory error = errors.New("title or content cannot be empty")
