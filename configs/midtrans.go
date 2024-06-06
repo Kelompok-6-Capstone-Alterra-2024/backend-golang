@@ -17,7 +17,7 @@ func MidtransConfig() Midtrans {
 	serverKey := os.Getenv("MIDTRANS_SERVER_KEY")
 	serverKeyBase64 := base64.StdEncoding.EncodeToString([]byte(serverKey))
 	return Midtrans{
-		ClientKey:       os.Getenv("MIDTRANS_KEY"),
+		ClientKey:       os.Getenv("MIDTRANS_CLIENT_KEY"),
 		ServerKey:       serverKey,
 		ServerKeyBase64: serverKeyBase64,
 		BaseURL:         os.Getenv("MIDTRANS_BASE_URL"),
