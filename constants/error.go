@@ -61,3 +61,5 @@ var ErrNewUserInfo error = errors.New("failed new user info")
 var ErrInsertOAuth error = errors.New("failed insert oauth")
 
 var ErrEmptyInputMusic error = errors.New("title or singer cannot be empty")
+
+var ErrEmptyInputStory error = errors.New("title or content cannot be empty")
