@@ -4,18 +4,22 @@ import (
 	"capstone/configs"
 	"capstone/constants"
 	midtransEntities "capstone/entities/midtrans"
+	"capstone/entities/payment"
 	"capstone/entities/transaction"
+	"capstone/utilities"
+	"encoding/json"
+	"fmt"
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
 	"github.com/midtrans/midtrans-go/snap"
 )
 
 type MidtransUseCase struct {
-	midtransConfig *configs.Midtrans
+	midtransConfig configs.Midtrans
 	envi           midtrans.EnvironmentType
 }
 
-func NewMidtransUseCase(m *configs.Midtrans) midtransEntities.MidtransUseCase {
+func NewMidtransUseCase(m configs.Midtrans) midtransEntities.MidtransUseCase {
 	envi := midtrans.Sandbox
 	if m.IsProd {
 		envi = midtrans.Production
@@ -35,22 +39,23 @@ func (usecase *MidtransUseCase) GenerateSnapURL(transaction *transaction.Transac
 	}
 
 	var client snap.Client
-	client.New(usecase.midtransConfig.Key, usecase.envi)
+	client.New(usecase.midtransConfig.ClientKey, usecase.envi)
 
 	snapResponse, err := client.CreateTransaction(req)
 	if err != nil {
 		return nil, err
 	}
-	transaction.SnapURL = snapResponse.RedirectURL
+	transaction.PaymentLink = snapResponse.RedirectURL
 	return transaction, nil
 }
 
 func (usecase *MidtransUseCase) VerifyPayment(orderID string) (string, error) {
 	var client coreapi.Client
-	client.New(usecase.midtransConfig.Key, usecase.envi)
+	client.New(usecase.midtransConfig.ServerKey, usecase.envi)
 
 	// 4. Check transaction to Midtrans with param orderId
 	transactionStatusResp, e := client.CheckTransaction(orderID)
+
 	if e != nil {
 		return constants.Deny, e
 	} else {
@@ -63,7 +68,7 @@ func (usecase *MidtransUseCase) VerifyPayment(orderID string) (string, error) {
 				} else if transactionStatusResp.FraudStatus == "accept" {
 					//return true, nil
 				}
-			} else if transactionStatusResp.TransactionStatus == "settlement" {
+			} else if transactionStatusResp.TransactionStatus == "settlement" && transactionStatusResp.SettlementTime != "" {
 				return constants.Success, nil
 			} else if transactionStatusResp.TransactionStatus == "deny" {
 				return constants.Deny, nil
@@ -75,4 +80,56 @@ func (usecase *MidtransUseCase) VerifyPayment(orderID string) (string, error) {
 		}
 	}
 	return constants.Deny, e
+}
+
+func (usecase *MidtransUseCase) BankTransfer(transaction *transaction.Transaction) (*transaction.Transaction, error) {
+	payload, err := json.Marshal(payment.ToBankTransfer(transaction))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := utilities.PaymentMidtrans(payload, &usecase.midtransConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	var responseBody midtransEntities.BankTransfer
+	err = json.Unmarshal(body, &responseBody)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := responseBody.ToTransaction(transaction)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+
+}
+
+func (usecase *MidtransUseCase) EWallet(transaction *transaction.Transaction) (*transaction.Transaction, error) {
+	payload, err := json.Marshal(payment.ToEWallet(transaction))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := utilities.PaymentMidtrans(payload, &usecase.midtransConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	var responseBody midtransEntities.EWallet
+	err = json.Unmarshal(body, &responseBody)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(responseBody.OrderID)
+	fmt.Println(transaction.ID)
+	response, err := responseBody.ToTransaction(transaction)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }

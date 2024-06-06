@@ -90,7 +90,7 @@ func main() {
 	consultationCont := consultationController.NewConsultationController(consultationUC)
 	storyCont := storyController.NewStoryController(storyUC)
 	complaintCont := complaintController.NewComplaintController(complaintUC)
-	transactionCont := transactionController.NewTransactionController(transactionUC)
+	transactionCont := transactionController.NewTransactionController(transactionUC, midtransUC)
 	musicCont := musicController.NewMusicController(musicUC)
 	ratingCont := ratingController.NewRatingController(ratingUC)
 	moodCont := moodController.NewMoodController(moodUC)

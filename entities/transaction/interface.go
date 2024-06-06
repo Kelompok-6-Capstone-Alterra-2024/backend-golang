@@ -12,7 +12,9 @@ type TransactionRepository interface {
 }
 
 type TransactionUseCase interface {
-	Insert(transaction *Transaction) (*Transaction, error)
+	InsertWithBuiltInInterface(transaction *Transaction) (*Transaction, error)
+	InsertWithCustomInterface(transaction *Transaction) (*Transaction, error)
+	ConfirmedPayment(id string, transactionStatus string) (*Transaction, error)
 	FindByID(ID string) (*Transaction, error)
 	FindByConsultationID(consultationID uint) (*Transaction, error)
 	FindAll(metadata *entities.Metadata, userID uint) (*[]Transaction, error)
