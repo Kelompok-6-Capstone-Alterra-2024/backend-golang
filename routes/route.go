@@ -96,6 +96,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("transaction/consultation/:id", r.transactionController.FindByConsultationID) // Get Transaction By Consultation ID
 	userRoute.GET("transactions", r.transactionController.FindAll)                              // Get All Transaction
 	userRoute.POST("transaction/bank-transfer", r.transactionController.BankTransfer)           // Bank Transfer
+	userRoute.POST("transaction/e-wallet", r.transactionController.EWallet)                     // E-Wallet
 
 	// Rating
 	userRoute.POST("feedbacks", r.ratingController.SendFeedback) // Create Rating

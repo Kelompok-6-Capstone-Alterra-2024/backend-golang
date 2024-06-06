@@ -1,6 +1,7 @@
 package transaction
 
 import (
+	"capstone/constants"
 	"capstone/controllers/transaction/request"
 	"capstone/controllers/transaction/response"
 	transactionEntities "capstone/entities/transaction"
@@ -82,7 +83,21 @@ func (controller *TransactionController) BankTransfer(c echo.Context) error {
 	}
 	bankName := c.QueryParam("bank")
 	transaction.Bank = bankName
-	transaction.PaymentType = "bank_transfer"
+	transaction.PaymentType = constants.BankTransfer
+	transactionRequest := transaction.ToEntities()
+	transactionResponse, err := controller.transactionUseCase.InsertWithCustom(transactionRequest)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+	return c.JSON(201, base.NewSuccessResponse("Transaction created", transactionResponse.ToResponse()))
+}
+
+func (controller *TransactionController) EWallet(c echo.Context) error {
+	var transaction request.TransactionRequest
+	if err := c.Bind(&transaction); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	transaction.PaymentType = constants.GoPay
 	transactionRequest := transaction.ToEntities()
 	transactionResponse, err := controller.transactionUseCase.InsertWithCustom(transactionRequest)
 	if err != nil {

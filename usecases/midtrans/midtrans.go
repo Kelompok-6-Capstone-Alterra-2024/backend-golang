@@ -1,18 +1,16 @@
 package midtrans
 
 import (
-	"bytes"
 	"capstone/configs"
 	"capstone/constants"
 	midtransEntities "capstone/entities/midtrans"
 	"capstone/entities/payment"
 	"capstone/entities/transaction"
+	"capstone/utilities"
 	"encoding/json"
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
 	"github.com/midtrans/midtrans-go/snap"
-	"io"
-	"net/http"
 )
 
 type MidtransUseCase struct {
@@ -88,25 +86,16 @@ func (usecase *MidtransUseCase) BankTransfer(transaction *transaction.Transactio
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", usecase.midtransConfig.BaseURL, bytes.NewBuffer(payload))
+	body, err := utilities.PaymentMidtrans(payload, usecase.midtransConfig)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+usecase.midtransConfig.ServerKey)
-	req.Header.Set("Accept", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	body, err := io.ReadAll(resp.Body)
 
 	var responseBody midtransEntities.BankTransfer
 	err = json.Unmarshal(body, &responseBody)
 	if err != nil {
 		return nil, err
 	}
-
-	defer resp.Body.Close()
 
 	response, err := responseBody.ToTransaction(transaction)
 	if err != nil {
@@ -118,6 +107,26 @@ func (usecase *MidtransUseCase) BankTransfer(transaction *transaction.Transactio
 }
 
 func (usecase *MidtransUseCase) EWallet(transaction *transaction.Transaction) (*transaction.Transaction, error) {
-	//TODO implement me
-	panic("implement me")
+	payload, err := json.Marshal(payment.ToEWallet(transaction))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := utilities.PaymentMidtrans(payload, usecase.midtransConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	var responseBody midtransEntities.EWallet
+	err = json.Unmarshal(body, &responseBody)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := responseBody.ToTransaction(transaction)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }

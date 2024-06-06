@@ -50,13 +50,13 @@ func (usecase *Transaction) InsertWithCustom(transaction *transactionEntities.Tr
 	}
 
 	var newTransaction, response *transactionEntities.Transaction
-	if transaction.PaymentType == "bank_transfer" {
+	if transaction.PaymentType == constants.BankTransfer {
 		newTransaction, err = usecase.midtransUseCase.BankTransfer(transaction)
 		if err != nil {
 			return nil, err
 		}
 	}
-	if transaction.PaymentType == "ewallet" {
+	if transaction.PaymentType == constants.GoPay {
 		newTransaction, err = usecase.midtransUseCase.EWallet(transaction)
 		if err != nil {
 			return nil, err
