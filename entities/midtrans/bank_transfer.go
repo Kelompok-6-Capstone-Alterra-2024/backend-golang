@@ -2,7 +2,6 @@ package midtrans
 
 import (
 	"capstone/entities/transaction"
-	"github.com/google/uuid"
 	"strconv"
 	"strings"
 )
@@ -28,7 +27,6 @@ type VirtualAccount struct {
 }
 
 func (r *BankTransfer) ToTransaction(trans *transaction.Transaction) (*transaction.Transaction, error) {
-	transactionID, _ := uuid.Parse(r.OrderID)
 	newGrossAmount := strings.Split(r.GrossAmount, ".")
 	price, err := strconv.Atoi(newGrossAmount[0])
 	if err != nil {
@@ -41,7 +39,7 @@ func (r *BankTransfer) ToTransaction(trans *transaction.Transaction) (*transacti
 		bank = account.Bank
 	}
 	return &transaction.Transaction{
-		ID:             transactionID,
+		ID:             trans.ID,
 		ConsultationID: trans.ConsultationID,
 		Consultation:   trans.Consultation,
 		Price:          price,

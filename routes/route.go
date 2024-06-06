@@ -59,6 +59,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	e.HTTPErrorHandler = base.ErrorHandler
 	e.Use(myMiddleware.CORSMiddleware())
 
+	e.POST("/v1/payment-callback", r.transactionController.CallbackTransaction)
+
 	userAuth := e.Group("/v1/users")
 	userAuth.POST("/register", r.userController.Register) //Register User
 	userAuth.POST("/login", r.userController.Login)       //Login User

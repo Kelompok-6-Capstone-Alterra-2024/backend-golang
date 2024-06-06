@@ -65,8 +65,11 @@ func (repository *TransactionRepo) FindAll(metadata *entities.Metadata, userID u
 }
 
 func (repository *TransactionRepo) Update(transaction *transactionEntities.Transaction) (*transactionEntities.Transaction, error) {
-	//TODO implement me
-	panic("implement me")
+	transactionDB := ToTransactionModel(transaction)
+	if err := repository.db.Model(&Transaction{}).Where("id LIKE ?", transactionDB.ID).Update("status", transactionDB.Status).Error; err != nil {
+		return nil, constants.ErrInsertDatabase
+	}
+	return transactionDB.ToEntities(), nil
 }
 
 func (repository *TransactionRepo) Delete(ID uint) error {

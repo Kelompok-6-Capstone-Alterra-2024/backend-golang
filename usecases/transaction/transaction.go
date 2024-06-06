@@ -26,7 +26,7 @@ func NewTransactionUseCase(
 	}
 }
 
-func (usecase *Transaction) InsertWithBuiltIn(transaction *transactionEntities.Transaction) (*transactionEntities.Transaction, error) {
+func (usecase *Transaction) InsertWithBuiltInInterface(transaction *transactionEntities.Transaction) (*transactionEntities.Transaction, error) {
 	if err := usecase.validate.Struct(transaction); err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (usecase *Transaction) InsertWithBuiltIn(transaction *transactionEntities.T
 	return response, nil
 }
 
-func (usecase *Transaction) InsertWithCustom(transaction *transactionEntities.Transaction) (*transactionEntities.Transaction, error) {
+func (usecase *Transaction) InsertWithCustomInterface(transaction *transactionEntities.Transaction) (*transactionEntities.Transaction, error) {
 	var err error
 	if err = usecase.validate.Struct(transaction); err != nil {
 		return nil, err
@@ -105,4 +105,25 @@ func (usecase *Transaction) Update(transaction *transactionEntities.Transaction)
 func (usecase *Transaction) Delete(ID uint) error {
 	//TODO implement me
 	panic("implement me")
+}
+
+func (usecase *Transaction) ConfirmedPayment(id string, transactionStatus string) (*transactionEntities.Transaction, error) {
+	transaction, err := usecase.transactionRepository.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+	if *transaction == (transactionEntities.Transaction{}) {
+		return nil, constants.ErrDataNotFound
+	}
+
+	if transaction.Status == transactionStatus {
+		return transaction, nil
+	}
+
+	transaction.Status = transactionStatus
+	transactionResponse, err := usecase.transactionRepository.Update(transaction)
+	if err != nil {
+		return nil, err
+	}
+	return transactionResponse, nil
 }
