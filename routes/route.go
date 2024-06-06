@@ -142,6 +142,9 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorAuth.POST("/login", r.doctorController.Login)       //Login Doctor
 
 	doctorRoute := doctorAuth.Group("/", echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))
+
+	// Consultation
 	doctorRoute.PUT("consultations/:id", r.consultationController.UpdateStatusConsultation)
+	doctorRoute.GET("consultations", r.consultationController.GetAllDoctorConsultation)
 
 }

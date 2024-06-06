@@ -21,7 +21,7 @@ type Transaction struct {
 func (r Transaction) ToResponse() *response.TransactionResponse {
 	return &response.TransactionResponse{
 		ID:           r.ID.String(),
-		Consultation: *r.Consultation.ToResponse(),
+		Consultation: *r.Consultation.ToUserResponse(),
 		Price:        r.Price,
 		SnapURL:      r.SnapURL,
 		Status:       r.Status,

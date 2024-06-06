@@ -4,8 +4,6 @@
 name: Deploy on Dev
 
 on:
-  push:
-    branches: [ "development" ]
   pull_request:
     branches: [ "development" ]
 

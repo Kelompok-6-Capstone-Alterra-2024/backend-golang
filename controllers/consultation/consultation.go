@@ -38,7 +38,7 @@ func (controller *ConsultationController) CreateConsultation(c echo.Context) err
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Add Consultation", consultationResponse.ToResponse()))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Add Consultation", consultationResponse.ToUserResponse()))
 }
 
 func (controller *ConsultationController) GetConsultationByID(c echo.Context) error {
@@ -50,7 +50,7 @@ func (controller *ConsultationController) GetConsultationByID(c echo.Context) er
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation", consultationResponse.ToResponse()))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation", consultationResponse.ToUserResponse()))
 }
 
 func (controller *ConsultationController) GetAllConsultation(c echo.Context) error {
@@ -63,14 +63,14 @@ func (controller *ConsultationController) GetAllConsultation(c echo.Context) err
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
-	consultations, err := controller.consultationUseCase.GetAllConsultation(metadata, userId)
+	consultations, err := controller.consultationUseCase.GetAllUserConsultation(metadata, userId)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
 
-	var responses []response.ConsultationResponse
+	var responses []response.ConsultationUserResponse
 	for _, value := range *consultations {
-		responses = append(responses, *value.ToResponse())
+		responses = append(responses, *value.ToUserResponse())
 	}
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation", responses))
@@ -92,5 +92,28 @@ func (controller *ConsultationController) UpdateStatusConsultation(c echo.Contex
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Update Consultation", consultationResponse.ToResponse()))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Update Consultation", consultationResponse.ToUserResponse()))
+}
+
+func (controller *ConsultationController) GetAllDoctorConsultation(c echo.Context) error {
+	pageParam := c.QueryParam("page")
+	limitParam := c.QueryParam("limit")
+	metadata := utilities.GetMetadata(pageParam, limitParam)
+
+	token := c.Request().Header.Get("Authorization")
+	doctorId, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	consultations, err := controller.consultationUseCase.GetAllDoctorConsultation(metadata, doctorId)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	var responses []response.ConsultationDoctorResponse
+	for _, value := range *consultations {
+		responses = append(responses, *value.ToDoctorResponse())
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation", responses))
 }
