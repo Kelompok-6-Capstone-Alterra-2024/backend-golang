@@ -4,6 +4,7 @@ import (
 	"capstone/constants"
 	"capstone/entities"
 	doctorEntities "capstone/entities/doctor"
+
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -87,4 +88,46 @@ func (repository *DoctorRepo) GetActiveDoctor(metadata *entities.Metadata) (*[]d
 		doctorsResponse = append(doctorsResponse, *doctor.ToEntities())
 	}
 	return &doctorsResponse, nil
+}
+
+func (r *DoctorRepo) Create(email string, picture string, name string) (doctorEntities.Doctor ,error) {
+	var doctorDB Doctor
+	doctorDB.Email = email
+	doctorDB.ProfilePicture = picture
+	doctorDB.Name = name
+	doctorDB.IsOauth = true
+    
+	err := r.db.Create(&doctorDB).Error
+	if err != nil {
+		return doctorEntities.Doctor{}, err
+	}
+
+	var doctorEnt doctorEntities.Doctor
+	doctorEnt.ID = doctorDB.ID
+	doctorEnt.Name = doctorDB.Name
+	doctorEnt.Email = doctorDB.Email
+	doctorEnt.ProfilePicture = doctorDB.ProfilePicture
+	doctorEnt.IsOauth = doctorDB.IsOauth
+
+	return doctorEnt, nil
+}
+
+func (r *DoctorRepo) OauthFindByEmail(email string) (doctorEntities.Doctor, int, error) {
+    var doctorDB Doctor
+    if err := r.db.Where("email = ?", email).First(&doctorDB).Error; err != nil {
+        return doctorEntities.Doctor{}, 0, err
+    }
+
+	if !doctorDB.IsOauth {
+		return doctorEntities.Doctor{}, 1, constants.ErrEmailAlreadyExist
+	}
+
+	var doctorEnt doctorEntities.Doctor
+	doctorEnt.ID = doctorDB.ID
+	doctorEnt.Name = doctorDB.Name
+	doctorEnt.Email = doctorDB.Email
+	doctorEnt.ProfilePicture = doctorDB.ProfilePicture
+	doctorEnt.IsOauth = doctorDB.IsOauth
+
+    return doctorEnt, 0, nil
 }
