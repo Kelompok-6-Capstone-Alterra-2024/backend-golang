@@ -55,6 +55,7 @@ func main() {
 	midtransConfig := configs.MidtransConfig()
 	validate := validator.New()
 	oauthConfig := configs.GetGoogleOAuthConfig()
+	oauthConfigDoctor := configs.GetGoogleOAuthConfigDoctor()
 
 	userRepo := userRepositories.NewUserRepo(db)
 	doctorRepo := doctorRepositories.NewDoctorRepo(db)
@@ -70,7 +71,7 @@ func main() {
 	articleRepo := articleRepositories.NewArticleRepo(db)
 
 	userUC := userUseCase.NewUserUseCase(userRepo, oauthConfig)
-	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo)
+	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo, oauthConfigDoctor)
 	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo)
 	storyUC := storyUseCase.NewStoryUseCase(storyRepo)
 	complaintUC := complaintUseCase.NewComplaintUseCase(complaintRepo)

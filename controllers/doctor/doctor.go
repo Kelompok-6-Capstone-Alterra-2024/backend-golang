@@ -6,9 +6,10 @@ import (
 	doctorUseCase "capstone/entities/doctor"
 	"capstone/utilities"
 	"capstone/utilities/base"
-	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
+
+	"github.com/labstack/echo/v4"
 )
 
 type DoctorController struct {
@@ -102,4 +103,18 @@ func (controller *DoctorController) GetActive(c echo.Context) error {
 		doctorResponse = append(doctorResponse, *doctor.ToDoctorResponse())
 	}
 	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get Active Doctor", metadata, doctorResponse))
+}
+
+func (c *DoctorController) GoogleLogin(ctx echo.Context) error {
+    url := c.doctorUseCase.HandleGoogleLogin()
+    return ctx.Redirect(http.StatusTemporaryRedirect, url)
+}
+
+func (c *DoctorController) GoogleCallback(ctx echo.Context) error {
+    code := ctx.QueryParam("code")
+    result, err := c.doctorUseCase.HandleGoogleCallback(ctx.Request().Context(), code)
+    if err != nil {
+        return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+    }
+    return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Login Oauth", result))
 }
