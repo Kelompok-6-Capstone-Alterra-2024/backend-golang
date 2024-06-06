@@ -24,6 +24,7 @@ type ArticleRepositoryInterface interface {
 	GetAllArticle(metadata entities.Metadata, userId int) ([]Article, error)
 	GetArticleById(articleId int, userId int) (Article, error)
 	GetLikedArticle(metadata entities.Metadata, userId int) ([]Article, error)
+	LikeArticle(articleId int, userId int) error
 }
 
 type ArticleUseCaseInterface interface {
@@ -31,6 +32,7 @@ type ArticleUseCaseInterface interface {
 	GetAllArticle(metadata entities.Metadata, userId int) ([]Article, error)
 	GetArticleById(articleId int, userId int) (Article, error)
 	GetLikedArticle(metadata entities.Metadata, userId int) ([]Article, error)
+	LikeArticle(articleId int, userId int) error
 }
 
 func (ar *Article) ToResponse() response.ArticleListResponse {

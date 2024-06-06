@@ -52,3 +52,11 @@ func (useCase *ArticleUseCase) GetLikedArticle(metadata entities.Metadata, userI
 	}
 	return articles, nil
 }
+
+func (useCase *ArticleUseCase) LikeArticle(articleId int, userId int) error {
+	err := useCase.articleRepository.LikeArticle(articleId, userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -193,3 +193,33 @@ func (repository *ArticleRepo) GetLikedArticle(metadata entities.Metadata, userI
 
 	return articlesEnt, nil
 }
+
+func (repository *ArticleRepo) LikeArticle(articleId int, userId int) error {
+	var articleLikes ArticleLikes
+
+	// Check if the like already exists
+	err := repository.db.Where("user_id = ? AND article_id = ?", userId, articleId).First(&articleLikes).Error
+	if err == nil {
+		return constants.ErrAlreadyLiked
+	}
+
+	// Ensure article exists
+	var article Article
+	err = repository.db.Where("id = ?", articleId).First(&article).Error
+	if err != nil {
+		return constants.ErrServer
+	}
+
+	// Create new like entry
+	articleLikes = ArticleLikes{
+		UserId:    uint(userId),
+		ArticleID: uint(articleId),
+	}
+
+	err = repository.db.Create(&articleLikes).Error
+	if err != nil {
+		return constants.ErrServer
+	}
+
+	return nil
+}

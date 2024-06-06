@@ -143,6 +143,7 @@ func (controller *ArticleController) GetLikedArticle(c echo.Context) error {
 	for i, article := range articles {
 		articleResponse[i] = response.ArticleCreatedResponse{
 			ID:        article.ID,
+			DoctorID:  article.DoctorID,
 			Title:     article.Title,
 			Content:   article.Content,
 			Date:      article.Date,
@@ -157,4 +158,26 @@ func (controller *ArticleController) GetLikedArticle(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get Liked Articles", metadata, articleResponse))
+}
+
+func (controller *ArticleController) LikeArticle(c echo.Context) error {
+	var req request.ArticleLike
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("Invalid request body"))
+	}
+
+	token := c.Request().Header.Get("Authorization")
+	userId, err := utilities.GetUserIdFromToken(token)
+
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse("Invalid token"))
+	}
+
+	err = controller.articleUseCase.LikeArticle(req.ArticleID, userId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success Like Article", nil))
 }
