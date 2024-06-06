@@ -152,7 +152,16 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor
 	doctorAuth.POST("/login", r.doctorController.Login)       //Login Doctor
 
-	doctorAuth.POST("/articles", r.articleController.CreateArticle) // Create Article
-	doctorAuth.GET("/articles", r.articleController.GetAllArticle)  // Get All Article
+	doctorRoute := doctorAuth.Group("/")
+	doctorRoute.Use(echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))
 
+	doctorRoute.POST("articles", r.articleController.CreateArticle) // Create Article
+	doctorRoute.GET("articles", r.articleController.GetAllArticle)  // Get All Article
+
+	doctorRoute.POST("musics", r.musicController.PostMusic)                    // Post Music
+	doctorRoute.GET("musics", r.musicController.GetAllMusicsByDoctorId)         // Get All Music By Doctor ID
+	doctorRoute.GET("musics/:id", r.musicController.GetMusicByIdForDoctor)              // Get Music By ID
+	doctorRoute.GET("musics/count", r.musicController.CountMusicByDoctorId) // Count Music By Doctor ID
+	doctorRoute.GET("musics/like/count", r.musicController.CountMusicLikesByDoctorId) // Count Music Likes By Doctor ID
+	doctorRoute.GET("musics/view/count", r.musicController.CountMusicViewCountByDoctorId) // Count Music View Count By Doctor ID
 }

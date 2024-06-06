@@ -63,6 +63,35 @@ func (m *MusicRepo) GetAllMusics(metadata entities.Metadata, userId int) ([]musi
 	return musicsEnt, nil
 }
 
+func (m *MusicRepo) GetAllMusicsByDoctorId(metadata entities.MetadataFull, userId int) ([]musicEntities.Music, error) {
+	var musics []Music
+	
+	query := m.db.Where("doctor_id = ?", userId).Limit(metadata.Limit).Offset((metadata.Page-1)*metadata.Limit).Order(metadata.Sort + " " + metadata.Order)
+
+	if metadata.Search != "" {
+		query = query.Where("title LIKE ?", "%"+metadata.Search+"%")
+	}
+
+	err := query.Find(&musics).Error
+	if err != nil {
+		return []musicEntities.Music{}, constants.ErrServer
+	}
+
+	musicsEnt := make([]musicEntities.Music, len(musics))
+	for i := 0; i < len(musics); i++ {
+		musicsEnt[i] = musicEntities.Music{
+			Id:        musics[i].ID,
+			Title:     musics[i].Title,
+			Singer:    musics[i].Singer,
+			MusicUrl:  musics[i].MusicUrl,
+			ImageUrl:  musics[i].ImageUrl,
+			ViewCount: musics[i].ViewCount,
+		}
+	}
+
+	return musicsEnt, nil
+}
+
 func (m *MusicRepo) GetMusicById(musicId int, userId int) (musicEntities.Music, error) {
 	var music Music
 	err := m.db.Where("id = ?", musicId).First(&music).Error
@@ -93,6 +122,11 @@ func (m *MusicRepo) GetMusicById(musicId int, userId int) (musicEntities.Music, 
 		ImageUrl:  music.ImageUrl,
 		ViewCount: music.ViewCount,
 		IsLiked:   isLiked,
+	}
+
+	err = m.db.Model(&music).Where("id = ?", musicId).Update("view_count", music.ViewCount+1).Error
+	if err != nil {
+		return musicEntities.Music{}, constants.ErrServer
 	}
 
 	return musicEnt, nil
@@ -149,4 +183,80 @@ func (m *MusicRepo) LikeMusic(musicId int, userId int) error {
 	}
 
 	return nil
+}
+
+func (m *MusicRepo) CountMusicByDoctorId(doctorId int) (int, error) {
+	var counter int64
+	err := m.db.Model(&Music{}).Where("doctor_id = ?", doctorId).Count(&counter).Error
+	if err != nil {
+		return 0, constants.ErrServer
+	}
+
+	return int(counter), nil
+}
+
+func (m *MusicRepo) CountMusicLikesByDoctorId(doctorId int) (int, error) {
+	var counter int64
+	err := m.db.Table("music_likes").
+		Joins("JOIN musics ON music_likes.music_id = musics.id").
+		Where("musics.doctor_id = ?", doctorId).
+		Count(&counter).Error
+	if err != nil {
+		return 0, constants.ErrServer
+	}
+
+	return int(counter), nil
+}
+
+func (m *MusicRepo) CountMusicViewCountByDoctorId(doctorId int) (int, error) {
+	var totalViews int64
+	err := m.db.Model(&Music{}).
+		Where("doctor_id = ?", doctorId).
+		Select("SUM(view_count)").
+		Scan(&totalViews).Error
+	if err != nil {
+		return 0, constants.ErrServer
+	}
+
+	return int(totalViews), nil
+}
+
+func (m *MusicRepo) PostMusic(music musicEntities.Music) (musicEntities.Music, error) {
+	var musicDB Music
+
+	musicDB.DoctorId = music.DoctorId
+	musicDB.Title = music.Title
+	musicDB.Singer = music.Singer
+	musicDB.MusicUrl = music.MusicUrl
+	musicDB.ImageUrl = music.ImageUrl
+
+	err := m.db.Create(&musicDB).Error
+	if err != nil {
+		return musicEntities.Music{}, constants.ErrServer
+	}
+
+	return musicEntities.Music{
+		Id:        musicDB.ID,
+		Title:     musicDB.Title,
+		Singer:    musicDB.Singer,
+		MusicUrl:  musicDB.MusicUrl,
+		ImageUrl:  musicDB.ImageUrl,
+		ViewCount: musicDB.ViewCount,
+	}, nil
+}
+
+func (m *MusicRepo) GetMusicByIdForDoctor(musicId int) (musicEntities.Music, error) {
+	var musicDB Music
+	err := m.db.Where("id = ?", musicId).First(&musicDB).Error
+	if err != nil {
+		return musicEntities.Music{}, constants.ErrDataNotFound
+	}
+	return musicEntities.Music{
+		Id:        musicDB.ID,
+		Title:     musicDB.Title,
+		Singer:    musicDB.Singer,
+		MusicUrl:  musicDB.MusicUrl,
+		ImageUrl:  musicDB.ImageUrl,
+		ViewCount: musicDB.ViewCount,
+	}, nil
 }
