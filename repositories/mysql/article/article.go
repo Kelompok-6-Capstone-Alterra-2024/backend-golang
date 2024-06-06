@@ -197,20 +197,17 @@ func (repository *ArticleRepo) GetLikedArticle(metadata entities.Metadata, userI
 func (repository *ArticleRepo) LikeArticle(articleId int, userId int) error {
 	var articleLikes ArticleLikes
 
-	// Check if the like already exists
 	err := repository.db.Where("user_id = ? AND article_id = ?", userId, articleId).First(&articleLikes).Error
 	if err == nil {
 		return constants.ErrAlreadyLiked
 	}
 
-	// Ensure article exists
 	var article Article
 	err = repository.db.Where("id = ?", articleId).First(&article).Error
 	if err != nil {
 		return constants.ErrServer
 	}
 
-	// Create new like entry
 	articleLikes = ArticleLikes{
 		UserId:    uint(userId),
 		ArticleID: uint(articleId),
@@ -222,4 +219,52 @@ func (repository *ArticleRepo) LikeArticle(articleId int, userId int) error {
 	}
 
 	return nil
+}
+
+func (repository *ArticleRepo) GetArticleByIdForDoctor(articleId int) (articleEntities.Article, error) {
+	var articleDb Article
+	err := repository.db.Where("id = ?", articleId).First(&articleDb).Error
+	if err != nil {
+		return articleEntities.Article{}, constants.ErrDataNotFound
+	}
+
+	return articleEntities.Article{
+		ID:        articleDb.ID,
+		Title:     articleDb.Title,
+		Content:   articleDb.Content,
+		Date:      articleDb.Date,
+		ImageUrl:  articleDb.ImageUrl,
+		ViewCount: articleDb.ViewCount,
+		DoctorID:  articleDb.DoctorID,
+	}, nil
+}
+
+func (repository *ArticleRepo) GetAllArticleByDoctorId(metadata entities.MetadataFull, doctorId int) ([]articleEntities.Article, error) {
+	var articleDb []Article
+
+	query := repository.db.Where("doctor_id = ?", doctorId).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Order(metadata.Sort + " " + metadata.Order)
+
+	if metadata.Search != "" {
+		query = query.Where("title LIKE ?", "%"+metadata.Search+"%")
+	}
+
+	err := query.Find(&articleDb).Error
+	if err != nil {
+		return []articleEntities.Article{}, constants.ErrServer
+	}
+
+	articlesEnt := make([]articleEntities.Article, len(articleDb))
+	for i := 0; i < len(articleDb); i++ {
+		articlesEnt[i] = articleEntities.Article{
+			ID:        articleDb[i].ID,
+			Title:     articleDb[i].Title,
+			Content:   articleDb[i].Content,
+			Date:      articleDb[i].Date,
+			ImageUrl:  articleDb[i].ImageUrl,
+			ViewCount: articleDb[i].ViewCount,
+			DoctorID:  articleDb[i].DoctorID,
+		}
+	}
+
+	return articlesEnt, nil
 }

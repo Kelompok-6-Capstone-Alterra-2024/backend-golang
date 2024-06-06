@@ -181,3 +181,60 @@ func (controller *ArticleController) LikeArticle(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success Like Article", nil))
 }
+
+func (controller *ArticleController) GetArticleByIdForDoctor(c echo.Context) error {
+	articleId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	article, err := controller.articleUseCase.GetArticleByIdForDoctor(articleId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var resp response.ArticleGetDoctorResponse
+	resp.ID = article.ID
+	resp.DoctorID = article.DoctorID
+	resp.Title = article.Title
+	resp.Content = article.Content
+	resp.Date = article.Date
+	resp.ImageUrl = article.ImageUrl
+	resp.ViewCount = article.ViewCount
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Article For Doctor", resp))
+}
+
+func (controller *ArticleController) GetAllArticleByDoctorId(c echo.Context) error {
+	pageParam := c.QueryParam("page")
+	limitParam := c.QueryParam("limit")
+	sortParam := c.QueryParam("sort")
+	orderParam := c.QueryParam("order")
+	searchParam := c.QueryParam("search")
+
+	metadata := utilities.GetFullMetadata(pageParam, limitParam, sortParam, orderParam, searchParam)
+
+	token := c.Request().Header.Get("Authorization")
+	doctorId, _ := utilities.GetUserIdFromToken(token)
+
+	articles, err := controller.articleUseCase.GetAllArticleByDoctorId(*metadata, doctorId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	articleResp := make([]response.ArticleGetDoctorResponse, len(articles))
+
+	for i, article := range articles {
+		articleResp[i] = response.ArticleGetDoctorResponse{
+			ID:        article.ID,
+			DoctorID:  article.DoctorID,
+			Title:     article.Title,
+			Content:   article.Content,
+			Date:      article.Date,
+			ImageUrl:  article.ImageUrl,
+			ViewCount: article.ViewCount,
+		}
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get All Article By Doctor Id", articleResp))
+}

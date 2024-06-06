@@ -60,3 +60,19 @@ func (useCase *ArticleUseCase) LikeArticle(articleId int, userId int) error {
 	}
 	return nil
 }
+
+func (useCase *ArticleUseCase) GetArticleByIdForDoctor(articleId int) (articleEntities.Article, error) {
+	articles, err := useCase.articleRepository.GetArticleByIdForDoctor(articleId)
+	if err != nil {
+		return articleEntities.Article{}, err
+	}
+	return articles, nil
+}
+
+func (useCase *ArticleUseCase) GetAllArticleByDoctorId(metadata entities.MetadataFull, doctorId int) ([]articleEntities.Article, error) {
+	articles, err := useCase.articleRepository.GetAllArticleByDoctorId(metadata, doctorId)
+	if err != nil {
+		return []articleEntities.Article{}, err
+	}
+	return articles, nil
+}

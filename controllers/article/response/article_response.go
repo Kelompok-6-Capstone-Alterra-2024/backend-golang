@@ -30,3 +30,13 @@ type ArticleListResponse struct {
 	IsLiked   bool      `json:"is_liked"`
 	Doctor    DoctorInfoResponse
 }
+
+type ArticleGetDoctorResponse struct {
+	ID        uint      `json:"id"`
+	DoctorID  uint      `json:"doctor_id"`
+	Title     string    `json:"title"`
+	Content   string    `json:"content"`
+	Date      time.Time `json:"date"`
+	ImageUrl  string    `json:"image_url"`
+	ViewCount int       `json:"view_count"`
+}
