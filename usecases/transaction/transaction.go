@@ -3,26 +3,30 @@ package transaction
 import (
 	"capstone/constants"
 	"capstone/entities"
+	"capstone/entities/consultation"
 	midtransEntities "capstone/entities/midtrans"
 	transactionEntities "capstone/entities/transaction"
 	"github.com/go-playground/validator/v10"
 )
 
 type Transaction struct {
-	transactionRepository transactionEntities.TransactionRepository
-	midtransUseCase       midtransEntities.MidtransUseCase
-	validate              *validator.Validate
+	transactionRepository  transactionEntities.TransactionRepository
+	midtransUseCase        midtransEntities.MidtransUseCase
+	consultationRepository consultation.ConsultationRepository
+	validate               *validator.Validate
 }
 
 func NewTransactionUseCase(
 	transactionRepository transactionEntities.TransactionRepository,
 	midtransUseCase midtransEntities.MidtransUseCase,
+	consultationRepository consultation.ConsultationRepository,
 	validate *validator.Validate,
 ) transactionEntities.TransactionUseCase {
 	return &Transaction{
-		transactionRepository: transactionRepository,
-		midtransUseCase:       midtransUseCase,
-		validate:              validate,
+		transactionRepository:  transactionRepository,
+		midtransUseCase:        midtransUseCase,
+		consultationRepository: consultationRepository,
+		validate:               validate,
 	}
 }
 
@@ -49,6 +53,10 @@ func (usecase *Transaction) InsertWithCustomInterface(transaction *transactionEn
 		return nil, err
 	}
 
+	_, err = usecase.consultationRepository.GetConsultationByID(int(transaction.ConsultationID))
+	if err != nil {
+		return nil, err
+	}
 	var newTransaction, response *transactionEntities.Transaction
 	if transaction.PaymentType == constants.BankTransfer {
 		newTransaction, err = usecase.midtransUseCase.BankTransfer(transaction)
