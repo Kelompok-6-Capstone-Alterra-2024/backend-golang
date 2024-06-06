@@ -1,6 +1,7 @@
 package music
 
 import (
+	"capstone/repositories/mysql/doctor"
 	"capstone/repositories/mysql/user"
 
 	"gorm.io/gorm"
@@ -8,6 +9,8 @@ import (
 
 type Music struct {
 	gorm.Model
+	DoctorId 	uint `gorm:"type:int;index"`
+	Doctor   	doctor.Doctor `gorm:"foreignKey:doctor_id;references:id"`
 	Title       string `gorm:"type:varchar(100)"`
 	Singer      string `gorm:"type:varchar(100)"`
 	MusicUrl    string `gorm:"type:varchar(255)"`
