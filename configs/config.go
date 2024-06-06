@@ -37,6 +37,16 @@ func GetGoogleOAuthConfig() *oauth2.Config {
 	}
 }
 
+func GetGoogleOAuthConfigDoctor() *oauth2.Config {
+	return &oauth2.Config{
+		ClientID:     os.Getenv("GOOGLE_CLIENT_ID_DOCTOR"),
+		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET_DOCTOR"),
+		RedirectURL:  "https://dev-capstone.practiceproject.tech/v1/doctors/auth/google/callback",
+		Scopes:       []string{"openid", "email", "profile"},
+		Endpoint:     google.Endpoint,
+	}
+}
+
 func InitConfigJWT() string {
 	return os.Getenv("SECRET_JWT")
 }
