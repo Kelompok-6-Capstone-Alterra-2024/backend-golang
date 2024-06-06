@@ -238,3 +238,51 @@ func (controller *ArticleController) GetAllArticleByDoctorId(c echo.Context) err
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get All Article By Doctor Id", articleResp))
 }
+
+func (controller *ArticleController) CountArticleByDoctorId(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	doctorId, _ := utilities.GetUserIdFromToken(token)
+
+	count, err := controller.articleUseCase.CountArticleByDoctorId(doctorId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	resp := response.ArticleCounter{
+		Count: count,
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Count Article By Doctor Id", resp))
+}
+
+func (controller *ArticleController) CountArticleLikesByDoctorId(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	doctorId, _ := utilities.GetUserIdFromToken(token)
+
+	count, err := controller.articleUseCase.CountArticleLikesByDoctorId(doctorId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	resp := response.ArticleCounter{
+		Count: count,
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Count Article Likes By Doctor Id", resp))
+}
+
+func (controller *ArticleController) CountArticleViewByDoctorId(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	doctorId, _ := utilities.GetUserIdFromToken(token)
+
+	count, err := controller.articleUseCase.CountArticleViewByDoctorId(doctorId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	resp := response.ArticleCounter{
+		Count: count,
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Count Article View By Doctor Id", resp))
+}

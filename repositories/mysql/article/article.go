@@ -268,3 +268,36 @@ func (repository *ArticleRepo) GetAllArticleByDoctorId(metadata entities.Metadat
 
 	return articlesEnt, nil
 }
+
+func (repository *ArticleRepo) CountArticleByDoctorId(doctorId int) (int, error) {
+	var counter int64
+	err := repository.db.Model(&Article{}).Where("doctor_id = ?", doctorId).Count(&counter).Error
+	if err != nil {
+		return 0, constants.ErrServer
+	}
+
+	return int(counter), nil
+}
+
+func (repository *ArticleRepo) CountArticleLikesByDoctorId(doctorId int) (int, error) {
+	var counter int64
+	err := repository.db.Table("article_likes").
+		Joins("JOIN articles ON article_likes.article_id = stories.id").
+		Where("articles.doctor_id = ?", doctorId).
+		Count(&counter).Error
+	if err != nil {
+		return 0, constants.ErrServer
+	}
+
+	return int(counter), nil
+}
+
+func (repository *ArticleRepo) CountArticleViewByDoctorId(doctorId int) (int, error) {
+	var counter int64
+	err := repository.db.Model(&Article{}).Where("doctor_id = ?", doctorId).Select("SUM(view_count)").Scan(&counter).Error
+	if err != nil {
+		return 0, constants.ErrServer
+	}
+
+	return int(counter), nil
+}

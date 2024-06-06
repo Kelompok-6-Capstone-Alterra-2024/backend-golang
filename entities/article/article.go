@@ -27,6 +27,9 @@ type ArticleRepositoryInterface interface {
 	LikeArticle(articleId int, userId int) error
 	GetArticleByIdForDoctor(articleId int) (Article, error)
 	GetAllArticleByDoctorId(metadata entities.MetadataFull, doctorId int) ([]Article, error)
+	CountArticleByDoctorId(doctorId int) (int, error)
+	CountArticleLikesByDoctorId(doctorId int) (int, error)
+	CountArticleViewByDoctorId(doctorId int) (int, error)
 }
 
 type ArticleUseCaseInterface interface {
@@ -37,6 +40,9 @@ type ArticleUseCaseInterface interface {
 	LikeArticle(articleId int, userId int) error
 	GetArticleByIdForDoctor(articleId int) (Article, error)
 	GetAllArticleByDoctorId(metadata entities.MetadataFull, doctorId int) ([]Article, error)
+	CountArticleByDoctorId(doctorId int) (int, error)
+	CountArticleLikesByDoctorId(doctorId int) (int, error)
+	CountArticleViewByDoctorId(doctorId int) (int, error)
 }
 
 func (ar *Article) ToResponse() response.ArticleListResponse {

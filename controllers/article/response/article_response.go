@@ -40,3 +40,7 @@ type ArticleGetDoctorResponse struct {
 	ImageUrl  string    `json:"image_url"`
 	ViewCount int       `json:"view_count"`
 }
+
+type ArticleCounter struct {
+	Count int `json:"count"`
+}

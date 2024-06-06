@@ -76,3 +76,27 @@ func (useCase *ArticleUseCase) GetAllArticleByDoctorId(metadata entities.Metadat
 	}
 	return articles, nil
 }
+
+func (useCase *ArticleUseCase) CountArticleByDoctorId(doctorId int) (int, error) {
+	count, err := useCase.articleRepository.CountArticleByDoctorId(doctorId)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (useCase *ArticleUseCase) CountArticleLikesByDoctorId(doctorId int) (int, error) {
+	count, err := useCase.articleRepository.CountArticleLikesByDoctorId(doctorId)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (useCase *ArticleUseCase) CountArticleViewByDoctorId(doctorId int) (int, error) {
+	count, err := useCase.articleRepository.CountArticleViewByDoctorId(doctorId)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
