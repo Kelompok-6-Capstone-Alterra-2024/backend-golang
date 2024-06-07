@@ -130,3 +130,11 @@ func (storiesUseCase *StoryUseCase) EditStory(story storyEntities.Story, file *m
 	}
 	return story, nil
 }
+
+func (storiesUseCase *StoryUseCase) DeleteStory(storyId int) error {
+	err := storiesUseCase.storyRepository.DeleteStory(storyId)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -312,3 +312,7 @@ func (repository *StoriesRepo) EditStory(story storyEntities.Story) (storyEntiti
 		DoctorId:  storyDB.DoctorId,
 	}, nil
 }
+
+func (repository *StoriesRepo) DeleteStory(storyId int) error {
+	return repository.DB.Where("id = ?", storyId).Delete(&Story{}).Error
+}

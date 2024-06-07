@@ -312,3 +312,17 @@ func (storyController *StoryController) EditStory(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Edit Story", resp))
 }
+
+func (storyController *StoryController) DeleteStory(c echo.Context) error {
+	storyId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	err = storyController.storyUseCase.DeleteStory(storyId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Delete Story", nil))
+}
