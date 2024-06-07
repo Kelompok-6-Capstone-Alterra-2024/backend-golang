@@ -152,6 +152,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("articles/:id", r.articleController.GetArticleById)
 	userRoute.GET("articles/liked", r.articleController.GetLikedArticle)
 
+	e.GET("/v1/doctors/chatbots/treatment", r.chatbotController.ChatbotTreatment) //Chatbot Treatment
+
 	doctorAuth := e.Group("/v1/doctors")
 
 	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor
