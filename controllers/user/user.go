@@ -74,5 +74,10 @@ func (c *UserController) GoogleCallback(ctx echo.Context) error {
     if err != nil {
         return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
     }
-    return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Login Oauth", result))
+
+	var res response.UserLoginRegisterResponse
+	res.Id = result.Id
+	res.Token = result.Token
+
+    return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Login Oauth", res))
 }
