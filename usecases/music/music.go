@@ -117,3 +117,33 @@ func (musicUseCase *MusicUseCase) GetMusicByIdForDoctor(musicId int) (musicEntit
 	}
 	return music, nil
 }
+
+func (musicUseCase *MusicUseCase) EditMusic(music musicEntities.Music, fileImage *multipart.FileHeader) (musicEntities.Music, error) {
+	if music.Title == "" || music.Singer == "" {
+		return musicEntities.Music{}, constants.ErrEmptyInputMusic
+	}
+
+	if fileImage != nil {
+		secureUrl, err := utilities.UploadImage(fileImage)
+		if err != nil {
+			return musicEntities.Music{}, constants.ErrUploadImage
+		}
+		music.ImageUrl = secureUrl
+	}else{
+		music.ImageUrl = ""
+	}
+	
+	music, err := musicUseCase.musicInterface.EditMusic(music)
+	if err != nil {
+		return musicEntities.Music{}, err
+	}
+	return music, nil
+}
+
+func (musicUseCase *MusicUseCase) DeleteMusic(musicId int) error {
+	err := musicUseCase.musicInterface.DeleteMusic(musicId)
+	if err != nil {
+		return err
+	}
+	return nil
+}

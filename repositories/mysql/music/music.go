@@ -260,3 +260,37 @@ func (m *MusicRepo) GetMusicByIdForDoctor(musicId int) (musicEntities.Music, err
 		ViewCount: musicDB.ViewCount,
 	}, nil
 }
+
+func (m *MusicRepo) EditMusic(music musicEntities.Music) (musicEntities.Music, error) {
+	var musicDB Music
+
+	err := m.db.Where("id = ?", music.Id).First(&musicDB).Error
+	if err != nil {
+		return musicEntities.Music{}, constants.ErrDataNotFound
+	}
+
+	musicDB.Title = music.Title
+	musicDB.Singer = music.Singer
+
+	if music.ImageUrl != "" {
+		musicDB.ImageUrl = music.ImageUrl
+	}
+
+	err = m.db.Save(&musicDB).Error
+	if err != nil {
+		return musicEntities.Music{}, constants.ErrServer
+	}
+
+	return musicEntities.Music{
+		Id:        musicDB.ID,
+		Title:     musicDB.Title,
+		Singer:    musicDB.Singer,
+		MusicUrl:  musicDB.MusicUrl,
+		ImageUrl:  musicDB.ImageUrl,
+		ViewCount: musicDB.ViewCount,
+	}, nil
+}
+
+func (m *MusicRepo) DeleteMusic(musicId int) error {
+	return m.db.Where("id = ?", musicId).Delete(&Music{}).Error
+}

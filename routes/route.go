@@ -174,6 +174,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("musics/count", r.musicController.CountMusicByDoctorId) // Count Music By Doctor ID
 	doctorRoute.GET("musics/like/count", r.musicController.CountMusicLikesByDoctorId) // Count Music Likes By Doctor ID
 	doctorRoute.GET("musics/view/count", r.musicController.CountMusicViewCountByDoctorId) // Count Music View Count By Doctor ID
+	doctorRoute.PUT("musics/:id", r.musicController.EditMusic)              // Update Music
+	doctorRoute.DELETE("musics/:id", r.musicController.DeleteMusic)          // Delete Music
 
 	doctorRoute.POST("stories", r.storyController.PostStory)                    // Post Story
 	doctorRoute.GET("stories", r.storyController.GetAllStoriesByDoctorId)         // Get All Story By Doctor ID
