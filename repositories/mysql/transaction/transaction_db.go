@@ -13,7 +13,7 @@ type Transaction struct {
 	ConsultationID uint                      `gorm:"column:consultation_id;not null;unique"`
 	Consultation   consultation.Consultation `gorm:"foreignKey:consultation_id;references:id"`
 	Price          int                       `gorm:"column:price;not null"`
-	PaymentType    string                    `gorm:"column:payment_type;not null;type:enum('gopay','bank_transfer')"`
+	PaymentType    string                    `gorm:"column:payment_type;not null;type:enum('gopay','bank_transfer');default:'bank_transfer'"`
 	Bank           string                    `gorm:"column:bank;not null;default:'ewallet'"`
 	PaymentLink    string                    `gorm:"column:payment_link;not null"`
 	Status         string                    `gorm:"column:status;not null;type:enum('pending','settlement','failed', 'deny');default:'pending'"`
