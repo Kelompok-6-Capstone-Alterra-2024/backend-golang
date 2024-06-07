@@ -13,7 +13,9 @@ type Transaction struct {
 	ConsultationID uint                      `gorm:"column:consultation_id;not null;unique"`
 	Consultation   consultation.Consultation `gorm:"foreignKey:consultation_id;references:id"`
 	Price          int                       `gorm:"column:price;not null"`
-	SnapURL        string                    `gorm:"column:snap_url"`
+	PaymentType    string                    `gorm:"column:payment_type;not null;type:enum('gopay','bank_transfer')"`
+	Bank           string                    `gorm:"column:bank;not null;default:'ewallet'"`
+	PaymentLink    string                    `gorm:"column:payment_link;not null"`
 	Status         string                    `gorm:"column:status;not null;type:enum('pending','settlement','failed', 'deny');default:'pending'"`
 }
 
@@ -23,7 +25,9 @@ func (receiver Transaction) ToEntities() *transaction.Transaction {
 		ConsultationID: receiver.ConsultationID,
 		Consultation:   *receiver.Consultation.ToEntities(),
 		Price:          receiver.Price,
-		SnapURL:        receiver.SnapURL,
+		PaymentType:    receiver.PaymentType,
+		PaymentLink:    receiver.PaymentLink,
+		Bank:           receiver.Bank,
 		Status:         receiver.Status,
 		CreatedAt:      receiver.CreatedAt,
 		UpdatedAt:      receiver.UpdatedAt,
@@ -32,12 +36,14 @@ func (receiver Transaction) ToEntities() *transaction.Transaction {
 
 func ToTransactionModel(transaction *transaction.Transaction) *Transaction {
 	return &Transaction{
-		ID:             uuid.New(),
+		ID:             transaction.ID,
 		Model:          gorm.Model{CreatedAt: transaction.CreatedAt, UpdatedAt: transaction.UpdatedAt},
 		ConsultationID: transaction.ConsultationID,
 		Consultation:   *consultation.ToConsultationModel(&transaction.Consultation),
 		Price:          transaction.Price,
-		SnapURL:        transaction.SnapURL,
+		PaymentType:    transaction.PaymentType,
+		PaymentLink:    transaction.PaymentLink,
+		Bank:           transaction.Bank,
 		Status:         transaction.Status,
 	}
 }

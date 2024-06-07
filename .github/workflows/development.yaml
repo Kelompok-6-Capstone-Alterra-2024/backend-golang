@@ -4,8 +4,6 @@
 name: Deploy on Dev
 
 on:
-  push:
-    branches: [ "development" ]
   pull_request:
     branches: [ "development" ]
 
@@ -42,4 +40,4 @@ jobs:
             cd ~/
             docker pull wdinx/capstone-project:latest
             docker container rm -f capstone
-            docker run -d --name capstone -p 8080:8080 --env DBHost=${{ secrets.DBHOST }} --env DBPort=${{ secrets.DBPORT }} --env DBUser=${{ secrets.DBUSER }} --env DBPass=${{ secrets.DBPASS }} --env DBName=${{ secrets.DBNAME }} --env SECRET_JWT=${{ secrets.SECRET_JWT }} --env MIDTRANS_KEY=${{ secrets.MIDTRANS_KEY }} --env MIDTRANS_ENV=${{ secrets.MIDTRANS_ENV }} --env CLOUDINARY_URL=${{ secrets.CLOUDINARY_URL }} --env AI_KEY=${{ secrets.AI_KEY }} --env GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} --env GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} --env GOOGLE_CLIENT_ID_DOCTOR=${{ secrets.GOOGLE_CLIENT_ID_DOCTOR }} --env GOOGLE_CLIENT_SECRET_DOCTOR=${{ secrets.GOOGLE_CLIENT_SECRET_DOCTOR }}  wdinx/capstone-project:latest
+            docker run -d --name capstone -p 8080:8080 --env DBHost=${{ secrets.DBHOST }} --env DBPort=${{ secrets.DBPORT }} --env DBUser=${{ secrets.DBUSER }} --env DBPass=${{ secrets.DBPASS }} --env DBName=${{ secrets.DBNAME }} --env SECRET_JWT=${{ secrets.SECRET_JWT }} --env MIDTRANS_CLIENT_KEY=${{ secrets.MIDTRANS_KEY }} --env MIDTRANS_SERVER_KEY=${{ secrets.MIDTRANS_SERVER_KEY }} --env MIDTRANS_BASE_URL=${{ secrets.MIDTRANS_BASE_URL }} --env MIDTRANS_ENV=${{ secrets.MIDTRANS_ENV }} --env CLOUDINARY_URL=${{ secrets.CLOUDINARY_URL }} --env AI_KEY=${{ secrets.AI_KEY }} --env GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} --env GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} --env GOOGLE_CLIENT_ID_DOCTOR=${{ secrets.GOOGLE_CLIENT_ID_DOCTOR }} --env GOOGLE_CLIENT_SECRET_DOCTOR=${{ secrets.GOOGLE_CLIENT_SECRET_DOCTOR }}  wdinx/capstone-project:latest

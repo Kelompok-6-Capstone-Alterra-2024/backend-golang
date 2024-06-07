@@ -169,3 +169,55 @@ func (u *ChatbotUsecase) GetReplyMentalHealth(newMessage string, chatHistory []c
 
 	return aiResponse.Choices[0].Message.Content, nil
 }
+
+func (u *ChatbotUsecase) GetReplyTreatment(newMessage string, chatHistory []chatbot.ChatHistory) (string, error) {
+	messages := []map[string]string{
+		{"role": "system", "content": "You are an advanced AI assistant designed to help mental health professionals develop appropriate treatment plans for their patients. Your responses should be empathetic, evidence-based, and should consider the patient's history, symptoms, and individual circumstances as described by the doctor. Provide recommendations for therapies, medications, and other treatment options, as well as any relevant considerations or precautions. Always prioritize patient safety and confidentiality in your suggestions."},
+	}
+	for _, chat := range chatHistory {
+		messages = append(messages, map[string]string{"role": "user", "content": chat.PreviousMessages}) //memasukkan seluruh message terdahulu kedalam message baru yang akan dikirim ke ai
+	}
+	messages = append(messages, map[string]string{"role": "user", "content": newMessage})
+
+	// Create the request payload
+	openAIRequest := chatbot.OpenAIRequest{
+		Model:    "gpt-3.5-turbo",
+		Messages: messages,
+	}
+
+	// Convert the request payload to JSON
+	requestBody, err := json.Marshal(openAIRequest)
+	if err != nil {
+		return "", err
+	}
+
+	openApiKey := configs.InitConfigKeyChatbot()
+
+	// Send the request to OpenAI API
+	req, err := http.NewRequest("POST", "https://api.openai.com/v1/chat/completions", bytes.NewBuffer(requestBody))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+ openApiKey) // Use your OpenAI API key here
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// Parse the response from OpenAI API
+	var aiResponse chatbot.OpenAIResponse
+	err = json.NewDecoder(resp.Body).Decode(&aiResponse)
+	if err != nil {
+		return "", err
+	}
+
+	if len(aiResponse.Choices) == 0 {
+		return "", fmt.Errorf("no completions found")
+	}
+
+	return aiResponse.Choices[0].Message.Content, nil
+}

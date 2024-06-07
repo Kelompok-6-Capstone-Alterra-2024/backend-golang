@@ -21,4 +21,5 @@ type ChatHistory struct {
 type UseCaseInterface interface {
 	GetReplyCS(message string, chatHistory []ChatHistory) (string, error)
 	GetReplyMentalHealth(message string, chatHistory []ChatHistory) (string, error)
+	GetReplyTreatment(message string, chatHistory []ChatHistory) (string, error)
 }

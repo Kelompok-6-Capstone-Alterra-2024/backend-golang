@@ -75,6 +75,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	e.HTTPErrorHandler = base.ErrorHandler
 	e.Use(myMiddleware.CORSMiddleware())
 
+	e.POST("/v1/payment-callback", r.transactionController.CallbackTransaction)
+
 	// chatbot
 	e.GET("/v1/users/chatbots/customer-service", r.chatbotController.ChatbotCS)        //customer service chatbot
 	e.GET("/v1/users/chatbots/mental-health", r.chatbotController.ChatbotMentalHealth) //mental health chatbot
@@ -114,10 +116,12 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.POST("complaint", r.complaintController.Create) // Create Complaint
 
 	// Transaction
-	userRoute.POST("transaction", r.transactionController.Insert)                               // Create Transaction
+	userRoute.POST("transaction", r.transactionController.InsertWithBuiltIn)                    // Create Transaction
 	userRoute.GET("transaction/:id", r.transactionController.FindByID)                          // Get Transaction By ID
 	userRoute.GET("transaction/consultation/:id", r.transactionController.FindByConsultationID) // Get Transaction By Consultation ID
 	userRoute.GET("transactions", r.transactionController.FindAll)                              // Get All Transaction
+	userRoute.POST("transaction/bank-transfer", r.transactionController.BankTransfer)           // Bank Transfer
+	userRoute.POST("transaction/e-wallet", r.transactionController.EWallet)                     // E-Wallet
 
 	// Rating
 	userRoute.POST("feedbacks", r.ratingController.SendFeedback) // Create Rating
@@ -147,6 +151,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("articles/:id", r.articleController.GetArticleById)    // Get Article By ID
 	userRoute.GET("articles/liked", r.articleController.GetLikedArticle) // Get Liked Article
 	userRoute.POST("articles/like", r.articleController.LikeArticle)     // Like Article
+
+	e.GET("/v1/doctors/chatbots/treatment", r.chatbotController.ChatbotTreatment) //Chatbot Treatment
 
 	doctorAuth := e.Group("/v1/doctors")
 
@@ -179,4 +185,6 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("stories/count", r.storyController.CountStoriesByDoctorId)         // Count Stories By Doctor ID
 	doctorRoute.GET("stories/like/count", r.storyController.CountStoryLikesByDoctorId) // Count Stories Likes By Doctor ID
 	doctorRoute.GET("stories/view/count", r.storyController.CountStoryViewByDoctorId)  // Count Stories View Count By Doctor ID
+	doctorRoute.PUT("stories/:id", r.storyController.EditStory)                        // Update Story
+	doctorRoute.DELETE("stories/:id", r.storyController.DeleteStory)                   // Delete Story
 }

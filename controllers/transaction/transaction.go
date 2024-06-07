@@ -1,32 +1,37 @@
 package transaction
 
 import (
+	"capstone/constants"
 	"capstone/controllers/transaction/request"
 	"capstone/controllers/transaction/response"
+	midtransEntities "capstone/entities/midtrans"
 	transactionEntities "capstone/entities/transaction"
 	"capstone/utilities"
 	"capstone/utilities/base"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
 
 type TransactionController struct {
 	transactionUseCase transactionEntities.TransactionUseCase
+	midtransUseCase    midtransEntities.MidtransUseCase
 }
 
-func NewTransactionController(transactionUseCase transactionEntities.TransactionUseCase) *TransactionController {
+func NewTransactionController(transactionUseCase transactionEntities.TransactionUseCase, midtransUseCase midtransEntities.MidtransUseCase) *TransactionController {
 	return &TransactionController{
 		transactionUseCase: transactionUseCase,
+		midtransUseCase:    midtransUseCase,
 	}
 }
 
-func (controller *TransactionController) Insert(c echo.Context) error {
+func (controller *TransactionController) InsertWithBuiltIn(c echo.Context) error {
 	var transactionRequest request.TransactionRequest
 	if err := c.Bind(&transactionRequest); err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 
-	transactionResponse, err := controller.transactionUseCase.Insert(transactionRequest.ToEntities())
+	transactionResponse, err := controller.transactionUseCase.InsertWithBuiltInInterface(transactionRequest.ToEntities())
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
@@ -73,4 +78,52 @@ func (controller *TransactionController) FindAll(c echo.Context) error {
 		transactionResponses = append(transactionResponses, *transaction.ToResponse())
 	}
 	return c.JSON(http.StatusOK, transactionResponses)
+}
+
+func (controller *TransactionController) BankTransfer(c echo.Context) error {
+	var transaction request.TransactionRequest
+	if err := c.Bind(&transaction); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	bankName := c.QueryParam("bank")
+	transaction.Bank = bankName
+	transaction.PaymentType = constants.BankTransfer
+	transactionRequest := transaction.ToEntities()
+	transactionResponse, err := controller.transactionUseCase.InsertWithCustomInterface(transactionRequest)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+	return c.JSON(201, base.NewSuccessResponse("Transaction created", transactionResponse.ToResponse()))
+}
+
+func (controller *TransactionController) EWallet(c echo.Context) error {
+	var transaction request.TransactionRequest
+	if err := c.Bind(&transaction); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	transaction.PaymentType = constants.GoPay
+	transactionRequest := transaction.ToEntities()
+	transactionResponse, err := controller.transactionUseCase.InsertWithCustomInterface(transactionRequest)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+	return c.JSON(201, base.NewSuccessResponse("Transaction created", transactionResponse.ToResponse()))
+}
+
+func (controller *TransactionController) CallbackTransaction(c echo.Context) error {
+	var transactionCallback response.TransactionCallback
+	if err := c.Bind(&transactionCallback); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	statusCode, err := controller.midtransUseCase.VerifyPayment(transactionCallback.OrderID)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	fmt.Println(transactionCallback.TransactionID)
+	transaction, err := controller.transactionUseCase.ConfirmedPayment(transactionCallback.OrderID, statusCode)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Payment confirmed", transaction.ToResponse()))
 }
