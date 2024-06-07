@@ -76,7 +76,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	e.Use(myMiddleware.CORSMiddleware())
 
 	e.POST("/v1/payment-callback", r.transactionController.CallbackTransaction)
-  
+
 	// chatbot
 	e.GET("/v1/users/chatbots/customer-service", r.chatbotController.ChatbotCS)        //customer service chatbot
 	e.GET("/v1/users/chatbots/mental-health", r.chatbotController.ChatbotMentalHealth) //mental health chatbot
@@ -179,4 +179,6 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("stories/count", r.storyController.CountStoriesByDoctorId) // Count Stories By Doctor ID
 	doctorRoute.GET("stories/like/count", r.storyController.CountStoryLikesByDoctorId) // Count Stories Likes By Doctor ID
 	doctorRoute.GET("stories/view/count", r.storyController.CountStoryViewByDoctorId) // Count Stories View Count By Doctor ID
+	doctorRoute.PUT("stories/:id", r.storyController.EditStory)              // Update Story
+	doctorRoute.DELETE("stories/:id", r.storyController.DeleteStory)          // Delete Story
 }
