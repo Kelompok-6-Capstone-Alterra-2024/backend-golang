@@ -2,6 +2,7 @@ package doctor
 
 import (
 	doctorEntities "capstone/entities/doctor"
+
 	"gorm.io/gorm"
 )
 
@@ -13,7 +14,7 @@ type Doctor struct {
 	Name             string `gorm:"type:varchar(100);not null"`
 	Address          string `gorm:"type:text"`
 	PhoneNumber      string `gorm:"type:varchar(100)"`
-	Gender           string `gorm:"type:ENUM('pria', 'wanita')"`
+	Gender           string `gorm:"type:ENUM('pria', 'wanita');default:pria"`
 	IsAvailable      bool   `gorm:"type:boolean;default:true"`
 	ProfilePicture   string `gorm:"type:varchar(255)"`
 	Balance          int    `gorm:"type:int;default:0"`
@@ -26,6 +27,7 @@ type Doctor struct {
 	StrNumber        string `gorm:"type:varchar(100)"`
 	Fee              int    `gorm:"type:int"`
 	Specialist       string `gorm:"type:varchar(100)"`
+	IsOauth          bool   `gorm:"type:boolean;default:false"`
 }
 
 func (doctor *Doctor) ToEntities() *doctorEntities.Doctor {

@@ -3,6 +3,7 @@ package doctor
 import (
 	"capstone/controllers/doctor/response"
 	"capstone/entities"
+	"context"
 )
 
 type Doctor struct {
@@ -27,6 +28,7 @@ type Doctor struct {
 	Fee              int
 	Specialist       string
 	Token            string
+	IsOauth          bool
 }
 
 type DoctorRepositoryInterface interface {
@@ -35,6 +37,8 @@ type DoctorRepositoryInterface interface {
 	GetDoctorByID(doctorID int) (*Doctor, error)
 	GetAllDoctor(metadata *entities.Metadata) (*[]Doctor, error)
 	GetActiveDoctor(metadata *entities.Metadata) (*[]Doctor, error)
+	Create(email string, picture string, name string) (Doctor, error)
+	OauthFindByEmail(email string) (Doctor, int, error)
 }
 
 type DoctorUseCaseInterface interface {
@@ -43,6 +47,8 @@ type DoctorUseCaseInterface interface {
 	GetDoctorByID(doctorID int) (*Doctor, error)
 	GetAllDoctor(metadata *entities.Metadata) (*[]Doctor, error)
 	GetActiveDoctor(metadata *entities.Metadata) (*[]Doctor, error)
+	HandleGoogleLogin() string
+	HandleGoogleCallback(ctx context.Context, code string) (Doctor, error)
 }
 
 func (r *Doctor) ToResponse() response.DoctorLoginAndRegisterResponse {

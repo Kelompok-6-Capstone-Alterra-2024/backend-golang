@@ -12,8 +12,10 @@ type Transaction struct {
 	ConsultationID uint `validate:"required"`
 	Consultation   consultation.Consultation
 	Price          int
-	SnapURL        string
 	Status         string
+	PaymentType    string
+	PaymentLink    string
+	Bank           string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 }
@@ -23,7 +25,11 @@ func (r Transaction) ToResponse() *response.TransactionResponse {
 		ID:           r.ID.String(),
 		Consultation: *r.Consultation.ToUserResponse(),
 		Price:        r.Price,
-		SnapURL:      r.SnapURL,
+		PaymentType:  r.PaymentType,
+		PaymentLink:  r.PaymentLink,
+		Bank:         r.Bank,
 		Status:       r.Status,
+		CreatedAt:    r.CreatedAt.String(),
+		UpdatedAt:    r.UpdatedAt.String(),
 	}
 }

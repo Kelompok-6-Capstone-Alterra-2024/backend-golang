@@ -67,18 +67,32 @@ func ConvertResponseCode(err error) int {
 	case constants.ErrAlreadyLiked:
 		return http.StatusConflict
 
-		case constants.ErrEmptyInputForum:
-			return http.StatusBadRequest
+	case constants.ErrEmptyInputForum:
+		return http.StatusBadRequest
 
-		case constants.ErrEmptyInputPost:
-			return http.StatusBadRequest
+	case constants.ErrEmptyInputPost:
+		return http.StatusBadRequest
 
-		case constants.ErrEmptyInputLike:
-			return http.StatusBadRequest
+	case constants.ErrEmptyInputLike:
+		return http.StatusBadRequest
 
-		case constants.ErrEmptyInputComment:
-			return http.StatusBadRequest
-			
+	case constants.ErrEmptyInputComment:
+		return http.StatusBadRequest
+
+	case constants.ErrExcange:
+		return http.StatusInternalServerError
+
+	case constants.ErrNewServiceGoogle:
+		return http.StatusInternalServerError
+
+	case constants.ErrNewUserInfo:
+		return http.StatusInternalServerError
+
+	case constants.ErrInsertOAuth:
+		return http.StatusInternalServerError
+
+	case constants.ErrEmptyInputMusic:
+		return http.StatusBadRequest
 	default:
 		return http.StatusInternalServerError
 	}

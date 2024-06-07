@@ -6,6 +6,8 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 func LoadEnv() {
@@ -22,6 +24,26 @@ func InitConfigMySQL() mysql.Config {
 		DBPass: os.Getenv("DBPass"),
 		DBHost: os.Getenv("DBHost"),
 		DBPort: os.Getenv("DBPort"),
+	}
+}
+
+func GetGoogleOAuthConfig() *oauth2.Config {
+	return &oauth2.Config{
+		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		RedirectURL:  "https://dev-capstone.practiceproject.tech/v1/users/auth/google/callback",
+		Scopes:       []string{"openid", "email", "profile"},
+		Endpoint:     google.Endpoint,
+	}
+}
+
+func GetGoogleOAuthConfigDoctor() *oauth2.Config {
+	return &oauth2.Config{
+		ClientID:     os.Getenv("GOOGLE_CLIENT_ID_DOCTOR"),
+		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET_DOCTOR"),
+		RedirectURL:  "https://dev-capstone.practiceproject.tech/v1/doctors/auth/google/callback",
+		Scopes:       []string{"openid", "email", "profile"},
+		Endpoint:     google.Endpoint,
 	}
 }
 
