@@ -30,6 +30,7 @@ type RepositoryInterface interface {
 	PostStory(story Story) (Story, error)
 	GetStoryByIdForDoctor(storyId int) (Story, error)
 	GetAllStoriesByDoctorId(metadata entities.MetadataFull, doctorId int) ([]Story, error)
+	EditStory(story Story) (Story, error)
 }
 
 type UseCaseInterface interface {
@@ -43,4 +44,5 @@ type UseCaseInterface interface {
 	PostStory(story Story, fileImage *multipart.FileHeader) (Story, error)
 	GetStoryByIdForDoctor(storyId int) (Story, error)
 	GetAllStoriesByDoctorId(metadata entities.MetadataFull, doctorId int) ([]Story, error)
+	EditStory(story Story, fileImage *multipart.FileHeader) (Story, error)
 }

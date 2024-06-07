@@ -281,3 +281,34 @@ func (repository *StoriesRepo) GetAllStoriesByDoctorId(metadata entities.Metadat
 
 	return storiesEnt, nil
 }
+
+func (repository *StoriesRepo) EditStory(story storyEntities.Story) (storyEntities.Story, error) {
+	var storyDB Story
+
+	err := repository.DB.Where("id = ?", story.Id).First(&storyDB).Error
+	if err != nil {
+		return storyEntities.Story{}, constants.ErrDataNotFound
+	}
+
+	storyDB.Title = story.Title
+	storyDB.Content = story.Content
+
+	if story.ImageUrl != "" {
+		storyDB.ImageUrl = story.ImageUrl
+	}
+
+	err = repository.DB.Save(&storyDB).Error
+	if err != nil {
+		return storyEntities.Story{}, constants.ErrServer
+	}
+
+	return storyEntities.Story{
+		Id:        storyDB.ID,
+		Title:     storyDB.Title,
+		Content:   storyDB.Content,
+		Date:      storyDB.Date,
+		ImageUrl:  storyDB.ImageUrl,
+		ViewCount: storyDB.ViewCount,
+		DoctorId:  storyDB.DoctorId,
+	}, nil
+}
