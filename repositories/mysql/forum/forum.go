@@ -143,3 +143,25 @@ func (f *ForumRepo) GetForumById(forumId uint) (forum.Forum, error) {
 
 	return forumEnt, nil
 }
+
+func (f *ForumRepo) CreateForum(forumEnt forum.Forum) (forum.Forum, error) {
+	var forumDB Forum
+	forumDB.Name = forumEnt.Name
+	forumDB.Description = forumEnt.Description
+	forumDB.ImageUrl = forumEnt.ImageUrl
+	forumDB.DoctorID = forumEnt.DoctorID
+
+	err := f.db.Create(&forumDB).Error
+	if err != nil {
+		return forum.Forum{}, constants.ErrServer
+	}
+
+	return forum.Forum{
+		ID:           forumDB.ID,
+		Name:         forumDB.Name,
+		Description:  forumDB.Description,
+		ImageUrl:     forumDB.ImageUrl,
+		DoctorID:     forumDB.DoctorID,
+		NumberOfMembers: 0,
+	}, nil
+}

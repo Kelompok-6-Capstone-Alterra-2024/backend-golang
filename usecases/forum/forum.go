@@ -4,6 +4,8 @@ import (
 	"capstone/constants"
 	"capstone/entities"
 	forumEntities "capstone/entities/forum"
+	"capstone/utilities"
+	"mime/multipart"
 )
 
 type ForumUseCase struct {
@@ -58,6 +60,26 @@ func (forumUseCase *ForumUseCase) GetRecommendationForum(userId uint, metadata e
 
 func (forumUseCase *ForumUseCase) GetForumById(forumId uint) (forumEntities.Forum, error) {
 	forum, err := forumUseCase.forumInterface.GetForumById(forumId)
+	if err != nil {
+		return forumEntities.Forum{}, err
+	}
+	return forum, nil
+}
+
+func (forumUseCase *ForumUseCase) CreateForum(forum forumEntities.Forum, fileImage *multipart.FileHeader) (forumEntities.Forum, error) {
+	if forum.Name == "" || forum.Description == ""  || fileImage == nil {
+		return forumEntities.Forum{}, constants.ErrEmptyInputForum
+	}
+
+	if fileImage != nil {
+		secureUrl, err := utilities.UploadImage(fileImage)
+		if err != nil {
+			return forumEntities.Forum{}, constants.ErrUploadImage
+		}
+		forum.ImageUrl = secureUrl
+	}
+
+	forum, err := forumUseCase.forumInterface.CreateForum(forum)
 	if err != nil {
 		return forumEntities.Forum{}, err
 	}

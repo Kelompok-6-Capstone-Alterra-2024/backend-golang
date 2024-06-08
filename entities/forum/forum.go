@@ -5,6 +5,7 @@ import (
 	"capstone/entities/doctor"
 	"capstone/entities/post"
 	"capstone/entities/user"
+	"mime/multipart"
 )
 
 type Forum struct {
@@ -33,6 +34,7 @@ type RepositoryInterface interface {
 	GetJoinedForum(userId uint, metadata entities.Metadata) ([]Forum, error)
 	GetRecommendationForum(userId uint, metadata entities.Metadata) ([]Forum, error)
 	GetForumById(forumId uint) (Forum, error)
+	CreateForum(forum Forum) (Forum, error)
 }
 
 type UseCaseInterface interface {
@@ -41,4 +43,5 @@ type UseCaseInterface interface {
 	GetJoinedForum(userId uint, metadata entities.Metadata) ([]Forum, error)
 	GetRecommendationForum(userId uint, metadata entities.Metadata) ([]Forum, error)
 	GetForumById(forumId uint) (Forum, error)
+	CreateForum(forum Forum, fileImage *multipart.FileHeader) (Forum, error)
 }

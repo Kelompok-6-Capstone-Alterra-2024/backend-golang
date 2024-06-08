@@ -134,3 +134,35 @@ func (forumController *ForumController) LeaveForum(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Leave Forum", nil))
 }
+
+func (forumController *ForumController) CreateForum(c echo.Context) error {
+	var req request.ForumCreateRequest
+	err := c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	file, _ := c.FormFile("image")
+
+	token := c.Request().Header.Get("Authorization")
+	doctorId, _ := utilities.GetUserIdFromToken(token)
+
+	var forumEnt forumEntities.Forum
+	forumEnt.Name = req.Name
+	forumEnt.Description = req.Description
+	forumEnt.ImageUrl = req.ImageUrl
+	forumEnt.DoctorID = uint(doctorId)
+
+	forum, err := forumController.forumUseCase.CreateForum(forumEnt, file)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var resp response.ForumDetailResponse
+	resp.ForumID = forum.ID
+	resp.Name = forum.Name
+	resp.Description = forum.Description
+	resp.ImageUrl = forum.ImageUrl
+
+	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success Create Forum", resp))
+}
