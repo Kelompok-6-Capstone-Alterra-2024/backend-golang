@@ -14,6 +14,7 @@ type Post struct {
 	ImageUrl string
 	User     user.User
 	Comments []PostComment
+	NumberOfComments int
 }
 
 type PostComment struct {
