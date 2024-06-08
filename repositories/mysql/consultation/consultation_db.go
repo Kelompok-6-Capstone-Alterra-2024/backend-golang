@@ -18,7 +18,7 @@ type Consultation struct {
 	Doctor        doctor.Doctor       `gorm:"foreignKey:doctor_id;references:id"`
 	UserID        int                 `gorm:"column:user_id;not null"`
 	User          user.User           `gorm:"foreignKey:user_id;references:id"`
-	ComplaintID   int                 `gorm:"column:complaint_id;unique;default:NULL"`
+	ComplaintID   uint                 `gorm:"column:complaint_id;unique;default:NULL"`
 	Complaint     complaint.Complaint `gorm:"foreignKey:complaint_id;references:id"`
 	Status        string              `gorm:"column:status;not null;default:'pending';type:enum('pending', 'accepted', 'rejected')"`
 	PaymentStatus string              `gorm:"column:payment_status;not null;type:enum('pending', 'paid', 'canceled');default:'pending'"`
