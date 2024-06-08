@@ -27,13 +27,22 @@ func (postRepo *PostRepo) GetAllPostsByForumId(forumId uint, metadata entities.M
 		return []postEntities.Post{}, err
 	}
 
+	counter := make([]int64, len(posts))
+	for i, post := range posts {
+		err := postRepo.db.Model(postEntities.PostComment{}).Where("post_id = ?", post.ID).Count(&counter[i]).Error
+		if err != nil {
+			return []postEntities.Post{}, err
+		}
+	}
+
 	var postEnts []postEntities.Post
-	for _, post := range posts {
+	for i, post := range posts {
 		postEnts = append(postEnts, postEntities.Post{
 			ID:       post.ID,
 			ForumId:  post.ForumID,
 			Content:  post.Content,
 			ImageUrl: post.ImageUrl,
+			NumberOfComments: int(counter[i]),
 			User:     userEntities.User{
 				Id:             post.User.Id,
 				Username:       post.User.Username,
@@ -156,6 +165,7 @@ func (postRepo *PostRepo) GetAllCommentByPostId(postId uint, metadata entities.M
 		commentEnt.CreatedAt = comment.CreatedAt.Format(time.RFC3339)
 		commentEnt.User = userEntities.User{
 			Id:             comment.User.Id,
+			Name:           comment.User.Name,
 			Username:       comment.User.Username,
 			ProfilePicture: comment.User.ProfilePicture,
 		}

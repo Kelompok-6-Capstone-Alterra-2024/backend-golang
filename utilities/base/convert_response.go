@@ -99,6 +99,9 @@ func ConvertResponseCode(err error) int {
 
 	case constants.ErrInvalidConsultationID:
 		return http.StatusBadRequest
+
+	case constants.ErrEmptyCreateForum:
+		return http.StatusBadRequest
 		
 	default:
 		return http.StatusInternalServerError
