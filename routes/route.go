@@ -197,4 +197,5 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	// Forum
 	doctorRoute.POST("forums", r.forumController.CreateForum) // Create Forum
+	doctorRoute.GET("forums", r.forumController.GetAllForumsByDoctorId) // Get All Forum By Doctor ID
 }

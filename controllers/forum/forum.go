@@ -166,3 +166,30 @@ func (forumController *ForumController) CreateForum(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success Create Forum", resp))
 }
+
+func (forumController *ForumController) GetAllForumsByDoctorId(c echo.Context) error {
+	pageParam := c.QueryParam("page")
+	limitParam := c.QueryParam("limit")
+	searchParam := c.QueryParam("search")
+
+	metadata := utilities.GetMetadata(pageParam, limitParam)
+
+	token := c.Request().Header.Get("Authorization")
+	doctorId, _ := utilities.GetUserIdFromToken(token)
+
+	forums, err := forumController.forumUseCase.GetAllForumsByDoctorId(uint(doctorId), *metadata, searchParam)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var resp []response.ForumGetDoctorResponse
+	for _, forum := range forums {
+		resp = append(resp, response.ForumGetDoctorResponse{
+			Name:            forum.Name,
+			ImageUrl:        forum.ImageUrl,
+			NumberOfMembers: forum.NumberOfMembers,
+		})
+	}
+
+	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get Forum By Doctor Id", metadata, resp))
+}

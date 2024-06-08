@@ -85,3 +85,11 @@ func (forumUseCase *ForumUseCase) CreateForum(forum forumEntities.Forum, fileIma
 	}
 	return forum, nil
 }
+
+func (forumUseCase *ForumUseCase) GetAllForumsByDoctorId(doctorId uint, metadata entities.Metadata, search string) ([]forumEntities.Forum, error) {
+	forums, err := forumUseCase.forumInterface.GetAllForumsByDoctorId(doctorId, metadata, search)
+	if err != nil {
+		return nil, err
+	}
+	return forums, nil
+}

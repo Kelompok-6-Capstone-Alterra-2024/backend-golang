@@ -35,6 +35,7 @@ type RepositoryInterface interface {
 	GetRecommendationForum(userId uint, metadata entities.Metadata) ([]Forum, error)
 	GetForumById(forumId uint) (Forum, error)
 	CreateForum(forum Forum) (Forum, error)
+	GetAllForumsByDoctorId(doctorId uint, metadata entities.Metadata, search string) ([]Forum, error)
 }
 
 type UseCaseInterface interface {
@@ -44,4 +45,5 @@ type UseCaseInterface interface {
 	GetRecommendationForum(userId uint, metadata entities.Metadata) ([]Forum, error)
 	GetForumById(forumId uint) (Forum, error)
 	CreateForum(forum Forum, fileImage *multipart.FileHeader) (Forum, error)
+	GetAllForumsByDoctorId(doctorId uint, metadata entities.Metadata, search string) ([]Forum, error)
 }

@@ -165,3 +165,37 @@ func (f *ForumRepo) CreateForum(forumEnt forum.Forum) (forum.Forum, error) {
 		NumberOfMembers: 0,
 	}, nil
 }
+
+func (f *ForumRepo) GetAllForumsByDoctorId(doctorId uint, metadata entities.Metadata, search string) ([]forum.Forum, error) {
+	var forumDBs []Forum
+	query := f.db.Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Where("doctor_id = ?", doctorId)
+
+	if search != "" {
+		query = query.Where("name LIKE ?", "%"+search+"%")
+	}
+
+	err := query.Find(&forumDBs).Error
+	if err != nil {
+		return nil, constants.ErrServer
+	}
+
+	counter := make([]int64, len(forumDBs))
+	for i, forumDB := range forumDBs {
+		err = f.db.Model(&ForumMember{}).Where("forum_id = ?", forumDB.ID).Count(&counter[i]).Error
+		if err != nil {
+			return nil, constants.ErrServer
+		}
+	}
+
+	var forumEnts []forum.Forum
+	for i, forumDB := range forumDBs {
+		forumEnts = append(forumEnts, forum.Forum{
+			ID:               forumDB.ID,
+			Name:             forumDB.Name,
+			ImageUrl:         forumDB.ImageUrl,
+			NumberOfMembers:  int(counter[i]),
+		})
+	}
+
+	return forumEnts, nil
+}
