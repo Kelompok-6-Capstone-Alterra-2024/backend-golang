@@ -150,7 +150,6 @@ func (forumController *ForumController) CreateForum(c echo.Context) error {
 	var forumEnt forumEntities.Forum
 	forumEnt.Name = req.Name
 	forumEnt.Description = req.Description
-	forumEnt.ImageUrl = req.ImageUrl
 	forumEnt.DoctorID = uint(doctorId)
 
 	forum, err := forumController.forumUseCase.CreateForum(forumEnt, file)
@@ -192,4 +191,48 @@ func (forumController *ForumController) GetAllForumsByDoctorId(c echo.Context) e
 	}
 
 	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get Forum By Doctor Id", metadata, resp))
+}
+
+func (forumController *ForumController) UpdateForum(c echo.Context) error {
+	var req request.ForumCreateRequest
+	err := c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	forumId := c.Param("id")
+	forumIdInt, _ := strconv.Atoi(forumId)
+
+	forum := forumEntities.Forum{
+		ID:          uint(forumIdInt),
+		Name:        req.Name,
+		Description: req.Description,
+	}
+
+	file, _ := c.FormFile("image")
+
+	forum, err = forumController.forumUseCase.UpdateForum(forum, file)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var resp response.ForumDetailResponse
+	resp.ForumID = forum.ID
+	resp.Name = forum.Name
+	resp.Description = forum.Description
+	resp.ImageUrl = forum.ImageUrl
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Update Forum", resp))
+}
+
+func (forumController *ForumController) DeleteForum(c echo.Context) error {
+	forumId := c.Param("id")
+	forumIdInt, _ := strconv.Atoi(forumId)
+
+	err := forumController.forumUseCase.DeleteForum(uint(forumIdInt))
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Delete Forum", nil))
 }

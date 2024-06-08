@@ -36,6 +36,8 @@ type RepositoryInterface interface {
 	GetForumById(forumId uint) (Forum, error)
 	CreateForum(forum Forum) (Forum, error)
 	GetAllForumsByDoctorId(doctorId uint, metadata entities.Metadata, search string) ([]Forum, error)
+	UpdateForum(forum Forum) (Forum, error)
+	DeleteForum(forumId uint) (error)
 }
 
 type UseCaseInterface interface {
@@ -46,4 +48,6 @@ type UseCaseInterface interface {
 	GetForumById(forumId uint) (Forum, error)
 	CreateForum(forum Forum, fileImage *multipart.FileHeader) (Forum, error)
 	GetAllForumsByDoctorId(doctorId uint, metadata entities.Metadata, search string) ([]Forum, error)
+	UpdateForum(forum Forum, fileImage *multipart.FileHeader) (Forum, error)
+	DeleteForum(forumId uint) (error)
 }

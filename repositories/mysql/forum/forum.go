@@ -199,3 +199,39 @@ func (f *ForumRepo) GetAllForumsByDoctorId(doctorId uint, metadata entities.Meta
 
 	return forumEnts, nil
 }
+
+func (f *ForumRepo) UpdateForum(forumEnt forum.Forum) (forum.Forum, error) {
+	var forumDB Forum
+
+	err := f.db.Where("id = ?", forumEnt.ID).First(&forumDB).Error
+	if err != nil {
+		return forum.Forum{}, constants.ErrServer
+	}
+
+	forumDB.Name = forumEnt.Name
+	forumDB.Description = forumEnt.Description
+
+	if forumEnt.ImageUrl != "" {
+		forumDB.ImageUrl = forumEnt.ImageUrl
+	}
+
+	err = f.db.Save(&forumDB).Error
+	if err != nil {
+		return forum.Forum{}, constants.ErrServer
+	}
+
+	return forum.Forum{
+		ID:           forumDB.ID,
+		Name:         forumDB.Name,
+		Description:  forumDB.Description,
+		ImageUrl:     forumDB.ImageUrl,
+	}, nil
+}
+
+func (f *ForumRepo) DeleteForum(forumId uint) error {
+	err := f.db.Where("id = ?", forumId).Delete(&Forum{}).Error
+	if err != nil {
+		return constants.ErrServer
+	}
+	return nil
+}

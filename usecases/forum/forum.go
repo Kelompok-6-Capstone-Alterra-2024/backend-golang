@@ -93,3 +93,33 @@ func (forumUseCase *ForumUseCase) GetAllForumsByDoctorId(doctorId uint, metadata
 	}
 	return forums, nil
 }
+
+func (forumUseCase *ForumUseCase) UpdateForum(forum forumEntities.Forum, fileImage *multipart.FileHeader) (forumEntities.Forum, error) {
+	if forum.Name == "" || forum.Description == "" {
+		return forumEntities.Forum{}, constants.ErrEmptyCreateForum
+	}
+
+	if fileImage != nil {
+		secureUrl, err := utilities.UploadImage(fileImage)
+		if err != nil {
+			return forumEntities.Forum{}, constants.ErrUploadImage
+		}
+		forum.ImageUrl = secureUrl
+	}else{
+		forum.ImageUrl = ""
+	}
+
+	forum, err := forumUseCase.forumInterface.UpdateForum(forum)
+	if err != nil {
+		return forumEntities.Forum{}, err
+	}
+	return forum, nil
+}
+
+func (forumUseCase *ForumUseCase) DeleteForum(forumId uint) error {
+	err := forumUseCase.forumInterface.DeleteForum(forumId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
