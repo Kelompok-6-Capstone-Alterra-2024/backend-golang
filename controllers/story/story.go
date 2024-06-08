@@ -288,6 +288,9 @@ func (storyController *StoryController) EditStory(c echo.Context) error {
 
 	var req request.StoryPostRequest
 	err = c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
 
 	file, _ := c.FormFile("image")
 

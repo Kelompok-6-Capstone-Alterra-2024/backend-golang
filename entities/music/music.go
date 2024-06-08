@@ -29,6 +29,8 @@ type RepositoryInterface interface {
 	CountMusicViewCountByDoctorId(doctorId int) (int, error)
 	PostMusic(music Music) (Music, error)
 	GetMusicByIdForDoctor(musicId int) (Music, error)
+	EditMusic(music Music) (Music, error)
+	DeleteMusic(musicId int) error
 }
 
 type UseCaseInterface interface {
@@ -42,4 +44,6 @@ type UseCaseInterface interface {
 	CountMusicViewCountByDoctorId(doctorId int) (int, error)
 	PostMusic(music Music, fileImage *multipart.FileHeader, fileMusic *multipart.FileHeader) (Music, error)
 	GetMusicByIdForDoctor(musicId int) (Music, error)
+	EditMusic(music Music, fileImage *multipart.FileHeader) (Music, error)
+	DeleteMusic(musicId int) error
 }

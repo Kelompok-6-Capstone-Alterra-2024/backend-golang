@@ -19,3 +19,9 @@ func (r *CreateArticleRequest) ToArticleEntities() *article.Article {
 		DoctorID: r.DoctorID,
 	}
 }
+
+type UpdateArticleRequest struct {
+	Title    string `json:"title" form:"title"`
+	Content  string `json:"content" form:"content"`
+	ImageUrl string `json:"image_url" form:"image_url"`
+}

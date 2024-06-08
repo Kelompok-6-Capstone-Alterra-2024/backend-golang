@@ -4,6 +4,8 @@ import (
 	"capstone/constants"
 	"capstone/entities"
 	articleEntities "capstone/entities/article"
+	"capstone/utilities"
+	"mime/multipart"
 )
 
 type ArticleUseCase struct {
@@ -99,4 +101,33 @@ func (useCase *ArticleUseCase) CountArticleViewByDoctorId(doctorId int) (int, er
 		return 0, err
 	}
 	return count, nil
+}
+
+func (useCase *ArticleUseCase) EditArticle(article articleEntities.Article, file *multipart.FileHeader) (articleEntities.Article, error) {
+	if article.Title == "" || article.Content == "" {
+		return articleEntities.Article{}, constants.ErrEmptyInputArticle
+	}
+	if file != nil {
+		secureUrl, err := utilities.UploadImage(file)
+		if err != nil {
+			return articleEntities.Article{}, constants.ErrUploadImage
+		}
+		article.ImageUrl = secureUrl
+	} else {
+		article.ImageUrl = ""
+	}
+
+	article, err := useCase.articleRepository.EditArticle(article)
+	if err != nil {
+		return articleEntities.Article{}, err
+	}
+	return article, nil
+}
+
+func (useCase *ArticleUseCase) DeleteArticle(articleId int) error {
+	err := useCase.articleRepository.DeleteArticle(articleId)
+	if err != nil {
+		return err
+	}
+	return nil
 }

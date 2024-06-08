@@ -282,7 +282,7 @@ func (repository *ArticleRepo) CountArticleByDoctorId(doctorId int) (int, error)
 func (repository *ArticleRepo) CountArticleLikesByDoctorId(doctorId int) (int, error) {
 	var counter int64
 	err := repository.db.Table("article_likes").
-		Joins("JOIN articles ON article_likes.article_id = stories.id").
+		Joins("JOIN articles ON article_likes.article_id = articles.id").
 		Where("articles.doctor_id = ?", doctorId).
 		Count(&counter).Error
 	if err != nil {
@@ -300,4 +300,40 @@ func (repository *ArticleRepo) CountArticleViewByDoctorId(doctorId int) (int, er
 	}
 
 	return int(counter), nil
+}
+
+func (repository *ArticleRepo) EditArticle(article articleEntities.Article) (articleEntities.Article, error) {
+	var articleDb Article
+
+	err := repository.db.Where("id = ?", article.ID).First(&articleDb).Error
+	if err != nil {
+		return articleEntities.Article{}, constants.ErrDataNotFound
+	}
+
+	articleDb.Title = article.Title
+	articleDb.Content = article.Content
+	articleDb.Date = time.Now()
+
+	if article.ImageUrl != "" {
+		articleDb.ImageUrl = article.ImageUrl
+	}
+
+	err = repository.db.Save(&articleDb).Error
+	if err != nil {
+		return articleEntities.Article{}, constants.ErrServer
+	}
+
+	return articleEntities.Article{
+		ID:        articleDb.ID,
+		Title:     articleDb.Title,
+		Content:   articleDb.Content,
+		Date:      articleDb.Date,
+		ImageUrl:  articleDb.ImageUrl,
+		ViewCount: articleDb.ViewCount,
+		DoctorID:  articleDb.DoctorID,
+	}, nil
+}
+
+func (repository *ArticleRepo) DeleteArticle(articleId int) error {
+	return repository.db.Where("id = ?", articleId).Delete(&Article{}).Error
 }

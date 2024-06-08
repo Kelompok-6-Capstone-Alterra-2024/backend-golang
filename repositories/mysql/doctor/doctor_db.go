@@ -10,7 +10,7 @@ type Doctor struct {
 	gorm.Model
 	Username         string `gorm:"type:varchar(100);unique;not null"`
 	Email            string `gorm:"type:varchar(100);unique;not null"`
-	Password         string `gorm:"type:varchar(100);not null"`
+	Password         string `gorm:"type:varchar(100)"`
 	Name             string `gorm:"type:varchar(100);not null"`
 	Address          string `gorm:"type:text"`
 	PhoneNumber      string `gorm:"type:varchar(100)"`

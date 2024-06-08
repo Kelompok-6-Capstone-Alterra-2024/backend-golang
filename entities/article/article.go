@@ -4,6 +4,7 @@ import (
 	"capstone/controllers/article/response"
 	"capstone/entities"
 	"capstone/entities/doctor"
+	"mime/multipart"
 	"time"
 )
 
@@ -30,6 +31,8 @@ type ArticleRepositoryInterface interface {
 	CountArticleByDoctorId(doctorId int) (int, error)
 	CountArticleLikesByDoctorId(doctorId int) (int, error)
 	CountArticleViewByDoctorId(doctorId int) (int, error)
+	EditArticle(article Article) (Article, error)
+	DeleteArticle(articleId int) error
 }
 
 type ArticleUseCaseInterface interface {
@@ -43,6 +46,8 @@ type ArticleUseCaseInterface interface {
 	CountArticleByDoctorId(doctorId int) (int, error)
 	CountArticleLikesByDoctorId(doctorId int) (int, error)
 	CountArticleViewByDoctorId(doctorId int) (int, error)
+	EditArticle(article Article, file *multipart.FileHeader) (Article, error)
+	DeleteArticle(articleId int) error
 }
 
 func (ar *Article) ToResponse() response.ArticleListResponse {

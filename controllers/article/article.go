@@ -286,3 +286,53 @@ func (controller *ArticleController) CountArticleViewByDoctorId(c echo.Context) 
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Count Article View By Doctor Id", resp))
 }
+
+func (controller *ArticleController) EditArticle(c echo.Context) error {
+	articleId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	var req request.UpdateArticleRequest
+	err = c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	file, _ := c.FormFile("image")
+
+	articleEnt := articleUseCase.Article{
+		ID:      uint(articleId),
+		Title:   req.Title,
+		Content: req.Content,
+	}
+
+	article, err := controller.articleUseCase.EditArticle(articleEnt, file)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var resp response.ArticleEditResponse
+	resp.ID = article.ID
+	resp.Title = article.Title
+	resp.Content = article.Content
+	resp.Date = article.Date
+	resp.ImageUrl = article.ImageUrl
+	resp.ViewCount = article.ViewCount
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Edit Article", resp))
+}
+
+func (controller *ArticleController) DeleteArticle(c echo.Context) error {
+	articleId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	err = controller.articleUseCase.DeleteArticle(articleId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Delete Article", nil))
+}
