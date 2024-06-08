@@ -193,4 +193,5 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	// Rating
 	doctorRoute.GET("feedbacks", r.ratingController.GetAllFeedbacks) // Get All Feedbacks
+	doctorRoute.GET("ratings", r.ratingController.GetSummaryRating) // Get Summary Rating
 }

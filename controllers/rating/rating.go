@@ -83,3 +83,24 @@ func (ratingController *RatingController) GetAllFeedbacks(c echo.Context) error 
 
 	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get All Feedbacks", metadata, responseResult))
 }
+
+func (ratingController *RatingController) GetSummaryRating(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	doctorId, _ := utilities.GetUserIdFromToken(token)
+
+	result, err := ratingController.ratingUseCase.GetSummaryRating(uint(doctorId))
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	resp := response.RatingSummaryResponse{
+		OneStarCount: result.OneStarCount,
+		TwoStarCount: result.TwoStarCount,
+		ThreeStarCount: result.ThreeStarCount,
+		FourStarCount: result.FourStarCount,
+		FiveStarCount: result.FiveStarCount,
+		Average: result.Average,
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Summary Rating", resp))
+}

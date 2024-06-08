@@ -70,3 +70,45 @@ func (repository *RatingRepo) GetAllFeedbacks(metadata entities.Metadata, doctor
 
 	return result, nil
 }
+
+func (repository *RatingRepo) GetSummaryRating(doctorId uint) (ratingEntities.Rating, error) {
+	var oneStarCount int64
+	var twoStarCount int64
+	var threeStarCount int64
+	var fourStarCount int64
+	var fiveStarCount int64
+	var average float64
+
+	err := repository.DB.Model(&Rating{}).Where("doctor_id = ? AND rate = 5", doctorId).Count(&fiveStarCount).Error
+	if err != nil {
+		return ratingEntities.Rating{}, constants.ErrServer
+	}
+	err = repository.DB.Model(&Rating{}).Where("doctor_id = ? AND rate = 4", doctorId).Count(&fourStarCount).Error
+	if err != nil {
+		return ratingEntities.Rating{}, constants.ErrServer
+	}
+	err = repository.DB.Model(&Rating{}).Where("doctor_id = ? AND rate = 3", doctorId).Count(&threeStarCount).Error
+	if err != nil {
+		return ratingEntities.Rating{}, constants.ErrServer
+	}
+	err = repository.DB.Model(&Rating{}).Where("doctor_id = ? AND rate = 2", doctorId).Count(&twoStarCount).Error
+	if err != nil {
+		return ratingEntities.Rating{}, constants.ErrServer
+	}
+	err = repository.DB.Model(&Rating{}).Where("doctor_id = ? AND rate = 1", doctorId).Count(&oneStarCount).Error
+	if err != nil {
+		return ratingEntities.Rating{}, constants.ErrServer
+	}
+	average = float64((oneStarCount + twoStarCount*2 + threeStarCount*3 + fourStarCount*4 + fiveStarCount*5) / (oneStarCount + twoStarCount + threeStarCount + fourStarCount + fiveStarCount))
+
+	result := ratingEntities.Rating{
+		OneStarCount:   int(oneStarCount),
+		TwoStarCount:   int(twoStarCount),
+		ThreeStarCount: int(threeStarCount),
+		FourStarCount:  int(fourStarCount),
+		FiveStarCount:  int(fiveStarCount),
+		Average:        average,
+	}
+
+	return result, nil
+}

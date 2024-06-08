@@ -35,3 +35,11 @@ func (ratingUseCase *RatingUseCase) GetAllFeedbacks(metadata entities.Metadata, 
 	}
 	return result, nil
 }
+
+func (ratingUseCase *RatingUseCase) GetSummaryRating(doctorId uint) (ratingEntities.Rating, error) {
+	result, err := ratingUseCase.ratingRepository.GetSummaryRating(doctorId)
+	if err != nil {
+		return ratingEntities.Rating{}, err
+	}
+	return result, nil
+}
