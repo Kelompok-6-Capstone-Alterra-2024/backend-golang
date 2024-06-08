@@ -5,5 +5,6 @@ type ComplaintResponse struct {
 	Name           string `json:"name"`
 	Age            int    `json:"age"`
 	Gender         string `json:"gender"`
+	Message        string `json:"message"`
 	MedicalHistory string `json:"medical_history"`
 }

@@ -117,12 +117,12 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.POST("complaint", r.complaintController.Create) // Create Complaint
 
 	// Transaction
-	userRoute.POST("transaction", r.transactionController.InsertWithBuiltIn)                    // Create Transaction
+	userRoute.POST("payments/gateway", r.transactionController.InsertWithBuiltIn)               // Create Transaction
 	userRoute.GET("transaction/:id", r.transactionController.FindByID)                          // Get Transaction By ID
 	userRoute.GET("transaction/consultation/:id", r.transactionController.FindByConsultationID) // Get Transaction By Consultation ID
 	userRoute.GET("transactions", r.transactionController.FindAll)                              // Get All Transaction
-	userRoute.POST("transaction/bank-transfer", r.transactionController.BankTransfer)           // Bank Transfer
-	userRoute.POST("transaction/e-wallet", r.transactionController.EWallet)                     // E-Wallet
+	userRoute.POST("payments/bank-transfer", r.transactionController.BankTransfer)              // Bank Transfer
+	userRoute.POST("payments/e-wallet", r.transactionController.EWallet)                        // E-Wallet
 
 	// Rating
 	userRoute.POST("feedbacks", r.ratingController.SendFeedback) // Create Rating
@@ -157,11 +157,10 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	doctorAuth := e.Group("/v1/doctors")
 
-	doctorAuth.POST("/register", r.doctorController.Register) //Register Doctor
-	doctorAuth.POST("/login", r.doctorController.Login)       //Login Doctor
-
-	doctorAuth.GET("/auth/google/login", r.doctorController.GoogleLogin)
-	doctorAuth.GET("/auth/google/callback", r.doctorController.GoogleCallback)
+	doctorAuth.POST("/register", r.doctorController.Register)                  //Register Doctor
+	doctorAuth.POST("/login", r.doctorController.Login)                        //Login Doctor
+	doctorAuth.GET("/auth/google/login", r.doctorController.GoogleLogin)       // Google Login
+	doctorAuth.GET("/auth/google/callback", r.doctorController.GoogleCallback) // Google Callback
 
 	doctorRoute := doctorAuth.Group("/")
 	doctorRoute.Use(echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))
@@ -180,7 +179,6 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.PUT("musics/:id", r.musicController.EditMusic)              // Update Music
 	doctorRoute.DELETE("musics/:id", r.musicController.DeleteMusic)          // Delete Music
 
-	// stories
 	doctorRoute.POST("stories", r.storyController.PostStory)                    // Post Story
 	doctorRoute.GET("stories", r.storyController.GetAllStoriesByDoctorId)         // Get All Story By Doctor ID
 	doctorRoute.GET("stories/:id", r.storyController.GetStoryByIdForDoctor)         // Get Story By ID

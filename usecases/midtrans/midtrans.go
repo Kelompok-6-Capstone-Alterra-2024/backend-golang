@@ -39,7 +39,7 @@ func (usecase *MidtransUseCase) GenerateSnapURL(transaction *transaction.Transac
 	}
 
 	var client snap.Client
-	client.New(usecase.midtransConfig.ClientKey, usecase.envi)
+	client.New(usecase.midtransConfig.ServerKey, usecase.envi)
 
 	snapResponse, err := client.CreateTransaction(req)
 	if err != nil {
