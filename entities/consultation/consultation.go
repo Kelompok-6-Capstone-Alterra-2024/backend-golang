@@ -4,6 +4,8 @@ import (
 	"capstone/controllers/consultation/response"
 	"capstone/entities"
 	"capstone/entities/doctor"
+	"capstone/entities/forum"
+	"capstone/entities/music"
 	"capstone/entities/user"
 	"time"
 )
@@ -21,16 +23,34 @@ type Consultation struct {
 	Date          time.Time
 }
 
+type ConsultationNotes struct {
+	ID        uint
+	ConsultationID uint
+	Consultation   Consultation
+	MusicID   uint
+	Music     music.Music
+	ForumID   uint
+	Forum     forum.Forum
+	MainPoint string
+	NextStep  string
+	AdditionalNote string
+	MoodTrackerNote string
+}
+
 type ConsultationRepository interface {
 	CreateConsultation(consultation *Consultation) (*Consultation, error)
 	GetConsultationByID(consultationID int) (*Consultation, error)
 	GetAllConsultation(metadata *entities.Metadata, userID int) (*[]Consultation, error)
+	CreateConsultationNotes(consultationNotes ConsultationNotes) (ConsultationNotes, error)
+	GetConsultationNotesByID(consultationID int) (ConsultationNotes, error)
 }
 
 type ConsultationUseCase interface {
 	CreateConsultation(consultation *Consultation) (*Consultation, error)
 	GetConsultationByID(consultationID int) (*Consultation, error)
 	GetAllConsultation(metadata *entities.Metadata, userID int) (*[]Consultation, error)
+	CreateConsultationNotes(consultationNotes ConsultationNotes) (ConsultationNotes, error)
+	GetConsultationNotesByID(consultationID int) (ConsultationNotes, error)
 }
 
 func (r *Consultation) ToResponse() *response.ConsultationResponse {

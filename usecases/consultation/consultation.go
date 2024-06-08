@@ -1,6 +1,7 @@
 package consultation
 
 import (
+	"capstone/constants"
 	"capstone/entities"
 	consultationEntities "capstone/entities/consultation"
 )
@@ -35,6 +36,27 @@ func (usecase *ConsultationUseCase) GetAllConsultation(metadata *entities.Metada
 	result, err := usecase.consultationRepo.GetAllConsultation(metadata, userID)
 	if err != nil {
 		return nil, err
+	}
+	return result, nil
+}
+
+func (usecase *ConsultationUseCase) CreateConsultationNotes(consultationNotes consultationEntities.ConsultationNotes) (consultationEntities.ConsultationNotes, error) {
+	if consultationNotes.ConsultationID == 0 {
+		return consultationEntities.ConsultationNotes{}, constants.ErrInvalidConsultationID
+	}
+	
+	result, err := usecase.consultationRepo.CreateConsultationNotes(consultationNotes)
+	if err != nil {
+		return result, err
+	}
+	
+	return result, nil
+}
+
+func (usecase *ConsultationUseCase) GetConsultationNotesByID(consultationID int) (consultationEntities.ConsultationNotes, error) {
+	result, err := usecase.consultationRepo.GetConsultationNotesByID(consultationID)
+	if err != nil {
+		return result, err
 	}
 	return result, nil
 }
