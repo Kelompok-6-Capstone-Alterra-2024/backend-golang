@@ -190,4 +190,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	// consultation notes
 	doctorRoute.POST("consultation-notes", r.consultationController.CreateConsultationNotes) // Post Consultation Note
+
+	// Rating
+	doctorRoute.GET("feedbacks", r.ratingController.GetAllFeedbacks) // Get All Feedbacks
 }
