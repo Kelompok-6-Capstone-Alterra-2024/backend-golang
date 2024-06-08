@@ -16,4 +16,5 @@ type User struct {
 	Age            int    `gorm:"type:int"`
 	ProfilePicture string `gorm:"type:varchar(255)"`
 	IsOauth        bool   `gorm:"type:boolean;default:false"`
+	Points         int    `gorm:"type:int;default:0"`
 }

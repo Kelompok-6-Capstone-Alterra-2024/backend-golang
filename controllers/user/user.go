@@ -4,6 +4,7 @@ import (
 	"capstone/controllers/user/request"
 	"capstone/controllers/user/response"
 	userEntities "capstone/entities/user"
+	"capstone/utilities"
 	"capstone/utilities/base"
 	"net/http"
 
@@ -80,4 +81,18 @@ func (c *UserController) GoogleCallback(ctx echo.Context) error {
 	res.Token = result.Token
 
     return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Login Oauth", res))
+}
+
+func (c *UserController) GetPointsByUserId(ctx echo.Context) error {
+	token := ctx.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	points, err := c.userUseCase.GetPointsByUserId(userId)
+	if err != nil {
+		return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var res response.UserPointsResponse
+	res.Points = points
+	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Points", res))
 }

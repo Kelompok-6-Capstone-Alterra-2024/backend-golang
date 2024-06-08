@@ -152,8 +152,11 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("articles/:id", r.articleController.GetArticleById)
 	userRoute.GET("articles/liked", r.articleController.GetLikedArticle)
 
-	// consultation notes
+	// Consultation Notes
 	userRoute.GET("consultation-notes/consultation/:id", r.consultationController.GetConsultationNotesByID) // Get Consultation Note By ID
+
+	// Points
+	userRoute.GET("points", r.userController.GetPointsByUserId) // Get Points
 
 	doctorAuth := e.Group("/v1/doctors")
 
