@@ -93,6 +93,13 @@ func ConvertResponseCode(err error) int {
 
 	case constants.ErrEmptyInputMusic:
 		return http.StatusBadRequest
+
+	case constants.ErrEmptyInputStory:
+		return http.StatusBadRequest
+
+	case constants.ErrInvalidConsultationID:
+		return http.StatusBadRequest
+		
 	default:
 		return http.StatusInternalServerError
 	}

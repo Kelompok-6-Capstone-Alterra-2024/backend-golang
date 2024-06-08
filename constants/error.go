@@ -63,3 +63,5 @@ var ErrInsertOAuth error = errors.New("failed insert oauth")
 var ErrEmptyInputMusic error = errors.New("title or singer cannot be empty")
 
 var ErrEmptyInputStory error = errors.New("title or content cannot be empty")
+
+var ErrInvalidConsultationID error = errors.New("invalid consultation id")

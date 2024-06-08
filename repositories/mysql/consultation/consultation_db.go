@@ -4,9 +4,12 @@ import (
 	"capstone/entities/consultation"
 	"capstone/repositories/mysql/complaint"
 	"capstone/repositories/mysql/doctor"
+	"capstone/repositories/mysql/forum"
+	"capstone/repositories/mysql/music"
 	"capstone/repositories/mysql/user"
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Consultation struct {
@@ -22,6 +25,20 @@ type Consultation struct {
 	IsAccepted    bool                `gorm:"column:is_accepted"`
 	IsActive      bool                `json:"is_active"`
 	Date          time.Time           `json:"date"`
+}
+
+type ConstultationNotes struct {
+	gorm.Model
+	ConsultationID uint          `gorm:"column:consultation_id;unique;not null"`
+	Consultation   Consultation `gorm:"foreignKey:consultation_id;references:id"`
+	MusicID        uint          `gorm:"column:music_id;default:NULL"`
+	Music          music.Music   `gorm:"foreignKey:music_id;references:id"`
+	ForumID        uint          `gorm:"column:forum_id;default:NULL"`
+	Forum          forum.Forum   `gorm:"foreignKey:forum_id;references:id"`
+	MainPoint      string        `gorm:"column:main_point;default:NULL"`
+	NextStep       string        `gorm:"column:next_step;default:NULL"`
+	AdditionalNote string        `gorm:"column:additional_note;default:NULL"`
+	MoodTrackerNote string        `gorm:"column:mood_tracker_note;default:NULL"`
 }
 
 func (receiver Consultation) ToEntities() *consultation.Consultation {
