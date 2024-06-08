@@ -121,3 +121,11 @@ func (u *UserUseCase) HandleGoogleCallback(ctx context.Context, code string) (us
 
     return result, nil
 }
+
+func (u *UserUseCase) GetPointsByUserId(id int) (int, error) {
+	result, err := u.repository.GetPointsByUserId(id)
+	if err != nil {
+		return 0, err
+	}
+	return result, nil
+}
