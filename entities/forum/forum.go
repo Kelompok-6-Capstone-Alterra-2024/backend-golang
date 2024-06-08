@@ -38,6 +38,7 @@ type RepositoryInterface interface {
 	GetAllForumsByDoctorId(doctorId uint, metadata entities.Metadata, search string) ([]Forum, error)
 	UpdateForum(forum Forum) (Forum, error)
 	DeleteForum(forumId uint) (error)
+	GetForumMemberByForumId(forumId uint, metadata entities.Metadata) ([]user.User, error)
 }
 
 type UseCaseInterface interface {
@@ -50,4 +51,5 @@ type UseCaseInterface interface {
 	GetAllForumsByDoctorId(doctorId uint, metadata entities.Metadata, search string) ([]Forum, error)
 	UpdateForum(forum Forum, fileImage *multipart.FileHeader) (Forum, error)
 	DeleteForum(forumId uint) (error)
+	GetForumMemberByForumId(forumId uint, metadata entities.Metadata) ([]user.User, error)
 }

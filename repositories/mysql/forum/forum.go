@@ -235,3 +235,23 @@ func (f *ForumRepo) DeleteForum(forumId uint) error {
 	}
 	return nil
 }
+
+func (f *ForumRepo) GetForumMemberByForumId(forumId uint, metadata entities.Metadata) ([]userEntities.User, error) {
+	var forumMemberDBs []ForumMember
+	err := f.db.Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Preload("User").Where("forum_id = ?", forumId).Find(&forumMemberDBs).Error
+	if err != nil {
+		return nil, constants.ErrServer
+	}
+
+	userEnts := make([]userEntities.User, len(forumMemberDBs))
+	for i, forumMemberDB := range forumMemberDBs {
+		userEnts[i] = userEntities.User{
+			Id:       forumMemberDB.User.Id,
+			Username: forumMemberDB.User.Username,
+			Name:     forumMemberDB.User.Name,
+			ProfilePicture: forumMemberDB.User.ProfilePicture,
+		}
+	}
+
+	return userEnts, nil
+}

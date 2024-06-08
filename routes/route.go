@@ -201,4 +201,5 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.PUT("forums/:id", r.forumController.UpdateForum) // Update Forum
 	doctorRoute.DELETE("forums/:id", r.forumController.DeleteForum) // Delete Forum
 	doctorRoute.GET("forums/:id", r.forumController.GetForumById) // Get Forum By ID
+	doctorRoute.GET("forums/:forumId/members", r.forumController.GetForumMemberByForumId) // Get Members By Forum ID
 }

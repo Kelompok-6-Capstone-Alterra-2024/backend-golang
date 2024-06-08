@@ -4,6 +4,7 @@ import (
 	"capstone/constants"
 	"capstone/entities"
 	forumEntities "capstone/entities/forum"
+	userEntities "capstone/entities/user"
 	"capstone/utilities"
 	"mime/multipart"
 )
@@ -122,4 +123,12 @@ func (forumUseCase *ForumUseCase) DeleteForum(forumId uint) error {
 		return err
 	}
 	return nil
+}
+
+func (forumUseCase *ForumUseCase) GetForumMemberByForumId(forumId uint, metadata entities.Metadata) ([]userEntities.User, error) {
+	members, err := forumUseCase.forumInterface.GetForumMemberByForumId(forumId, metadata)
+	if err != nil {
+		return nil, err
+	}
+	return members, nil
 }

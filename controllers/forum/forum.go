@@ -236,3 +236,30 @@ func (forumController *ForumController) DeleteForum(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Delete Forum", nil))
 }
+
+func (forumController *ForumController) GetForumMemberByForumId(c echo.Context) error {
+	pageParam := c.QueryParam("page")
+	limitParam := c.QueryParam("limit")
+	
+	metadata := utilities.GetMetadata(pageParam, limitParam)
+
+	forumId := c.Param("forumId")
+	forumIdInt, _ := strconv.Atoi(forumId)
+
+	users, err := forumController.forumUseCase.GetForumMemberByForumId(uint(forumIdInt), *metadata)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var resp []response.ForumMemberResponse
+	for _, user := range users {
+		resp = append(resp, response.ForumMemberResponse{
+			ID:       uint(user.Id),
+			Username: user.Username,
+			Name:     user.Name,
+			ImageUrl: user.ProfilePicture,
+		})
+	}
+
+	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Get Forum Member", metadata, resp))
+}
