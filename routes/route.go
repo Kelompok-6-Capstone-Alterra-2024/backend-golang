@@ -10,6 +10,7 @@ import (
 	"capstone/controllers/forum"
 	"capstone/controllers/mood"
 	"capstone/controllers/music"
+	"capstone/controllers/otp"
 	"capstone/controllers/post"
 	"capstone/controllers/rating"
 	"capstone/controllers/story"
@@ -38,6 +39,7 @@ type RouteController struct {
 	chatbotController      *chatbot.ChatbotController
 	articleController      *article.ArticleController
 	chatController         *chat.ChatController
+	otpController          *otp.OtpController
 }
 
 func NewRoute(
@@ -54,7 +56,8 @@ func NewRoute(
 	postController *post.PostController,
 	chatbotController *chatbot.ChatbotController,
 	articleController *article.ArticleController,
-	chatController *chat.ChatController) *RouteController {
+	chatController *chat.ChatController,
+	otpController *otp.OtpController) *RouteController {
 	return &RouteController{
 		userController:         userController,
 		doctorController:       doctorController,
@@ -70,6 +73,7 @@ func NewRoute(
 		chatbotController:      chatbotController,
 		articleController:      articleController,
 		chatController:         chatController,
+		otpController:          otpController,
 	}
 }
 
@@ -168,6 +172,10 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	// Chat Messages
 	userRoute.POST("chats/messages", r.chatController.SendMessage) // Send Message
 	userRoute.GET("chats/:chatId/messages", r.chatController.GetAllMessages) // Get All Message
+
+	// OTP
+	userRoute.POST("send-otp", r.otpController.SendOtp) // Send OTP
+	userRoute.POST("verify-otp", r.otpController.VerifyOtp) // Verify OTP
 
 	doctorAuth := e.Group("/v1/doctors")
 
