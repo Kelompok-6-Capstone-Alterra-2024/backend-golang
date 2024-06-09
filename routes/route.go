@@ -2,6 +2,7 @@ package routes
 
 import (
 	"capstone/controllers/article"
+	"capstone/controllers/chat"
 	"capstone/controllers/chatbot"
 	"capstone/controllers/complaint"
 	"capstone/controllers/consultation"
@@ -36,6 +37,7 @@ type RouteController struct {
 	postController         *post.PostController
 	chatbotController      *chatbot.ChatbotController
 	articleController      *article.ArticleController
+	chatController         *chat.ChatController
 }
 
 func NewRoute(
@@ -51,7 +53,8 @@ func NewRoute(
 	forumController *forum.ForumController,
 	postController *post.PostController,
 	chatbotController *chatbot.ChatbotController,
-	articleController *article.ArticleController) *RouteController {
+	articleController *article.ArticleController,
+	chatController *chat.ChatController) *RouteController {
 	return &RouteController{
 		userController:         userController,
 		doctorController:       doctorController,
@@ -66,6 +69,7 @@ func NewRoute(
 		postController:         postController,
 		chatbotController:      chatbotController,
 		articleController:      articleController,
+		chatController:         chatController,
 	}
 }
 
@@ -158,6 +162,13 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	// Points
 	userRoute.GET("points", r.userController.GetPointsByUserId) // Get Points
 
+	// Chat
+	userRoute.GET("chats", r.chatController.GetAllChatByUserId) // Get All Chat
+
+	// Chat Messages
+	userRoute.POST("chats/messages", r.chatController.SendMessage) // Send Message
+	userRoute.GET("chats/:chatId/messages", r.chatController.GetAllMessages) // Get All Message
+
 	doctorAuth := e.Group("/v1/doctors")
 
 	doctorAuth.POST("/register", r.doctorController.Register)                  //Register Doctor
@@ -221,6 +232,13 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	// Post
 	doctorRoute.GET("forums/:forumId/posts", r.postController.GetAllPostsByForumId)   // Get All Posts By Forum ID
 	doctorRoute.GET("posts/:postId/comments", r.postController.GetAllCommentByPostId) // Get All Comment By Post ID
+
+	// Chat
+	doctorRoute.GET("chats", r.chatController.GetAllChatByDoctorId) // Get All Chat By Doctor ID
+
+	// Chat Message
+	doctorRoute.POST("chats/messages", r.chatController.SendMessageDoctor) // Send Message
+	doctorRoute.GET("chats/:chatId/messages", r.chatController.GetAllMessages) // Get All Message
 
 	// Transaction
 	doctorRoute.GET("transactions", r.transactionController.FindAllByDoctorID) // Get All Transaction By Doctor ID

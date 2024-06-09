@@ -3,6 +3,7 @@ package main
 import (
 	"capstone/configs"
 	articleController "capstone/controllers/article"
+	chatController "capstone/controllers/chat"
 	chatbotController "capstone/controllers/chatbot"
 	complaintController "capstone/controllers/complaint"
 	consultationController "capstone/controllers/consultation"
@@ -17,6 +18,7 @@ import (
 	userController "capstone/controllers/user"
 	"capstone/repositories/mysql"
 	articleRepositories "capstone/repositories/mysql/article"
+	chatRepositories "capstone/repositories/mysql/chat"
 	complaintRepositories "capstone/repositories/mysql/complaint"
 	consultationRepositories "capstone/repositories/mysql/consultation"
 	doctorRepositories "capstone/repositories/mysql/doctor"
@@ -30,6 +32,7 @@ import (
 	userRepositories "capstone/repositories/mysql/user"
 	"capstone/routes"
 	articleUseCase "capstone/usecases/article"
+	chatUseCase "capstone/usecases/chat"
 	chatbotUseCase "capstone/usecases/chatbot"
 	complaintUseCase "capstone/usecases/complaint"
 	consultationUseCase "capstone/usecases/consultation"
@@ -69,10 +72,11 @@ func main() {
 	forumRepo := forumRepositories.NewForumRepo(db)
 	postRepo := postRepositories.NewPostRepo(db)
 	articleRepo := articleRepositories.NewArticleRepo(db)
+	chatRepo := chatRepositories.NewChatRepo(db)
 
 	userUC := userUseCase.NewUserUseCase(userRepo, oauthConfig)
 	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo, oauthConfigDoctor)
-	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo, validate)
+	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo, validate, chatRepo)
 	storyUC := storyUseCase.NewStoryUseCase(storyRepo)
 	complaintUC := complaintUseCase.NewComplaintUseCase(complaintRepo)
 	midtransUC := midtransUseCase.NewMidtransUseCase(midtransConfig)
@@ -84,6 +88,7 @@ func main() {
 	postUC := postUseCase.NewPostUseCase(postRepo)
 	chatbotUC := chatbotUseCase.NewChatbotUsecase()
 	articleUC := articleUseCase.NewArticleUseCase(articleRepo)
+	chatUC := chatUseCase.NewChatUseCase(chatRepo)
 
 	userCont := userController.NewUserController(userUC)
 	doctorCont := doctorController.NewDoctorController(doctorUC)
@@ -98,8 +103,9 @@ func main() {
 	postCont := postController.NewPostController(postUC)
 	chatbotCont := chatbotController.NewChatbotController(chatbotUC)
 	articleCont := articleController.NewArticleController(articleUC)
+	chatCont := chatController.NewChatController(chatUC)
 
-	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont, ratingCont, moodCont, forumCont, postCont, chatbotCont, articleCont)
+	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont, ratingCont, moodCont, forumCont, postCont, chatbotCont, articleCont, chatCont)
 
 	e := echo.New()
 	route.InitRoute(e)

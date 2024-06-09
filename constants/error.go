@@ -69,3 +69,5 @@ var ErrInputTime error = errors.New("invalid time format")
 var ErrInvalidConsultationID error = errors.New("invalid consultation id")
 
 var ErrEmptyCreateForum error = errors.New("name, description, or image cannot be empty")
+
+var ErrEmptyChat error = errors.New("chat id or message cannot be empty")
