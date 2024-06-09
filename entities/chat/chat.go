@@ -25,15 +25,15 @@ type ChatMessage struct {
 
 type RepositoryInterface interface {
 	CreateChatRoom(consultationId uint) (error)
-	GetAllChatByUserId(userId int) ([]Chat, error)
-	GetAllChatByDoctorId(doctorId int) ([]Chat, error)
+	GetAllChatByUserId(userId int, metadata entities.Metadata, status string) ([]Chat, error)
+	GetAllChatByDoctorId(doctorId int, metadata entities.Metadata, status string) ([]Chat, error)
 	SendMessage(chatMessage ChatMessage) (ChatMessage, error)
 	GetAllMessages(chatId int, lastMessageId int, metadata entities.Metadata) ([]ChatMessage, error)
 }
 
 type UseCaseInterface interface {
-	GetAllChatByUserId(userId int) ([]Chat, error)
-	GetAllChatByDoctorId(doctorId int) ([]Chat, error)
+	GetAllChatByUserId(userId int, metadata entities.Metadata, status string) ([]Chat, error)
+	GetAllChatByDoctorId(doctorId int, metadata entities.Metadata, status string) ([]Chat, error)
 	SendMessage(chatMessage ChatMessage) (ChatMessage, error)
 	GetAllMessages(chatId int, lastMessageId string, metadata entities.Metadata) ([]ChatMessage, error)
 }

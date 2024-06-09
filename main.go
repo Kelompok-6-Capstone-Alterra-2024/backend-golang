@@ -76,7 +76,7 @@ func main() {
 
 	userUC := userUseCase.NewUserUseCase(userRepo, oauthConfig)
 	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo, oauthConfigDoctor)
-	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo, chatRepo)
+	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo, validate, chatRepo)
 	storyUC := storyUseCase.NewStoryUseCase(storyRepo)
 	complaintUC := complaintUseCase.NewComplaintUseCase(complaintRepo)
 	midtransUC := midtransUseCase.NewMidtransUseCase(midtransConfig)

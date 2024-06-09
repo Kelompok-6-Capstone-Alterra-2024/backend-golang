@@ -27,10 +27,21 @@ func (c *ChatRepo) CreateChatRoom(consultationId uint) (error) {
 	return c.db.Create(&newChat).Error
 }
 
-func (c *ChatRepo) GetAllChatByUserId(userId int) ([]chatEntities.Chat, error) {
+func (c *ChatRepo) GetAllChatByUserId(userId int, metadata entities.Metadata, status string) ([]chatEntities.Chat, error) {
 	var consultationDB []consultation.Consultation
 
-	if err := c.db.Where("user_id = ?", userId).Find(&consultationDB).Error; err != nil {
+	query := c.db.Where("user_id = ?", userId)
+
+	if status != "" && status == "completed" {
+		query = query.Where("status = ? OR status = ?", "rejected", "done")
+	} else if status != "" && status == "process" {
+		query = query.Where("status = ? OR status = ?", "pending", "incoming")
+	} else if status != "" && status == "active" {
+		query = query.Where("status = ?", "active")
+	}
+
+	err := query.Find(&consultationDB).Error
+	if err != nil {
 		return nil, err
 	}
 
@@ -41,7 +52,8 @@ func (c *ChatRepo) GetAllChatByUserId(userId int) ([]chatEntities.Chat, error) {
 
 	var chatDB []Chat
 
-	if err := c.db.Preload("Consultation").Preload("Consultation.Doctor").Where("consultation_id IN ?", consultationIds).Find(&chatDB).Error; err != nil {
+	err = c.db.Preload("Consultation").Preload("Consultation.Doctor").Where("consultation_id IN ?", consultationIds).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&chatDB).Error
+	if err != nil {
 		return nil, err
 	}
 
@@ -70,29 +82,44 @@ func (c *ChatRepo) GetAllChatByUserId(userId int) ([]chatEntities.Chat, error) {
 			ProfilePicture: chat.Consultation.Doctor.ProfilePicture,
 			Specialist: chat.Consultation.Doctor.Specialist,
 		}
+
 		if chat.Consultation.Status == "pending" {
 			chatEnts[i].Status = "process"
 			chatEnts[i].Isrejected = false
-		} else if chat.Consultation.Status == "accepted" && chat.Consultation.IsActive {
+		} else if chat.Consultation.Status == "rejected" {
+			chatEnts[i].Status = "completed"
+			chatEnts[i].Isrejected = true
+		} else if chat.Consultation.Status == "incoming" {
+			chatEnts[i].Status = "incoming"
+			chatEnts[i].Isrejected = false
+		} else if chat.Consultation.Status == "active" {
 			chatEnts[i].Status = "active"
 			chatEnts[i].Isrejected = false
-		} else if chat.Consultation.Status == "accepted" && !chat.Consultation.IsActive {
-			chatEnts[i].Status = "waiting"
+		} else if chat.Consultation.Status == "done" {
+			chatEnts[i].Status = "completed"
 			chatEnts[i].Isrejected = false
-		} else if chat.Consultation.Status == "rejected" {
-			chatEnts[i].Status = "complete"
-			chatEnts[i].Isrejected = true
 		}
 	}
 
 	return chatEnts, nil
 }
 
-func (c *ChatRepo) GetAllChatByDoctorId(doctorId int) ([]chatEntities.Chat, error) {
+func (c *ChatRepo) GetAllChatByDoctorId(doctorId int, metadata entities.Metadata, status string) ([]chatEntities.Chat, error) {
 	
 	var consultationDB []consultation.Consultation
 
-	if err := c.db.Where("doctor_id = ?", doctorId).Find(&consultationDB).Error; err != nil {
+	query := c.db.Where("doctor_id = ?", doctorId)
+
+	if status != "" && status == "completed" {
+		query = query.Where("status = ? OR status = ?", "rejected", "done")
+	} else if status != "" && status == "process" {
+		query = query.Where("status = ? OR status = ?", "pending", "incoming")
+	} else if status != "" && status == "active" {
+		query = query.Where("status = ?", "active")
+	}
+
+	err := query.Find(&consultationDB).Error
+	if err != nil {
 		return nil, err
 	}
 
@@ -103,7 +130,7 @@ func (c *ChatRepo) GetAllChatByDoctorId(doctorId int) ([]chatEntities.Chat, erro
 
 	var chatDB []Chat
 
-	if err := c.db.Preload("Consultation").Preload("Consultation.User").Where("consultation_id IN ?", consultationIds).Find(&chatDB).Error; err != nil {
+	if err := c.db.Preload("Consultation").Preload("Consultation.User").Where("consultation_id IN ?", consultationIds).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&chatDB).Error; err != nil {
 		return nil, err
 	}
 
@@ -131,18 +158,22 @@ func (c *ChatRepo) GetAllChatByDoctorId(doctorId int) ([]chatEntities.Chat, erro
 			Username: chat.Consultation.User.Username,
 			ProfilePicture: chat.Consultation.User.ProfilePicture,
 		}
+
 		if chat.Consultation.Status == "pending" {
 			chatEnts[i].Status = "process"
 			chatEnts[i].Isrejected = false
-		} else if chat.Consultation.Status == "accepted" && chat.Consultation.IsActive {
+		} else if chat.Consultation.Status == "rejected" {
+			chatEnts[i].Status = "completed"
+			chatEnts[i].Isrejected = true
+		} else if chat.Consultation.Status == "incoming" {
+			chatEnts[i].Status = "incoming"
+			chatEnts[i].Isrejected = false
+		} else if chat.Consultation.Status == "active" {
 			chatEnts[i].Status = "active"
 			chatEnts[i].Isrejected = false
-		} else if chat.Consultation.Status == "accepted" && !chat.Consultation.IsActive {
-			chatEnts[i].Status = "waiting"
+		} else if chat.Consultation.Status == "done" {
+			chatEnts[i].Status = "completed"
 			chatEnts[i].Isrejected = false
-		} else if chat.Consultation.Status == "rejected" {
-			chatEnts[i].Status = "complete"
-			chatEnts[i].Isrejected = true
 		}
 	}
 

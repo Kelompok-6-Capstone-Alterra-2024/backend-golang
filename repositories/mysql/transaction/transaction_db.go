@@ -20,10 +20,11 @@ type Transaction struct {
 }
 
 func (receiver Transaction) ToEntities() *transaction.Transaction {
+	consultationEntities, _ := receiver.Consultation.ToEntities()
 	return &transaction.Transaction{
 		ID:             receiver.ID,
 		ConsultationID: receiver.ConsultationID,
-		Consultation:   *receiver.Consultation.ToEntities(),
+		Consultation:   *consultationEntities,
 		Price:          receiver.Price,
 		PaymentType:    receiver.PaymentType,
 		PaymentLink:    receiver.PaymentLink,
@@ -39,7 +40,6 @@ func ToTransactionModel(transaction *transaction.Transaction) *Transaction {
 		ID:             transaction.ID,
 		Model:          gorm.Model{CreatedAt: transaction.CreatedAt, UpdatedAt: transaction.UpdatedAt},
 		ConsultationID: transaction.ConsultationID,
-		Consultation:   *consultation.ToConsultationModel(&transaction.Consultation),
 		Price:          transaction.Price,
 		PaymentType:    transaction.PaymentType,
 		PaymentLink:    transaction.PaymentLink,

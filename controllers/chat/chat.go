@@ -23,10 +23,16 @@ func NewChatController(chatUseCase chatEntities.UseCaseInterface) *ChatControlle
 }
 
 func (chatController *ChatController) GetAllChatByUserId(c echo.Context) (error) {
+	page := c.QueryParam("page")
+	limit := c.QueryParam("limit")
+	status := c.QueryParam("status")
+
+	metadata := utilities.GetMetadata(page, limit)
+
 	token := c.Request().Header.Get("Authorization")
 	userId, _ := utilities.GetUserIdFromToken(token)
 
-	chats, err := chatController.chatUseCase.GetAllChatByUserId(userId)
+	chats, err := chatController.chatUseCase.GetAllChatByUserId(userId, *metadata, status)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
@@ -57,10 +63,16 @@ func (chatController *ChatController) GetAllChatByUserId(c echo.Context) (error)
 }
 
 func (chatController *ChatController) GetAllChatByDoctorId(c echo.Context) (error) {
+	page := c.QueryParam("page")
+	limit := c.QueryParam("limit")
+	status := c.QueryParam("status")
+
+	metadata := utilities.GetMetadata(page, limit)
+
 	token := c.Request().Header.Get("Authorization")
 	doctorId, _ := utilities.GetUserIdFromToken(token)
 
-	chats, err := chatController.chatUseCase.GetAllChatByDoctorId(doctorId)
+	chats, err := chatController.chatUseCase.GetAllChatByDoctorId(doctorId, *metadata, status)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}

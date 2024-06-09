@@ -16,32 +16,44 @@ type Consultation struct {
 	gorm.Model
 	DoctorID      uint                `gorm:"column:doctor_id;not null"`
 	Doctor        doctor.Doctor       `gorm:"foreignKey:doctor_id;references:id"`
-	UserID        int                 `gorm:"column:user_id;not null"`
+	UserID        uint                `gorm:"column:user_id;not null"`
 	User          user.User           `gorm:"foreignKey:user_id;references:id"`
-	ComplaintID   uint                 `gorm:"column:complaint_id;unique;default:NULL"`
+	ComplaintID   uint                `gorm:"column:complaint_id;unique;default:NULL"`
 	Complaint     complaint.Complaint `gorm:"foreignKey:complaint_id;references:id"`
-	Status        string              `gorm:"column:status;not null;default:'pending';type:enum('pending', 'accepted', 'rejected')"`
+	Status        string              `gorm:"column:status;not null;default:'pending';type:enum('pending', 'rejected', 'incoming', 'active', 'done')"`
 	PaymentStatus string              `gorm:"column:payment_status;not null;type:enum('pending', 'paid', 'canceled');default:'pending'"`
 	IsAccepted    bool                `gorm:"column:is_accepted"`
-	IsActive      bool                `json:"is_active"`
-	Date          time.Time           `json:"date"`
+	IsActive      bool                `gorm:"column:is_active"`
+	Date          time.Time           `gorm:"column:date;type:date;not null"`
+	Time          string              `gorm:"column:time;type:time(3);not null"`
 }
 
 type ConstultationNotes struct {
 	gorm.Model
-	ConsultationID uint          `gorm:"column:consultation_id;unique;not null"`
-	Consultation   Consultation `gorm:"foreignKey:consultation_id;references:id"`
-	MusicID        uint          `gorm:"column:music_id;default:NULL"`
-	Music          music.Music   `gorm:"foreignKey:music_id;references:id"`
-	ForumID        uint          `gorm:"column:forum_id;default:NULL"`
-	Forum          forum.Forum   `gorm:"foreignKey:forum_id;references:id"`
-	MainPoint      string        `gorm:"column:main_point;default:NULL"`
-	NextStep       string        `gorm:"column:next_step;default:NULL"`
-	AdditionalNote string        `gorm:"column:additional_note;default:NULL"`
-	MoodTrackerNote string        `gorm:"column:mood_tracker_note;default:NULL"`
+	ConsultationID  uint         `gorm:"column:consultation_id;unique;not null"`
+	Consultation    Consultation `gorm:"foreignKey:consultation_id;references:id"`
+	MusicID         uint         `gorm:"column:music_id;default:NULL"`
+	Music           music.Music  `gorm:"foreignKey:music_id;references:id"`
+	ForumID         uint         `gorm:"column:forum_id;default:NULL"`
+	Forum           forum.Forum  `gorm:"foreignKey:forum_id;references:id"`
+	MainPoint       string       `gorm:"column:main_point;default:NULL"`
+	NextStep        string       `gorm:"column:next_step;default:NULL"`
+	AdditionalNote  string       `gorm:"column:additional_note;default:NULL"`
+	MoodTrackerNote string       `gorm:"column:mood_tracker_note;default:NULL"`
 }
 
-func (receiver Consultation) ToEntities() *consultation.Consultation {
+func (receiver Consultation) ToEntities() (*consultation.Consultation, error) {
+	consultationTime, err := time.Parse("15:04:05.000", receiver.Time)
+	if err != nil {
+		consultationTime, err = time.Parse("15:04", receiver.Time)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+
 	return &consultation.Consultation{
 		ID:            receiver.ID,
 		DoctorID:      receiver.DoctorID,
@@ -53,7 +65,8 @@ func (receiver Consultation) ToEntities() *consultation.Consultation {
 		IsAccepted:    receiver.IsAccepted,
 		IsActive:      receiver.IsActive,
 		Date:          receiver.Date,
-	}
+		Time:          consultationTime,
+	}, nil
 }
 
 func ToConsultationModel(request *consultation.Consultation) *Consultation {
@@ -66,5 +79,6 @@ func ToConsultationModel(request *consultation.Consultation) *Consultation {
 		IsAccepted:    request.IsAccepted,
 		IsActive:      request.IsActive,
 		Date:          request.Date,
+		Time:          request.Time.Format("15:04"),
 	}
 }
