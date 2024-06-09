@@ -43,8 +43,13 @@ type ConstultationNotes struct {
 }
 
 func (receiver Consultation) ToEntities() (*consultation.Consultation, error) {
-
 	consultationTime, err := time.Parse("15:04:05.000", receiver.Time)
+	if err != nil {
+		consultationTime, err = time.Parse("15:04", receiver.Time)
+		if err != nil {
+			return nil, err
+		}
+	}
 	if err != nil {
 		return nil, err
 	}

@@ -27,6 +27,9 @@ func (repository *ConsultationRepo) CreateConsultation(consultation *consultatio
 	if err := repository.db.Create(&consultationRequest).Error; err != nil {
 		return nil, constants.ErrInsertDatabase
 	}
+	if err := repository.db.Preload("Doctor").First(&consultationRequest, consultationRequest.ID).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
 
 	consultationResult, err := consultationRequest.ToEntities()
 	if err != nil {
