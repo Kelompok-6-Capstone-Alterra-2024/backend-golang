@@ -54,3 +54,28 @@ func (usecase *ConsultationUseCase) GetAllDoctorConsultation(metadata *entities.
 	}
 	return result, nil
 }
+
+func (usecase *ConsultationUseCase) CountConsultationByDoctorID(doctorID int) (int64, error) {
+	result, err := usecase.consultationRepo.CountConsultationByDoctorID(doctorID)
+	if err != nil {
+		return 0, err
+	}
+
+	return result, nil
+}
+
+func (usecase *ConsultationUseCase) CountConsultationToday(doctorID int) (int64, error) {
+	result, err := usecase.consultationRepo.CountConsultationToday(doctorID)
+	if err != nil {
+		return 0, nil
+	}
+	return result, nil
+}
+
+func (usecase *ConsultationUseCase) CountConsultationByStatus(doctorID int, status string) (int64, error) {
+	result, err := usecase.consultationRepo.CountConsultationByStatus(doctorID, status)
+	if err != nil {
+		return 0, err
+	}
+	return result, nil
+}

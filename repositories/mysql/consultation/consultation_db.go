@@ -17,14 +17,19 @@ type Consultation struct {
 	User          user.User           `gorm:"foreignKey:user_id;references:id"`
 	ComplaintID   int                 `gorm:"column:complaint_id;unique;default:NULL"`
 	Complaint     complaint.Complaint `gorm:"foreignKey:complaint_id;references:id"`
-	Status        string              `gorm:"column:status;not null;default:'pending';type:enum('pending', 'accepted', 'rejected')"`
+	Status        string              `gorm:"column:status;not null;default:'pending';type:enum('pending', 'rejected', 'incoming', 'active', 'done')"`
 	PaymentStatus string              `gorm:"column:payment_status;not null;type:enum('pending', 'paid', 'canceled');default:'pending'"`
 	IsAccepted    bool                `gorm:"column:is_accepted"`
-	IsActive      bool                `json:"is_active"`
-	Date          time.Time           `json:"date"`
+	IsActive      bool                `gorm:"column:is_active"`
+	Date          time.Time           `gorm:"column:date;type:date;not null"`
+	Time          string              `gorm:"column:time;type:time(3);not null"`
 }
 
-func (receiver Consultation) ToEntities() *consultation.Consultation {
+func (receiver Consultation) ToEntities() (*consultation.Consultation, error) {
+	consultationTime, err := time.Parse("15:04:05.000", receiver.Time)
+	if err != nil {
+		return nil, err
+	}
 	return &consultation.Consultation{
 		ID:            receiver.ID,
 		DoctorID:      receiver.DoctorID,
@@ -36,7 +41,8 @@ func (receiver Consultation) ToEntities() *consultation.Consultation {
 		IsAccepted:    receiver.IsAccepted,
 		IsActive:      receiver.IsActive,
 		Date:          receiver.Date,
-	}
+		Time:          consultationTime,
+	}, nil
 }
 
 func ToConsultationModel(request *consultation.Consultation) *Consultation {
@@ -49,5 +55,6 @@ func ToConsultationModel(request *consultation.Consultation) *Consultation {
 		IsAccepted:    request.IsAccepted,
 		IsActive:      request.IsActive,
 		Date:          request.Date,
+		Time:          request.Time.Format("15:04"),
 	}
 }

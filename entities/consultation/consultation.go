@@ -21,6 +21,7 @@ type Consultation struct {
 	IsAccepted    bool
 	IsActive      bool
 	Date          time.Time
+	Time          time.Time
 }
 
 type ConsultationRepository interface {
@@ -29,6 +30,9 @@ type ConsultationRepository interface {
 	GetAllUserConsultation(metadata *entities.Metadata, userID int) (*[]Consultation, error)
 	UpdateStatusConsultation(consultation *Consultation) (*Consultation, error)
 	GetAllDoctorConsultation(metadata *entities.Metadata, doctorID int) (*[]Consultation, error)
+	CountConsultationByStatus(doctorID int, status string) (int64, error)
+	CountConsultationToday(doctorID int) (int64, error)
+	CountConsultationByDoctorID(doctorID int) (int64, error)
 }
 
 type ConsultationUseCase interface {
@@ -37,6 +41,9 @@ type ConsultationUseCase interface {
 	GetAllUserConsultation(metadata *entities.Metadata, userID int) (*[]Consultation, error)
 	UpdateStatusConsultation(consultation *Consultation) (*Consultation, error)
 	GetAllDoctorConsultation(metadata *entities.Metadata, doctorID int) (*[]Consultation, error)
+	CountConsultationByDoctorID(doctorID int) (int64, error)
+	CountConsultationToday(doctorID int) (int64, error)
+	CountConsultationByStatus(doctorID int, status string) (int64, error)
 }
 
 func (r *Consultation) ToUserResponse() *response.ConsultationUserResponse {
@@ -47,7 +54,8 @@ func (r *Consultation) ToUserResponse() *response.ConsultationUserResponse {
 		PaymentStatus: r.PaymentStatus,
 		IsAccepted:    r.IsAccepted,
 		IsActive:      r.IsActive,
-		Date:          r.Date,
+		Date:          r.Date.Format("2006-01-02"),
+		Time:          r.Time.Format("15:04"),
 	}
 }
 
@@ -58,7 +66,8 @@ func (r *Consultation) ToDoctorResponse() *response.ConsultationDoctorResponse {
 		PaymentStatus: r.PaymentStatus,
 		IsAccepted:    r.IsAccepted,
 		IsActive:      r.IsActive,
-		Date:          r.Date,
+		Date:          r.Date.Format("2006-01-02"),
+		Time:          r.Time.Format("15:04"),
 		Complaint:     r.Complaint.ToResponse(),
 	}
 }

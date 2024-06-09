@@ -6,6 +6,7 @@ import (
 	"capstone/entities/consultation"
 	"capstone/utilities"
 	"capstone/utilities/base"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
@@ -30,11 +31,12 @@ func (controller *ConsultationController) CreateConsultation(c echo.Context) err
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
 	date, err := utilities.StringToDate(consultationRequest.Date)
+	time, err := utilities.StringToTime(consultationRequest.Time)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
 	consultationRequest.UserID = userId
-	consultationResponse, err := controller.consultationUseCase.CreateConsultation(consultationRequest.ToEntities(date))
+	consultationResponse, err := controller.consultationUseCase.CreateConsultation(consultationRequest.ToEntities(date, time))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
@@ -43,10 +45,18 @@ func (controller *ConsultationController) CreateConsultation(c echo.Context) err
 
 func (controller *ConsultationController) GetConsultationByID(c echo.Context) error {
 	consultationID, err := strconv.Atoi(c.Param("id"))
+	token := c.Request().Header.Get("Authorization")
+	userId, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("Invalid ID"))
 	}
 	consultationResponse, err := controller.consultationUseCase.GetConsultationByID(consultationID)
+	if userId != consultationResponse.UserID {
+		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse("Unauthorized"))
+	}
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
@@ -116,4 +126,41 @@ func (controller *ConsultationController) GetAllDoctorConsultation(c echo.Contex
 	}
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation", responses))
+}
+
+func (controller *ConsultationController) CountConsultationByDoctorID(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	doctorId, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	var count int64
+	status := c.QueryParam("status")
+	fmt.Print(status)
+	if status != "" {
+		count, err = controller.consultationUseCase.CountConsultationByStatus(doctorId, status)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+		}
+		return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation", count))
+	}
+
+	count, err = controller.consultationUseCase.CountConsultationByDoctorID(doctorId)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation", count))
+}
+
+func (controller *ConsultationController) CountConsultationToday(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	doctorId, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	count, err := controller.consultationUseCase.CountConsultationToday(doctorId)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation", count))
 }

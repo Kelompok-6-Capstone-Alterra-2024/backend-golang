@@ -181,4 +181,11 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("stories/view/count", r.storyController.CountStoryViewByDoctorId)  // Count Stories View Count By Doctor ID
 	doctorRoute.PUT("stories/:id", r.storyController.EditStory)                        // Update Story
 	doctorRoute.DELETE("stories/:id", r.storyController.DeleteStory)                   // Delete Story
+
+	// Consultation
+	doctorRoute.GET("consultations", r.consultationController.GetAllDoctorConsultation) //Get All Consultation
+	doctorRoute.GET("consultations/count", r.consultationController.CountConsultationByDoctorID)
+	doctorRoute.GET("consultations/today/count", r.consultationController.CountConsultationToday)
+	doctorRoute.GET("consultations/:id", r.consultationController.GetConsultationByID)  //Get Consultation By ID
+	doctorRoute.PUT("consultations", r.consultationController.UpdateStatusConsultation) // Update Status Consultation
 }
