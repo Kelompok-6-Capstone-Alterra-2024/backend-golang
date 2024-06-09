@@ -21,7 +21,7 @@ func NewConsultationUseCase(consultationRepo consultationEntities.ConsultationRe
 
 func (usecase *ConsultationUseCase) CreateConsultation(consultation *consultationEntities.Consultation) (*consultationEntities.Consultation, error) {
 	if err := usecase.validate.Struct(consultation); err != nil {
-		return nil, err
+		return nil, constants.ErrDataEmpty
 	}
 	result, err := usecase.consultationRepo.CreateConsultation(consultation)
 	if err != nil {
