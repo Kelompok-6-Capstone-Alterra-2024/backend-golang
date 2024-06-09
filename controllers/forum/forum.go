@@ -45,12 +45,14 @@ func (forumController *ForumController) GetJoinedForum(c echo.Context) error {
 	pageParam := c.QueryParam("page")
 	limitParam := c.QueryParam("limit")
 
+	search := c.QueryParam("search")
+
 	metadata := utilities.GetMetadata(pageParam, limitParam)
 
 	token := c.Request().Header.Get("Authorization")
 	userId, _ := utilities.GetUserIdFromToken(token)
 
-	forums, err := forumController.forumUseCase.GetJoinedForum(uint(userId), *metadata)
+	forums, err := forumController.forumUseCase.GetJoinedForum(uint(userId), *metadata, search)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
@@ -79,12 +81,14 @@ func (forumController *ForumController) GetRecommendationForum(c echo.Context) e
 	pageParam := c.QueryParam("page")
 	limitParam := c.QueryParam("limit")
 
+	search := c.QueryParam("search")
+
 	metadata := utilities.GetMetadata(pageParam, limitParam)
 
 	token := c.Request().Header.Get("Authorization")
 	userId, _ := utilities.GetUserIdFromToken(token)
 
-	forums, err := forumController.forumUseCase.GetRecommendationForum(uint(userId), *metadata)
+	forums, err := forumController.forumUseCase.GetRecommendationForum(uint(userId), *metadata, search)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}

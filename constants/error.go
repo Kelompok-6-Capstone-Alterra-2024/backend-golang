@@ -44,7 +44,7 @@ var ErrStartDateGreater error = errors.New("start date must be less than end dat
 
 var ErrAlreadyLiked error = errors.New("already liked")
 
-var ErrEmptyInputForum error = errors.New("forum id cannot be empty")
+var ErrEmptyInputForum error = errors.New("name or description cannot be empty")
 
 var ErrEmptyInputPost error = errors.New("forum id or content cannot be empty")
 
