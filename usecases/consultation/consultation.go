@@ -3,19 +3,24 @@ package consultation
 import (
 	"capstone/entities"
 	consultationEntities "capstone/entities/consultation"
+	"github.com/go-playground/validator/v10"
 )
 
 type ConsultationUseCase struct {
 	consultationRepo consultationEntities.ConsultationRepository
+	validate         *validator.Validate
 }
 
-func NewConsultationUseCase(consultationRepo consultationEntities.ConsultationRepository) consultationEntities.ConsultationUseCase {
+func NewConsultationUseCase(consultationRepo consultationEntities.ConsultationRepository, validate validator.Validate) consultationEntities.ConsultationUseCase {
 	return &ConsultationUseCase{
 		consultationRepo: consultationRepo,
 	}
 }
 
 func (usecase *ConsultationUseCase) CreateConsultation(consultation *consultationEntities.Consultation) (*consultationEntities.Consultation, error) {
+	if err := usecase.validate.Struct(consultation); err != nil {
+		return nil, err
+	}
 	result, err := usecase.consultationRepo.CreateConsultation(consultation)
 	if err != nil {
 		return nil, err

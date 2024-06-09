@@ -11,17 +11,16 @@ import (
 
 type Consultation struct {
 	ID            uint
-	DoctorID      uint
+	DoctorID      uint `validate:"required"`
 	Doctor        *doctor.Doctor
-	UserID        int
 	User          user.User
 	Complaint     complaint.Complaint
 	Status        string
 	PaymentStatus string
 	IsAccepted    bool
 	IsActive      bool
-	Date          time.Time
-	Time          time.Time
+	Date          time.Time `validate:"required"`
+	Time          time.Time `validate:"required"`
 }
 
 type ConsultationRepository interface {
