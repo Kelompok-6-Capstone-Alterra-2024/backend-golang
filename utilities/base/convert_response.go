@@ -117,6 +117,9 @@ func ConvertResponseCode(err error) int {
 
 	case constants.ErrExpiredOTP:
 		return http.StatusGone
+
+	case constants.ErrEmptyResetPassword:
+		return http.StatusBadRequest
 		
 	default:
 		return http.StatusInternalServerError

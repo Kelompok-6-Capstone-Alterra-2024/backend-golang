@@ -129,3 +129,20 @@ func (u *UserUseCase) GetPointsByUserId(id int) (int, error) {
 	}
 	return result, nil
 }
+
+func (u *UserUseCase) ResetPassword(email string, password string) (error) {
+	if password == "" {
+		return constants.ErrEmptyResetPassword
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	err = u.repository.ResetPassword(email, string(hashedPassword))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

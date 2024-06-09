@@ -93,6 +93,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userAuth := e.Group("/v1/users")
 	userAuth.POST("/register", r.userController.Register) //Register User
 	userAuth.POST("/login", r.userController.Login)       //Login User
+	userAuth.PUT("/reset-password", r.userController.ResetPassword) //Reset Password
 
 	userAuth.GET("/auth/google/login", r.userController.GoogleLogin)
 	userAuth.GET("/auth/google/callback", r.userController.GoogleCallback)
