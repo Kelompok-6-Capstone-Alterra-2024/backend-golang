@@ -27,12 +27,14 @@ func (chatController *ChatController) GetAllChatByUserId(c echo.Context) (error)
 	limit := c.QueryParam("limit")
 	status := c.QueryParam("status")
 
+	search := c.QueryParam("search")
+
 	metadata := utilities.GetMetadata(page, limit)
 
 	token := c.Request().Header.Get("Authorization")
 	userId, _ := utilities.GetUserIdFromToken(token)
 
-	chats, err := chatController.chatUseCase.GetAllChatByUserId(userId, *metadata, status)
+	chats, err := chatController.chatUseCase.GetAllChatByUserId(userId, *metadata, status, search)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
@@ -67,12 +69,14 @@ func (chatController *ChatController) GetAllChatByDoctorId(c echo.Context) (erro
 	limit := c.QueryParam("limit")
 	status := c.QueryParam("status")
 
+	search := c.QueryParam("search")
+
 	metadata := utilities.GetMetadata(page, limit)
 
 	token := c.Request().Header.Get("Authorization")
 	doctorId, _ := utilities.GetUserIdFromToken(token)
 
-	chats, err := chatController.chatUseCase.GetAllChatByDoctorId(doctorId, *metadata, status)
+	chats, err := chatController.chatUseCase.GetAllChatByDoctorId(doctorId, *metadata, status, search)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}

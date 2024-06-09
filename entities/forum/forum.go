@@ -31,8 +31,8 @@ type ForumMember struct {
 type RepositoryInterface interface {
 	JoinForum(forumId uint, userId uint) (error)
 	LeaveForum(forumId uint, userId uint) (error)
-	GetJoinedForum(userId uint, metadata entities.Metadata) ([]Forum, error)
-	GetRecommendationForum(userId uint, metadata entities.Metadata) ([]Forum, error)
+	GetJoinedForum(userId uint, metadata entities.Metadata, search string) ([]Forum, error)
+	GetRecommendationForum(userId uint, metadata entities.Metadata, search string) ([]Forum, error)
 	GetForumById(forumId uint) (Forum, error)
 	CreateForum(forum Forum) (Forum, error)
 	GetAllForumsByDoctorId(doctorId uint, metadata entities.Metadata, search string) ([]Forum, error)
@@ -44,8 +44,8 @@ type RepositoryInterface interface {
 type UseCaseInterface interface {
 	JoinForum(forumId uint, userId uint) (error)
 	LeaveForum(forumId uint, userId uint) (error)
-	GetJoinedForum(userId uint, metadata entities.Metadata) ([]Forum, error)
-	GetRecommendationForum(userId uint, metadata entities.Metadata) ([]Forum, error)
+	GetJoinedForum(userId uint, metadata entities.Metadata, search string) ([]Forum, error)
+	GetRecommendationForum(userId uint, metadata entities.Metadata, search string) ([]Forum, error)
 	GetForumById(forumId uint) (Forum, error)
 	CreateForum(forum Forum, fileImage *multipart.FileHeader) (Forum, error)
 	GetAllForumsByDoctorId(doctorId uint, metadata entities.Metadata, search string) ([]Forum, error)

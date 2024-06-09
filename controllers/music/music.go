@@ -26,12 +26,14 @@ func (musicController *MusicController) GetAllMusics(c echo.Context) error {
 	pageParam := c.QueryParam("page")
 	limitParam := c.QueryParam("limit")
 
+	searchParam := c.QueryParam("search")
+
 	metadata := utilities.GetMetadata(pageParam, limitParam)
 
 	token := c.Request().Header.Get("Authorization")
 	userId, _ := utilities.GetUserIdFromToken(token)
 
-	musics, err := musicController.musicUseCase.GetAllMusics(*metadata, userId)
+	musics, err := musicController.musicUseCase.GetAllMusics(*metadata, userId, searchParam)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
