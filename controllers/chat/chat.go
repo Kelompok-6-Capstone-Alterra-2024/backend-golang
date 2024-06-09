@@ -56,6 +56,37 @@ func (chatController *ChatController) GetAllChatByUserId(c echo.Context) (error)
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success get all chat", resp))
 }
 
+func (chatController *ChatController) GetAllChatByDoctorId(c echo.Context) (error) {
+	token := c.Request().Header.Get("Authorization")
+	doctorId, _ := utilities.GetUserIdFromToken(token)
+
+	chats, err := chatController.chatUseCase.GetAllChatByDoctorId(doctorId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	resp := make([]response.ChatDoctorResponse, len(chats))
+
+	for i, chat := range chats {
+		resp[i] = response.ChatDoctorResponse{
+			Id:            chat.ID,
+			Status:        chat.Status,
+			LatestMessage: response.LatestMessage{
+				Id:      chat.LatestMessageID,
+				Message: chat.LatestMessageContent,
+				Date:    chat.LatestMessageTime,
+			},
+			User: response.UserChatResponse{
+				Id:       uint(chat.Consultation.User.Id),
+				Name:     chat.Consultation.User.Name,
+				Username: chat.Consultation.User.Username,
+				ImageUrl: chat.Consultation.User.ProfilePicture,
+			},
+		}
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success get all chat", resp))
+}
 
 func (chatController *ChatController) SendMessage(c echo.Context) (error) {
 	var req request.ChatSendRequest
@@ -82,6 +113,30 @@ func (chatController *ChatController) SendMessage(c echo.Context) (error) {
 	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success send message", resp))
 }
 
+func (chatController *ChatController) SendMessageDoctor(c echo.Context) (error) {
+	var req request.ChatSendRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	var chatMessageEnt chatEntities.ChatMessage
+	chatMessageEnt.ChatID = req.ChatId
+	chatMessageEnt.Message = req.Message
+	chatMessageEnt.Role = "doctor"
+
+	result, err := chatController.chatUseCase.SendMessage(chatMessageEnt)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var resp response.ChatMessageResponse
+	resp.Id = result.ID
+	resp.Message = result.Message
+	resp.Role = result.Role
+	resp.Date = result.CreatedAt
+
+	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success send message", resp))
+}
 
 func (chatController *ChatController) GetAllMessages(c echo.Context) (error) {
 	id := c.Param("chatId")

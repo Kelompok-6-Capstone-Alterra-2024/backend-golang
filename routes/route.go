@@ -220,4 +220,11 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	// Post
 	doctorRoute.GET("forums/:forumId/posts", r.postController.GetAllPostsByForumId) // Get All Posts By Forum ID
 	doctorRoute.GET("posts/:postId/comments", r.postController.GetAllCommentByPostId) // Get All Comment By Post ID
+
+	// Chat
+	doctorRoute.GET("chats", r.chatController.GetAllChatByDoctorId) // Get All Chat By Doctor ID
+
+	// Chat Message
+	doctorRoute.POST("chats/messages", r.chatController.SendMessageDoctor) // Send Message
+	doctorRoute.GET("chats/:chatId/messages", r.chatController.GetAllMessages) // Get All Message
 }

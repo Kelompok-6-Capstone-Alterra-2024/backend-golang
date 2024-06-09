@@ -3,16 +3,19 @@ package consultation
 import (
 	"capstone/constants"
 	"capstone/entities"
+	chatEntities "capstone/entities/chat"
 	consultationEntities "capstone/entities/consultation"
 )
 
 type ConsultationUseCase struct {
 	consultationRepo consultationEntities.ConsultationRepository
+	chatRepo chatEntities.RepositoryInterface
 }
 
-func NewConsultationUseCase(consultationRepo consultationEntities.ConsultationRepository) consultationEntities.ConsultationUseCase {
+func NewConsultationUseCase(consultationRepo consultationEntities.ConsultationRepository, chatRepo chatEntities.RepositoryInterface) consultationEntities.ConsultationUseCase {
 	return &ConsultationUseCase{
 		consultationRepo: consultationRepo,
+		chatRepo:         chatRepo,
 	}
 }
 
@@ -21,6 +24,12 @@ func (usecase *ConsultationUseCase) CreateConsultation(consultation *consultatio
 	if err != nil {
 		return nil, err
 	}
+
+	err = usecase.chatRepo.CreateChatRoom(result.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	return result, nil
 }
 

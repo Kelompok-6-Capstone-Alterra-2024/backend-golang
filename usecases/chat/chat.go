@@ -25,6 +25,14 @@ func (chatUseCase *ChatUseCase) GetAllChatByUserId(userId int) ([]chatEntities.C
 	return chats, nil
 }
 
+func (chatUseCase *ChatUseCase) GetAllChatByDoctorId(doctorId int) ([]chatEntities.Chat, error) {
+	chats, err := chatUseCase.chatInterface.GetAllChatByDoctorId(doctorId)
+	if err != nil {
+		return nil, err
+	}
+	return chats, nil
+}
+
 func (chatUseCase *ChatUseCase) SendMessage(chatMessage chatEntities.ChatMessage) (chatEntities.ChatMessage, error) {
 	if chatMessage.ChatID == 0 && chatMessage.Message == "" {
 		return chatEntities.ChatMessage{}, constants.ErrEmptyChat

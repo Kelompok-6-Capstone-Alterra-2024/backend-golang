@@ -4,6 +4,7 @@ import (
 	"capstone/entities"
 	chatEntities "capstone/entities/chat"
 	"capstone/entities/doctor"
+	userEntities "capstone/entities/user"
 	"capstone/repositories/mysql/consultation"
 
 	"gorm.io/gorm"
@@ -17,6 +18,13 @@ func NewChatRepo(db *gorm.DB) *ChatRepo {
 	return &ChatRepo{
 		db: db,
 	}
+}
+
+func (c *ChatRepo) CreateChatRoom(consultationId uint) (error) {
+	var newChat Chat
+	newChat.ConsultationId = consultationId
+
+	return c.db.Create(&newChat).Error
 }
 
 func (c *ChatRepo) GetAllChatByUserId(userId int) ([]chatEntities.Chat, error) {
@@ -37,15 +45,15 @@ func (c *ChatRepo) GetAllChatByUserId(userId int) ([]chatEntities.Chat, error) {
 		return nil, err
 	}
 
-	var mesageTemp []ChatMessage
-	var latestMessage []ChatMessage
+	latestMessage := make([]ChatMessage, len(chatDB))
 
-	for _, chat := range chatDB {
+	for i, chat := range chatDB {
+		var mesageTemp ChatMessage
 		err := c.db.Where("chat_id = ?", chat.ID).Order("created_at DESC").Limit(1).Find(&mesageTemp).Error
 		if err != nil {
 			return nil, err
 		}
-		latestMessage = append(latestMessage, mesageTemp...)
+		latestMessage[i] = mesageTemp
 	}
 
 	chatEnts := make([]chatEntities.Chat, len(chatDB))
@@ -61,6 +69,67 @@ func (c *ChatRepo) GetAllChatByUserId(userId int) ([]chatEntities.Chat, error) {
 			Username:   chat.Consultation.Doctor.Username,
 			ProfilePicture: chat.Consultation.Doctor.ProfilePicture,
 			Specialist: chat.Consultation.Doctor.Specialist,
+		}
+		if chat.Consultation.Status == "pending" {
+			chatEnts[i].Status = "process"
+			chatEnts[i].Isrejected = false
+		} else if chat.Consultation.Status == "accepted" && chat.Consultation.IsActive {
+			chatEnts[i].Status = "active"
+			chatEnts[i].Isrejected = false
+		} else if chat.Consultation.Status == "accepted" && !chat.Consultation.IsActive {
+			chatEnts[i].Status = "waiting"
+			chatEnts[i].Isrejected = false
+		} else if chat.Consultation.Status == "rejected" {
+			chatEnts[i].Status = "complete"
+			chatEnts[i].Isrejected = true
+		}
+	}
+
+	return chatEnts, nil
+}
+
+func (c *ChatRepo) GetAllChatByDoctorId(doctorId int) ([]chatEntities.Chat, error) {
+	
+	var consultationDB []consultation.Consultation
+
+	if err := c.db.Where("doctor_id = ?", doctorId).Find(&consultationDB).Error; err != nil {
+		return nil, err
+	}
+
+	var consultationIds []int
+	for _, consultation := range consultationDB {
+		consultationIds = append(consultationIds, int(consultation.ID))
+	}
+
+	var chatDB []Chat
+
+	if err := c.db.Preload("Consultation").Preload("Consultation.User").Where("consultation_id IN ?", consultationIds).Find(&chatDB).Error; err != nil {
+		return nil, err
+	}
+
+	var latestMessage []ChatMessage
+
+	for _, chat := range chatDB {
+		var mesageTemp ChatMessage
+		err := c.db.Where("chat_id = ?", chat.ID).Order("created_at DESC").Limit(1).Find(&mesageTemp).Error
+		if err != nil {
+			return nil, err
+		}
+		latestMessage = append(latestMessage, mesageTemp)
+	}
+
+	chatEnts := make([]chatEntities.Chat, len(chatDB))
+
+	for i, chat := range chatDB {
+		chatEnts[i].ID = chat.ID
+		chatEnts[i].LatestMessageID = latestMessage[i].ID
+		chatEnts[i].LatestMessageContent = latestMessage[i].Message
+		chatEnts[i].LatestMessageTime = latestMessage[i].CreatedAt.Format("2006-01-02 15:04:05")
+		chatEnts[i].Consultation.User = userEntities.User{
+			Id:       chat.Consultation.User.Id,
+			Name:     chat.Consultation.User.Name,
+			Username: chat.Consultation.User.Username,
+			ProfilePicture: chat.Consultation.User.ProfilePicture,
 		}
 		if chat.Consultation.Status == "pending" {
 			chatEnts[i].Status = "process"
