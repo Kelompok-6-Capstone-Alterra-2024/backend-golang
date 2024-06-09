@@ -3,6 +3,7 @@ package transaction
 import (
 	"capstone/controllers/transaction/response"
 	"capstone/entities/consultation"
+	"capstone/entities/doctor"
 	"github.com/google/uuid"
 	"time"
 )
@@ -11,6 +12,8 @@ type Transaction struct {
 	ID             uuid.UUID
 	ConsultationID uint `validate:"required"`
 	Consultation   consultation.Consultation
+	DoctorID       uint
+	Doctor         doctor.Doctor
 	Price          int
 	Status         string
 	PaymentType    string

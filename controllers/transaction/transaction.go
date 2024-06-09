@@ -40,7 +40,6 @@ func (controller *TransactionController) InsertWithBuiltIn(c echo.Context) error
 
 func (controller *TransactionController) FindByID(c echo.Context) error {
 	id := c.Param("id")
-
 	transactionResponse, err := controller.transactionUseCase.FindByID(id)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
