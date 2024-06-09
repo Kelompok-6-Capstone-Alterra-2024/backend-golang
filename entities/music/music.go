@@ -19,7 +19,7 @@ type Music struct {
 }
 
 type RepositoryInterface interface {
-	GetAllMusics(metadata entities.Metadata, userId int) ([]Music, error)
+	GetAllMusics(metadata entities.Metadata, userId int, search string) ([]Music, error)
 	GetAllMusicsByDoctorId(metadata entities.MetadataFull, userId int) ([]Music, error)
 	GetMusicById(musicId int, userId int) (Music, error)
 	GetLikedMusics(metadata entities.Metadata, userId int) ([]Music, error)
@@ -34,7 +34,7 @@ type RepositoryInterface interface {
 }
 
 type UseCaseInterface interface {
-	GetAllMusics(metadata entities.Metadata, userId int) ([]Music, error)
+	GetAllMusics(metadata entities.Metadata, userId int, search string) ([]Music, error)
 	GetAllMusicsByDoctorId(metadata entities.MetadataFull, userId int) ([]Music, error)
 	GetMusicById(musicId int, userId int) (Music, error)
 	GetLikedMusics(metadata entities.Metadata, userId int) ([]Music, error)
