@@ -13,7 +13,7 @@ import (
 
 type Consultation struct {
 	ID            uint
-	DoctorID      uint `validate:"required"`
+	DoctorID      uint
 	Doctor        *doctor.Doctor
 	UserID        uint
 	User          user.User
@@ -22,8 +22,8 @@ type Consultation struct {
 	PaymentStatus string
 	IsAccepted    bool
 	IsActive      bool
-	Date          time.Time `validate:"required"`
-	Time          time.Time `validate:"required"`
+	Date          time.Time
+	Time          time.Time
 }
 
 type ConsultationNotes struct {

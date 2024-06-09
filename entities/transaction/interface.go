@@ -6,9 +6,11 @@ type TransactionRepository interface {
 	Insert(transaction *Transaction) (*Transaction, error)
 	FindByID(ID string) (*Transaction, error)
 	FindByConsultationID(consultationID uint) (*Transaction, error)
-	FindAll(metadata *entities.Metadata, userID uint) (*[]Transaction, error)
+	FindAllByUserID(metadata *entities.Metadata, userID uint) (*[]Transaction, error)
+	FindAllByDoctorID(metadata *entities.Metadata, doctorID uint) (*[]Transaction, error)
 	Update(transaction *Transaction) (*Transaction, error)
 	Delete(ID uint) error
+	CountTransactionByDoctorID(doctorID uint) (int, error)
 }
 
 type TransactionUseCase interface {
@@ -17,7 +19,9 @@ type TransactionUseCase interface {
 	ConfirmedPayment(id string, transactionStatus string) (*Transaction, error)
 	FindByID(ID string) (*Transaction, error)
 	FindByConsultationID(consultationID uint) (*Transaction, error)
-	FindAll(metadata *entities.Metadata, userID uint) (*[]Transaction, error)
+	FindAllByUserID(metadata *entities.Metadata, userID uint) (*[]Transaction, error)
+	FindAllByDoctorID(metadata *entities.Metadata, doctorID uint) (*[]Transaction, error)
 	Update(transaction *Transaction) (*Transaction, error)
 	Delete(ID uint) error
+	CountTransactionByDoctorID(doctorID uint) (int, error)
 }
