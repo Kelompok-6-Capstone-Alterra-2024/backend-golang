@@ -1,6 +1,7 @@
 package consultation
 
 import (
+	"capstone/constants"
 	"capstone/entities"
 	consultationEntities "capstone/entities/consultation"
 	"github.com/go-playground/validator/v10"
@@ -14,6 +15,7 @@ type ConsultationUseCase struct {
 func NewConsultationUseCase(consultationRepo consultationEntities.ConsultationRepository, validate *validator.Validate) consultationEntities.ConsultationUseCase {
 	return &ConsultationUseCase{
 		consultationRepo: consultationRepo,
+		validate:         validate,
 	}
 }
 
@@ -81,6 +83,27 @@ func (usecase *ConsultationUseCase) CountConsultationByStatus(doctorID int, stat
 	result, err := usecase.consultationRepo.CountConsultationByStatus(doctorID, status)
 	if err != nil {
 		return 0, err
+	}
+	return result, nil
+}
+
+func (usecase *ConsultationUseCase) CreateConsultationNotes(consultationNotes consultationEntities.ConsultationNotes) (consultationEntities.ConsultationNotes, error) {
+	if consultationNotes.ConsultationID == 0 {
+		return consultationEntities.ConsultationNotes{}, constants.ErrInvalidConsultationID
+	}
+
+	result, err := usecase.consultationRepo.CreateConsultationNotes(consultationNotes)
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
+func (usecase *ConsultationUseCase) GetConsultationNotesByID(consultationID int) (consultationEntities.ConsultationNotes, error) {
+	result, err := usecase.consultationRepo.GetConsultationNotesByID(consultationID)
+	if err != nil {
+		return result, err
 	}
 	return result, nil
 }

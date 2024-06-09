@@ -5,6 +5,8 @@ import (
 	"capstone/entities"
 	"capstone/entities/complaint"
 	"capstone/entities/doctor"
+	"capstone/entities/forum"
+	"capstone/entities/music"
 	"capstone/entities/user"
 	"time"
 )
@@ -24,6 +26,20 @@ type Consultation struct {
 	Time          time.Time `validate:"required"`
 }
 
+type ConsultationNotes struct {
+	ID              uint
+	ConsultationID  uint
+	Consultation    Consultation
+	MusicID         uint
+	Music           music.Music
+	ForumID         uint
+	Forum           forum.Forum
+	MainPoint       string
+	NextStep        string
+	AdditionalNote  string
+	MoodTrackerNote string
+}
+
 type ConsultationRepository interface {
 	CreateConsultation(consultation *Consultation) (*Consultation, error)
 	GetConsultationByID(consultationID int) (*Consultation, error)
@@ -33,6 +49,8 @@ type ConsultationRepository interface {
 	CountConsultationByStatus(doctorID int, status string) (int64, error)
 	CountConsultationToday(doctorID int) (int64, error)
 	CountConsultationByDoctorID(doctorID int) (int64, error)
+	CreateConsultationNotes(consultationNotes ConsultationNotes) (ConsultationNotes, error)
+	GetConsultationNotesByID(consultationID int) (ConsultationNotes, error)
 }
 
 type ConsultationUseCase interface {
@@ -44,6 +62,8 @@ type ConsultationUseCase interface {
 	CountConsultationByDoctorID(doctorID int) (int64, error)
 	CountConsultationToday(doctorID int) (int64, error)
 	CountConsultationByStatus(doctorID int, status string) (int64, error)
+	CreateConsultationNotes(consultationNotes ConsultationNotes) (ConsultationNotes, error)
+	GetConsultationNotesByID(consultationID int) (ConsultationNotes, error)
 }
 
 func (r *Consultation) ToUserResponse() *response.ConsultationUserResponse {

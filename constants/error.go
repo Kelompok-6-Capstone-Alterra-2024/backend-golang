@@ -65,3 +65,7 @@ var ErrEmptyInputMusic error = errors.New("title or singer cannot be empty")
 var ErrEmptyInputStory error = errors.New("title or content cannot be empty")
 
 var ErrInputTime error = errors.New("invalid time format")
+
+var ErrInvalidConsultationID error = errors.New("invalid consultation id")
+
+var ErrEmptyCreateForum error = errors.New("name, description, or image cannot be empty")

@@ -96,12 +96,13 @@ func (userRepo *UserRepo) Login(user *userEntities.User) (userEntities.User, err
 	return userResult, nil
 }
 
-func (r *UserRepo) Create(email string, picture string, name string) (userEntities.User ,error) {
+func (r *UserRepo) Create(email string, picture string, name string, username string) (userEntities.User ,error) {
 	var userDB User
 	userDB.Email = email
 	userDB.ProfilePicture = picture
 	userDB.Name = name
 	userDB.IsOauth = true
+	userDB.Username = username
     
 	err := r.DB.Create(&userDB).Error
 	if err != nil {
@@ -136,4 +137,13 @@ func (r *UserRepo) OauthFindByEmail(email string) (userEntities.User, int, error
 	userEnt.IsOauth = userDB.IsOauth
 
     return userEnt, 0, nil
+}
+
+func (r *UserRepo) GetPointsByUserId(id int) (int, error) {
+	var userDB User
+	if err := r.DB.Where("id = ?", id).First(&userDB).Error; err != nil {
+		return 0, err
+	}
+
+	return userDB.Points, nil
 }

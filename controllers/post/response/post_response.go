@@ -1,10 +1,11 @@
 package response
 
 type PostResponse struct {
-	ID       uint             `json:"id"`
-	Content  string           `json:"content"`
-	ImageUrl string           `json:"image_url"`
-	User     UserPostResponse `json:"user"`
+	ID               uint             `json:"id"`
+	Content          string           `json:"content"`
+	ImageUrl         string           `json:"image_url"`
+	NumberOfComments int              `json:"total_comments"`
+	User             UserPostResponse `json:"user"`
 }
 
 type PostCreateResponse struct {

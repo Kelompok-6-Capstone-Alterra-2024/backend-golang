@@ -4,9 +4,12 @@ import (
 	"capstone/entities/consultation"
 	"capstone/repositories/mysql/complaint"
 	"capstone/repositories/mysql/doctor"
+	"capstone/repositories/mysql/forum"
+	"capstone/repositories/mysql/music"
 	"capstone/repositories/mysql/user"
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Consultation struct {
@@ -15,7 +18,7 @@ type Consultation struct {
 	Doctor        doctor.Doctor       `gorm:"foreignKey:doctor_id;references:id"`
 	UserID        uint                `gorm:"column:user_id;not null"`
 	User          user.User           `gorm:"foreignKey:user_id;references:id"`
-	ComplaintID   int                 `gorm:"column:complaint_id;unique;default:NULL"`
+	ComplaintID   uint                `gorm:"column:complaint_id;unique;default:NULL"`
 	Complaint     complaint.Complaint `gorm:"foreignKey:complaint_id;references:id"`
 	Status        string              `gorm:"column:status;not null;default:'pending';type:enum('pending', 'rejected', 'incoming', 'active', 'done')"`
 	PaymentStatus string              `gorm:"column:payment_status;not null;type:enum('pending', 'paid', 'canceled');default:'pending'"`
@@ -25,11 +28,27 @@ type Consultation struct {
 	Time          string              `gorm:"column:time;type:time(3);not null"`
 }
 
+type ConstultationNotes struct {
+	gorm.Model
+	ConsultationID  uint         `gorm:"column:consultation_id;unique;not null"`
+	Consultation    Consultation `gorm:"foreignKey:consultation_id;references:id"`
+	MusicID         uint         `gorm:"column:music_id;default:NULL"`
+	Music           music.Music  `gorm:"foreignKey:music_id;references:id"`
+	ForumID         uint         `gorm:"column:forum_id;default:NULL"`
+	Forum           forum.Forum  `gorm:"foreignKey:forum_id;references:id"`
+	MainPoint       string       `gorm:"column:main_point;default:NULL"`
+	NextStep        string       `gorm:"column:next_step;default:NULL"`
+	AdditionalNote  string       `gorm:"column:additional_note;default:NULL"`
+	MoodTrackerNote string       `gorm:"column:mood_tracker_note;default:NULL"`
+}
+
 func (receiver Consultation) ToEntities() (*consultation.Consultation, error) {
+
 	consultationTime, err := time.Parse("15:04:05.000", receiver.Time)
 	if err != nil {
 		return nil, err
 	}
+
 	return &consultation.Consultation{
 		ID:            receiver.ID,
 		DoctorID:      receiver.DoctorID,

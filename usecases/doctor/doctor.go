@@ -5,6 +5,7 @@ import (
 	"capstone/entities"
 	doctorEntities "capstone/entities/doctor"
 	"capstone/middlewares"
+	"capstone/utilities"
 	"context"
 
 	"golang.org/x/crypto/bcrypt"
@@ -111,7 +112,10 @@ func (u *DoctorUseCase) HandleGoogleCallback(ctx context.Context, code string) (
     // Cek apakah pengguna sudah ada di database
 	result, myCode, err := u.doctorRepository.OauthFindByEmail(userInfo.Email)
     if err != nil && myCode == 0 {
-        newUser, err := u.doctorRepository.Create(userInfo.Email, userInfo.Picture, userInfo.Name)
+
+		username := utilities.GetFirstNameWithNumbers(userInfo.Name)
+
+        newUser, err := u.doctorRepository.Create(userInfo.Email, userInfo.Picture, userInfo.Name, username)
 		if err != nil {
             return doctorEntities.Doctor{}, constants.ErrInsertOAuth
         }
