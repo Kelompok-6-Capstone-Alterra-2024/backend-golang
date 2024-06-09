@@ -109,3 +109,32 @@ func (storiesUseCase *StoryUseCase) GetAllStoriesByDoctorId(metadata entities.Me
 	}
 	return stories, nil
 }
+
+func (storiesUseCase *StoryUseCase) EditStory(story storyEntities.Story, file *multipart.FileHeader) (storyEntities.Story, error) {
+	if story.Title == "" || story.Content == "" {
+		return storyEntities.Story{}, constants.ErrEmptyInputStory
+	}
+	if file != nil {
+		secureUrl, err := utilities.UploadImage(file)
+		if err != nil {
+			return storyEntities.Story{}, constants.ErrUploadImage
+		}
+		story.ImageUrl = secureUrl
+	}else{
+		story.ImageUrl = ""
+	}
+
+	story, err := storiesUseCase.storyRepository.EditStory(story)
+	if err != nil {
+		return storyEntities.Story{}, err
+	}
+	return story, nil
+}
+
+func (storiesUseCase *StoryUseCase) DeleteStory(storyId int) error {
+	err := storiesUseCase.storyRepository.DeleteStory(storyId)
+	if err != nil {
+		return err
+	}
+	return nil
+}

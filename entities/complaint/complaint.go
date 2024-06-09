@@ -21,6 +21,7 @@ func (r *Complaint) ToResponse() *response.ComplaintResponse {
 		Name:           r.Name,
 		Age:            r.Age,
 		Gender:         r.Gender,
+		Message:        r.Message,
 		MedicalHistory: r.MedicalHistory,
 	}
 }

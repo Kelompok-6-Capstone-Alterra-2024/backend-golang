@@ -37,7 +37,7 @@ type DoctorRepositoryInterface interface {
 	GetDoctorByID(doctorID int) (*Doctor, error)
 	GetAllDoctor(metadata *entities.Metadata) (*[]Doctor, error)
 	GetActiveDoctor(metadata *entities.Metadata) (*[]Doctor, error)
-	Create(email string, picture string, name string) (Doctor, error)
+	Create(email string, picture string, name string, username string) (Doctor, error)
 	OauthFindByEmail(email string) (Doctor, int, error)
 }
 

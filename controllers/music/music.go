@@ -266,3 +266,53 @@ func (musicController *MusicController) GetMusicByIdForDoctor(c echo.Context) er
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Music By Id", resp))
 }
+
+func (musicController *MusicController) EditMusic(c echo.Context) error {
+	musicId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	var req request.StoryEditRequest
+	err = c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	file, _ := c.FormFile("image")
+
+	musicEnt := musicEntities.Music{
+		Id:       uint(musicId),
+		Title:    req.Title,
+		Singer:   req.Singer,
+	}
+
+	music, err := musicController.musicUseCase.EditMusic(musicEnt, file)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var resp response.MusicGetDoctorResponse
+	resp.Id = music.Id
+	resp.Title = music.Title
+	resp.Singer = music.Singer
+	resp.MusicUrl = music.MusicUrl
+	resp.ImageUrl = music.ImageUrl
+	resp.ViewCount = music.ViewCount
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Edit Music", resp))
+}
+
+func (musicController *MusicController) DeleteMusic(c echo.Context) error {
+	musicId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	err = musicController.musicUseCase.DeleteMusic(musicId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Delete Music", nil))
+}

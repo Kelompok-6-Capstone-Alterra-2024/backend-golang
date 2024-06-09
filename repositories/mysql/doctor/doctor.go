@@ -90,12 +90,13 @@ func (repository *DoctorRepo) GetActiveDoctor(metadata *entities.Metadata) (*[]d
 	return &doctorsResponse, nil
 }
 
-func (r *DoctorRepo) Create(email string, picture string, name string) (doctorEntities.Doctor ,error) {
+func (r *DoctorRepo) Create(email string, picture string, name string, username string) (doctorEntities.Doctor ,error) {
 	var doctorDB Doctor
 	doctorDB.Email = email
 	doctorDB.ProfilePicture = picture
 	doctorDB.Name = name
 	doctorDB.IsOauth = true
+	doctorDB.Username = username
     
 	err := r.db.Create(&doctorDB).Error
 	if err != nil {

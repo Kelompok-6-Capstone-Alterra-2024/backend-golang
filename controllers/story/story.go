@@ -279,3 +279,53 @@ func (storyController *StoryController) GetAllStoriesByDoctorId(c echo.Context) 
 
 	return c.JSON(http.StatusOK, base.NewMetadataFullSuccessResponse("Success Get All Stories By Doctor Id", metadata, storyResp))
 }
+
+func (storyController *StoryController) EditStory(c echo.Context) error {
+	storyId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	var req request.StoryPostRequest
+	err = c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	file, _ := c.FormFile("image")
+
+	storyEnt := storyEntities.Story{
+		Id:       uint(storyId),
+		Title:    req.Title,
+		Content:  req.Content,
+	}
+
+	story, err := storyController.storyUseCase.EditStory(storyEnt, file)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var resp response.StoriesGetDoctorResponse
+	resp.ID = int(story.Id)
+	resp.Title = story.Title
+	resp.Content = story.Content
+	resp.Date = story.Date
+	resp.ImageUrl = story.ImageUrl
+	resp.ViewCount = story.ViewCount
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Edit Story", resp))
+}
+
+func (storyController *StoryController) DeleteStory(c echo.Context) error {
+	storyId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	err = storyController.storyUseCase.DeleteStory(storyId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Delete Story", nil))
+}

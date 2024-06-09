@@ -2,6 +2,7 @@ package rating
 
 import (
 	"capstone/constants"
+	"capstone/entities"
 	ratingEntities "capstone/entities/rating"
 )
 
@@ -21,6 +22,22 @@ func (ratingUseCase *RatingUseCase) SendFeedback(rating ratingEntities.Rating) (
 	}
 	
 	result, err := ratingUseCase.ratingRepository.SendFeedback(rating)
+	if err != nil {
+		return ratingEntities.Rating{}, err
+	}
+	return result, nil
+}
+
+func (ratingUseCase *RatingUseCase) GetAllFeedbacks(metadata entities.Metadata, doctorId uint) ([]ratingEntities.Rating, error) {
+	result, err := ratingUseCase.ratingRepository.GetAllFeedbacks(metadata, doctorId)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (ratingUseCase *RatingUseCase) GetSummaryRating(doctorId uint) (ratingEntities.Rating, error) {
+	result, err := ratingUseCase.ratingRepository.GetSummaryRating(doctorId)
 	if err != nil {
 		return ratingEntities.Rating{}, err
 	}
