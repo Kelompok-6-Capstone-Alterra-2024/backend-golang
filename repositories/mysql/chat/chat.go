@@ -27,7 +27,7 @@ func (c *ChatRepo) CreateChatRoom(consultationId uint) (error) {
 	return c.db.Create(&newChat).Error
 }
 
-func (c *ChatRepo) GetAllChatByUserId(userId int, metadata entities.Metadata, status string) ([]chatEntities.Chat, error) {
+func (c *ChatRepo) GetAllChatByUserId(userId int, metadata entities.Metadata, status string, search string) ([]chatEntities.Chat, error) {
 	var consultationDB []consultation.Consultation
 
 	query := c.db.Where("user_id = ?", userId)
@@ -52,7 +52,17 @@ func (c *ChatRepo) GetAllChatByUserId(userId int, metadata entities.Metadata, st
 
 	var chatDB []Chat
 
-	err = c.db.Preload("Consultation").Preload("Consultation.Doctor").Where("consultation_id IN ?", consultationIds).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&chatDB).Error
+	query = c.db.Preload("Consultation").Preload("Consultation.Doctor")
+	if search != "" {
+		query = query.Joins("JOIN consultations ON consultations.id = chats.consultation_id").
+			Joins("JOIN doctors ON doctors.id = consultations.doctor_id").
+			Where("consultations.id IN ?", consultationIds).
+			Where("doctors.name LIKE ?", "%"+search+"%")
+	} else {
+		query = query.Where("consultation_id IN ?", consultationIds)
+	}
+
+	err = query.Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&chatDB).Error
 	if err != nil {
 		return nil, err
 	}
@@ -104,8 +114,7 @@ func (c *ChatRepo) GetAllChatByUserId(userId int, metadata entities.Metadata, st
 	return chatEnts, nil
 }
 
-func (c *ChatRepo) GetAllChatByDoctorId(doctorId int, metadata entities.Metadata, status string) ([]chatEntities.Chat, error) {
-	
+func (c *ChatRepo) GetAllChatByDoctorId(doctorId int, metadata entities.Metadata, status string, search string) ([]chatEntities.Chat, error) {
 	var consultationDB []consultation.Consultation
 
 	query := c.db.Where("doctor_id = ?", doctorId)
@@ -130,7 +139,18 @@ func (c *ChatRepo) GetAllChatByDoctorId(doctorId int, metadata entities.Metadata
 
 	var chatDB []Chat
 
-	if err := c.db.Preload("Consultation").Preload("Consultation.User").Where("consultation_id IN ?", consultationIds).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&chatDB).Error; err != nil {
+	query = c.db.Preload("Consultation").Preload("Consultation.User")
+	if search != "" {
+		query = query.Joins("JOIN consultations ON consultations.id = chats.consultation_id").
+			Joins("JOIN users ON users.id = consultations.user_id").
+			Where("consultations.id IN ?", consultationIds).
+			Where("users.name LIKE ?", "%"+search+"%")
+	} else {
+		query = query.Where("consultation_id IN ?", consultationIds)
+	}
+
+	err = query.Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&chatDB).Error
+	if err != nil {
 		return nil, err
 	}
 

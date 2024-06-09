@@ -17,16 +17,16 @@ func NewChatUseCase(chatInterface chatEntities.RepositoryInterface) *ChatUseCase
 	}
 }
 
-func (chatUseCase *ChatUseCase) GetAllChatByUserId(userId int, metadata entities.Metadata, status string) ([]chatEntities.Chat, error) {
-	chats, err := chatUseCase.chatInterface.GetAllChatByUserId(userId, metadata, status)
+func (chatUseCase *ChatUseCase) GetAllChatByUserId(userId int, metadata entities.Metadata, status string, search string) ([]chatEntities.Chat, error) {
+	chats, err := chatUseCase.chatInterface.GetAllChatByUserId(userId, metadata, status, search)
 	if err != nil {
 		return nil, err
 	}
 	return chats, nil
 }
 
-func (chatUseCase *ChatUseCase) GetAllChatByDoctorId(doctorId int, metadata entities.Metadata, status string) ([]chatEntities.Chat, error) {
-	chats, err := chatUseCase.chatInterface.GetAllChatByDoctorId(doctorId, metadata, status)
+func (chatUseCase *ChatUseCase) GetAllChatByDoctorId(doctorId int, metadata entities.Metadata, status string, search string) ([]chatEntities.Chat, error) {
+	chats, err := chatUseCase.chatInterface.GetAllChatByDoctorId(doctorId, metadata, status, search)
 	if err != nil {
 		return nil, err
 	}
