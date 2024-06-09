@@ -80,7 +80,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	// chatbot
 	e.GET("/v1/users/chatbots/customer-service", r.chatbotController.ChatbotCS)        //customer service chatbot
 	e.GET("/v1/users/chatbots/mental-health", r.chatbotController.ChatbotMentalHealth) //mental health chatbot
-	e.GET("/v1/doctors/chatbots/treatment", r.chatbotController.ChatbotTreatment) //Chatbot Treatment
+	e.GET("/v1/doctors/chatbots/treatment", r.chatbotController.ChatbotTreatment)      //Chatbot Treatment
 
 	userAuth := e.Group("/v1/users")
 	userAuth.POST("/register", r.userController.Register) //Register User
@@ -173,40 +173,52 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("articles", r.articleController.GetAllArticle)  // Get All Article
 
 	// musics
-	doctorRoute.POST("musics", r.musicController.PostMusic)                    // Post Music
-	doctorRoute.GET("musics", r.musicController.GetAllMusicsByDoctorId)         // Get All Music By Doctor ID
-	doctorRoute.GET("musics/:id", r.musicController.GetMusicByIdForDoctor)              // Get Music By ID
-	doctorRoute.GET("musics/count", r.musicController.CountMusicByDoctorId) // Count Music By Doctor ID
-	doctorRoute.GET("musics/like/count", r.musicController.CountMusicLikesByDoctorId) // Count Music Likes By Doctor ID
+	doctorRoute.POST("musics", r.musicController.PostMusic)                               // Post Music
+	doctorRoute.GET("musics", r.musicController.GetAllMusicsByDoctorId)                   // Get All Music By Doctor ID
+	doctorRoute.GET("musics/:id", r.musicController.GetMusicByIdForDoctor)                // Get Music By ID
+	doctorRoute.GET("musics/count", r.musicController.CountMusicByDoctorId)               // Count Music By Doctor ID
+	doctorRoute.GET("musics/like/count", r.musicController.CountMusicLikesByDoctorId)     // Count Music Likes By Doctor ID
 	doctorRoute.GET("musics/view/count", r.musicController.CountMusicViewCountByDoctorId) // Count Music View Count By Doctor ID
-	doctorRoute.PUT("musics/:id", r.musicController.EditMusic)              // Update Music
-	doctorRoute.DELETE("musics/:id", r.musicController.DeleteMusic)          // Delete Music
+	doctorRoute.PUT("musics/:id", r.musicController.EditMusic)                            // Update Music
+	doctorRoute.DELETE("musics/:id", r.musicController.DeleteMusic)                       // Delete Music
 
-	doctorRoute.POST("stories", r.storyController.PostStory)                    // Post Story
-	doctorRoute.GET("stories", r.storyController.GetAllStoriesByDoctorId)         // Get All Story By Doctor ID
-	doctorRoute.GET("stories/:id", r.storyController.GetStoryByIdForDoctor)         // Get Story By ID
-	doctorRoute.GET("stories/count", r.storyController.CountStoriesByDoctorId) // Count Stories By Doctor ID
+	doctorRoute.POST("stories", r.storyController.PostStory)                           // Post Story
+	doctorRoute.GET("stories", r.storyController.GetAllStoriesByDoctorId)              // Get All Story By Doctor ID
+	doctorRoute.GET("stories/:id", r.storyController.GetStoryByIdForDoctor)            // Get Story By ID
+	doctorRoute.GET("stories/count", r.storyController.CountStoriesByDoctorId)         // Count Stories By Doctor ID
 	doctorRoute.GET("stories/like/count", r.storyController.CountStoryLikesByDoctorId) // Count Stories Likes By Doctor ID
+
 	doctorRoute.GET("stories/view/count", r.storyController.CountStoryViewByDoctorId) // Count Stories View Count By Doctor ID
-	doctorRoute.PUT("stories/:id", r.storyController.EditStory)              // Update Story
-	doctorRoute.DELETE("stories/:id", r.storyController.DeleteStory)          // Delete Story
+	doctorRoute.PUT("stories/:id", r.storyController.EditStory)                       // Update Story
+	doctorRoute.DELETE("stories/:id", r.storyController.DeleteStory)                  // Delete Story
+
+	// Consultation
+	doctorRoute.GET("consultations", r.consultationController.GetAllDoctorConsultation) //Get All Consultation
+	doctorRoute.GET("consultations/count", r.consultationController.CountConsultationByDoctorID)
+	doctorRoute.GET("consultations/today/count", r.consultationController.CountConsultationToday)
+	doctorRoute.GET("consultations/:id", r.consultationController.GetConsultationByID)  //Get Consultation By ID
+	doctorRoute.PUT("consultations", r.consultationController.UpdateStatusConsultation) // Update Status Consultation
+
+	doctorRoute.GET("stories/view/count", r.storyController.CountStoryViewByDoctorId) // Count Stories View Count By Doctor ID
+	doctorRoute.PUT("stories/:id", r.storyController.EditStory)                       // Update Story
+	doctorRoute.DELETE("stories/:id", r.storyController.DeleteStory)                  // Delete Story
 
 	// consultation notes
 	doctorRoute.POST("consultation-notes", r.consultationController.CreateConsultationNotes) // Post Consultation Note
 
 	// Rating
 	doctorRoute.GET("feedbacks", r.ratingController.GetAllFeedbacks) // Get All Feedbacks
-	doctorRoute.GET("ratings", r.ratingController.GetSummaryRating) // Get Summary Rating
+	doctorRoute.GET("ratings", r.ratingController.GetSummaryRating)  // Get Summary Rating
 
 	// Forum
-	doctorRoute.POST("forums", r.forumController.CreateForum) // Create Forum
-	doctorRoute.GET("forums", r.forumController.GetAllForumsByDoctorId) // Get All Forum By Doctor ID
-	doctorRoute.PUT("forums/:id", r.forumController.UpdateForum) // Update Forum
-	doctorRoute.DELETE("forums/:id", r.forumController.DeleteForum) // Delete Forum
-	doctorRoute.GET("forums/:id", r.forumController.GetForumById) // Get Forum By ID
+	doctorRoute.POST("forums", r.forumController.CreateForum)                             // Create Forum
+	doctorRoute.GET("forums", r.forumController.GetAllForumsByDoctorId)                   // Get All Forum By Doctor ID
+	doctorRoute.PUT("forums/:id", r.forumController.UpdateForum)                          // Update Forum
+	doctorRoute.DELETE("forums/:id", r.forumController.DeleteForum)                       // Delete Forum
+	doctorRoute.GET("forums/:id", r.forumController.GetForumById)                         // Get Forum By ID
 	doctorRoute.GET("forums/:forumId/members", r.forumController.GetForumMemberByForumId) // Get Members By Forum ID
 
 	// Post
-	doctorRoute.GET("forums/:forumId/posts", r.postController.GetAllPostsByForumId) // Get All Posts By Forum ID
+	doctorRoute.GET("forums/:forumId/posts", r.postController.GetAllPostsByForumId)   // Get All Posts By Forum ID
 	doctorRoute.GET("posts/:postId/comments", r.postController.GetAllCommentByPostId) // Get All Comment By Post ID
 }

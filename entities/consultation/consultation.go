@@ -13,29 +13,30 @@ import (
 
 type Consultation struct {
 	ID            uint
-	DoctorID      uint
+	DoctorID      uint `validate:"required"`
 	Doctor        *doctor.Doctor
-	UserID        int
+	UserID        uint
 	User          user.User
 	Complaint     complaint.Complaint
 	Status        string
 	PaymentStatus string
 	IsAccepted    bool
 	IsActive      bool
-	Date          time.Time
+	Date          time.Time `validate:"required"`
+	Time          time.Time `validate:"required"`
 }
 
 type ConsultationNotes struct {
-	ID        uint
-	ConsultationID uint
-	Consultation   Consultation
-	MusicID   uint
-	Music     music.Music
-	ForumID   uint
-	Forum     forum.Forum
-	MainPoint string
-	NextStep  string
-	AdditionalNote string
+	ID              uint
+	ConsultationID  uint
+	Consultation    Consultation
+	MusicID         uint
+	Music           music.Music
+	ForumID         uint
+	Forum           forum.Forum
+	MainPoint       string
+	NextStep        string
+	AdditionalNote  string
 	MoodTrackerNote string
 }
 
@@ -45,6 +46,9 @@ type ConsultationRepository interface {
 	GetAllUserConsultation(metadata *entities.Metadata, userID int) (*[]Consultation, error)
 	UpdateStatusConsultation(consultation *Consultation) (*Consultation, error)
 	GetAllDoctorConsultation(metadata *entities.Metadata, doctorID int) (*[]Consultation, error)
+	CountConsultationByStatus(doctorID int, status string) (int64, error)
+	CountConsultationToday(doctorID int) (int64, error)
+	CountConsultationByDoctorID(doctorID int) (int64, error)
 	CreateConsultationNotes(consultationNotes ConsultationNotes) (ConsultationNotes, error)
 	GetConsultationNotesByID(consultationID int) (ConsultationNotes, error)
 }
@@ -55,6 +59,9 @@ type ConsultationUseCase interface {
 	GetAllUserConsultation(metadata *entities.Metadata, userID int) (*[]Consultation, error)
 	UpdateStatusConsultation(consultation *Consultation) (*Consultation, error)
 	GetAllDoctorConsultation(metadata *entities.Metadata, doctorID int) (*[]Consultation, error)
+	CountConsultationByDoctorID(doctorID int) (int64, error)
+	CountConsultationToday(doctorID int) (int64, error)
+	CountConsultationByStatus(doctorID int, status string) (int64, error)
 	CreateConsultationNotes(consultationNotes ConsultationNotes) (ConsultationNotes, error)
 	GetConsultationNotesByID(consultationID int) (ConsultationNotes, error)
 }
@@ -67,7 +74,8 @@ func (r *Consultation) ToUserResponse() *response.ConsultationUserResponse {
 		PaymentStatus: r.PaymentStatus,
 		IsAccepted:    r.IsAccepted,
 		IsActive:      r.IsActive,
-		Date:          r.Date,
+		Date:          r.Date.Format("2006-01-02"),
+		Time:          r.Time.Format("15:04"),
 	}
 }
 
@@ -78,7 +86,8 @@ func (r *Consultation) ToDoctorResponse() *response.ConsultationDoctorResponse {
 		PaymentStatus: r.PaymentStatus,
 		IsAccepted:    r.IsAccepted,
 		IsActive:      r.IsActive,
-		Date:          r.Date,
+		Date:          r.Date.Format("2006-01-02"),
+		Time:          r.Time.Format("15:04"),
 		Complaint:     r.Complaint.ToResponse(),
 	}
 }
