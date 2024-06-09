@@ -18,8 +18,8 @@ func NewStoryUseCase(storyRepository storyEntities.RepositoryInterface) *StoryUs
 	}
 }
 
-func (storiesUseCase *StoryUseCase) GetAllStories(metadata entities.Metadata, userId int) ([]storyEntities.Story, error) {
-	stories, err := storiesUseCase.storyRepository.GetAllStories(metadata, userId)
+func (storiesUseCase *StoryUseCase) GetAllStories(metadata entities.Metadata, userId int, search string) ([]storyEntities.Story, error) {
+	stories, err := storiesUseCase.storyRepository.GetAllStories(metadata, userId, search)
 	if err != nil {
 		return []storyEntities.Story{}, err
 	}
