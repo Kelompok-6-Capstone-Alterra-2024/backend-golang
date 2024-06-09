@@ -71,3 +71,13 @@ var ErrInvalidConsultationID error = errors.New("invalid consultation id")
 var ErrEmptyCreateForum error = errors.New("name, description, or image cannot be empty")
 
 var ErrEmptyChat error = errors.New("chat id or message cannot be empty")
+
+var ErrEmptyInputEmailOTP error = errors.New("email cannot be empty")
+
+var ErrEmptyInputVerifyOTP error = errors.New("email or code cannot be empty")
+
+var ErrInvalidOTP error = errors.New("invalid otp")
+
+var ErrExpiredOTP error = errors.New("expired otp")
+
+var ErrEmptyResetPassword error = errors.New("new password cannot be empty")

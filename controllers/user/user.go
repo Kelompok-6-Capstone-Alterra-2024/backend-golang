@@ -96,3 +96,16 @@ func (c *UserController) GetPointsByUserId(ctx echo.Context) error {
 	res.Points = points
 	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Points", res))
 }
+
+func (c *UserController) ResetPassword(ctx echo.Context) error {
+	var req request.ResetPasswordRequest
+	if err := ctx.Bind(&req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	err := c.userUseCase.ResetPassword(req.Email, req.Password)
+	if err != nil {
+		return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Reset Password", nil))
+}

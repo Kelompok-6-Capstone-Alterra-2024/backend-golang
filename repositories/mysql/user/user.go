@@ -147,3 +147,11 @@ func (r *UserRepo) GetPointsByUserId(id int) (int, error) {
 
 	return userDB.Points, nil
 }
+
+func (r *UserRepo) ResetPassword(email string, password string) error {
+	err := r.DB.Model(&User{}).Where("email = ?", email).Update("password", password).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

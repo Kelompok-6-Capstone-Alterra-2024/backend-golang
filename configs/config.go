@@ -58,3 +58,11 @@ func InitConfigCloudinary() string {
 func InitConfigKeyChatbot() string {
 	return os.Getenv("AI_KEY")
 }
+
+func InitConfigMyEmail() string {
+	return os.Getenv("MY_EMAIL")
+}
+
+func InitConfigAppPassword() string {
+	return os.Getenv("APP_PASSWORD")
+}
