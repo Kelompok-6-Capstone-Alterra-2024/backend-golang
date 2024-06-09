@@ -40,7 +40,6 @@ func ToTransactionModel(transaction *transaction.Transaction) *Transaction {
 		ID:             transaction.ID,
 		Model:          gorm.Model{CreatedAt: transaction.CreatedAt, UpdatedAt: transaction.UpdatedAt},
 		ConsultationID: transaction.ConsultationID,
-		Consultation:   *consultation.ToConsultationModel(&transaction.Consultation),
 		Price:          transaction.Price,
 		PaymentType:    transaction.PaymentType,
 		PaymentLink:    transaction.PaymentLink,

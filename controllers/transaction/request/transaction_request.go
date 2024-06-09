@@ -6,8 +6,8 @@ import (
 )
 
 type TransactionRequest struct {
-	ConsultationID uint `json:"consultation_id" binding:"required"`
-	Price          int  `json:"price" binding:"required"`
+	ConsultationID uint `json:"consultation_id" binding:"required" validate:"required"`
+	Price          int  `json:"price" binding:"required" validate:"required"`
 	Bank           string
 	PaymentType    string
 }
