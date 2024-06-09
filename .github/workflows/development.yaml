@@ -4,7 +4,7 @@
 name: Deploy on Dev
 
 on:
-  pull_request:
+  push:
     branches: [ "development" ]
 
 jobs:
