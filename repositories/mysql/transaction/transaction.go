@@ -44,7 +44,7 @@ func (repository *TransactionRepo) FindByConsultationID(consultationID uint) (*t
 	return transactionDB.ToEntities(), nil
 }
 
-func (repository *TransactionRepo) FindAll(metadata *entities.Metadata, userID uint) (*[]transactionEntities.Transaction, error) {
+func (repository *TransactionRepo) FindAllByUserID(metadata *entities.Metadata, userID uint) (*[]transactionEntities.Transaction, error) {
 	transactionDB := new([]Transaction)
 	if err := repository.db.
 		Joins("JOIN consultations ON consultations.id = transactions.consultation_id").
@@ -75,4 +75,37 @@ func (repository *TransactionRepo) Update(transaction *transactionEntities.Trans
 func (repository *TransactionRepo) Delete(ID uint) error {
 	//TODO implement me
 	panic("implement me")
+}
+
+func (repository *TransactionRepo) FindAllByDoctorID(metadata *entities.Metadata, doctorID uint) (*[]transactionEntities.Transaction, error) {
+	transactionDB := new([]Transaction)
+	if err := repository.db.
+		Joins("JOIN consultations ON consultations.id = transactions.consultation_id").
+		Joins("JOIN doctors ON consultations.doctor_id = doctors.id").
+		Where("doctors.id LIKE ?", doctorID).
+		Preload("Consultation").
+		Preload("Consultation.User").
+		Limit(metadata.Limit).
+		Offset(metadata.Offset()).
+		Find(&transactionDB).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+	var transactions []transactionEntities.Transaction
+	for _, transaction := range *transactionDB {
+		transactions = append(transactions, *transaction.ToEntities())
+	}
+	return &transactions, nil
+}
+
+func (repository *TransactionRepo) CountTransactionByDoctorID(doctorID uint) (int, error) {
+	var count int64
+	if err := repository.db.
+		Model(&Transaction{}).
+		Joins("JOIN consultations ON consultations.id = transactions.consultation_id").
+		Joins("JOIN doctors ON consultations.doctor_id = doctors.id").
+		Where("doctors.id LIKE ?", doctorID).
+		Count(&count).Error; err != nil {
+		return 0, constants.ErrDataNotFound
+	}
+	return int(count), nil
 }

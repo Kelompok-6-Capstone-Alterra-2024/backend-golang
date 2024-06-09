@@ -67,7 +67,7 @@ func (controller *TransactionController) FindAll(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
 
-	transactions, err := controller.transactionUseCase.FindAll(metadata, uint(userId))
+	transactions, err := controller.transactionUseCase.FindAllByUserID(metadata, uint(userId))
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
@@ -125,4 +125,40 @@ func (controller *TransactionController) CallbackTransaction(c echo.Context) err
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Payment confirmed", transaction.ToResponse()))
+}
+
+func (controller *TransactionController) CountTransactionByDoctorID(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	doctorId, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	count, err := controller.transactionUseCase.CountTransactionByDoctorID(uint(doctorId))
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Count transaction success", count))
+}
+
+func (controller *TransactionController) FindAllByDoctorID(c echo.Context) error {
+	pageParam := c.QueryParam("page")
+	limitParam := c.QueryParam("limit")
+
+	metadata := utilities.GetMetadata(pageParam, limitParam)
+	token := c.Request().Header.Get("Authorization")
+	doctorId, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	transactions, err := controller.transactionUseCase.FindAllByDoctorID(metadata, uint(doctorId))
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var transactionResponses []response.TransactionResponse
+	for _, transaction := range *transactions {
+		transactionResponses = append(transactionResponses, *transaction.ToResponse())
+	}
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Get all transaction success", transactionResponses))
 }
