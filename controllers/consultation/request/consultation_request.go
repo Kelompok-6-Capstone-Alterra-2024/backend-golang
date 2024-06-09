@@ -15,7 +15,7 @@ type ConsultationRequest struct {
 func (r ConsultationRequest) ToEntities(date, time time.Time) *consultation.Consultation {
 	return &consultation.Consultation{
 		DoctorID: r.DoctorID,
-		UserID:   r.UserID,
+		UserID:   uint(r.UserID),
 		Date:     date,
 		Time:     time,
 	}

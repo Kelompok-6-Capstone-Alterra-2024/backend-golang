@@ -13,7 +13,7 @@ type Consultation struct {
 	gorm.Model
 	DoctorID      uint                `gorm:"column:doctor_id;not null"`
 	Doctor        doctor.Doctor       `gorm:"foreignKey:doctor_id;references:id"`
-	UserID        int                 `gorm:"column:user_id;not null"`
+	UserID        uint                `gorm:"column:user_id;not null"`
 	User          user.User           `gorm:"foreignKey:user_id;references:id"`
 	ComplaintID   int                 `gorm:"column:complaint_id;unique;default:NULL"`
 	Complaint     complaint.Complaint `gorm:"foreignKey:complaint_id;references:id"`

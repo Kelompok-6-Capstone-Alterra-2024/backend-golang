@@ -13,6 +13,7 @@ type Consultation struct {
 	ID            uint
 	DoctorID      uint `validate:"required"`
 	Doctor        *doctor.Doctor
+	UserID        uint
 	User          user.User
 	Complaint     complaint.Complaint
 	Status        string

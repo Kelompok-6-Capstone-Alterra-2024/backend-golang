@@ -11,7 +11,7 @@ type ConsultationUseCase struct {
 	validate         *validator.Validate
 }
 
-func NewConsultationUseCase(consultationRepo consultationEntities.ConsultationRepository, validate validator.Validate) consultationEntities.ConsultationUseCase {
+func NewConsultationUseCase(consultationRepo consultationEntities.ConsultationRepository, validate *validator.Validate) consultationEntities.ConsultationUseCase {
 	return &ConsultationUseCase{
 		consultationRepo: consultationRepo,
 	}

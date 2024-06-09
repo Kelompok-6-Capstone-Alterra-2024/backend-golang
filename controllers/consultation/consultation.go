@@ -45,18 +45,7 @@ func (controller *ConsultationController) CreateConsultation(c echo.Context) err
 
 func (controller *ConsultationController) GetConsultationByID(c echo.Context) error {
 	consultationID, err := strconv.Atoi(c.Param("id"))
-	token := c.Request().Header.Get("Authorization")
-	userId, err := utilities.GetUserIdFromToken(token)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
-	}
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("Invalid ID"))
-	}
 	consultationResponse, err := controller.consultationUseCase.GetConsultationByID(consultationID)
-	if userId != consultationResponse.UserID {
-		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse("Unauthorized"))
-	}
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
