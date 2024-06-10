@@ -1,13 +1,12 @@
 package utilities
 
 import (
-	"capstone/configs"
 	"log"
 	"net/smtp"
 )
 
 func SendEmail(to string, otp string) error {
-	from := configs.InitConfigMyEmail()
+	from := "dikocesrt@gmail.com"
 	password := "otdl otda orgr ahzp"
 
 	// Konfigurasi SMTP server
