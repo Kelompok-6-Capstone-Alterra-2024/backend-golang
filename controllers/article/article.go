@@ -44,12 +44,16 @@ func (controller *ArticleController) CreateArticle(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, base.NewErrorResponse("Failed to upload image"))
 	}
 
+	wordCount := utilities.CountWords(newArticle.Content)
+	readTime := utilities.EstimateReadingTime(wordCount)
+
 	articleEntity := articleUseCase.Article{
-		Title:     newArticle.Title,
-		Content:   newArticle.Content,
-		ImageUrl:  imageURL,
-		DoctorID:  uint(userId),
-		ViewCount: 0,
+		Title:       newArticle.Title,
+		Content:     newArticle.Content,
+		ImageUrl:    imageURL,
+		DoctorID:    uint(userId),
+		ViewCount:   0,
+		ReadingTime: readTime,
 	}
 
 	createdArticle, err := controller.articleUseCase.CreateArticle(&articleEntity, userId)
@@ -58,13 +62,14 @@ func (controller *ArticleController) CreateArticle(c echo.Context) error {
 	}
 
 	articleResponse := response.ArticleCreatedResponse{
-		ID:        createdArticle.ID,
-		DoctorID:  createdArticle.DoctorID,
-		Title:     createdArticle.Title,
-		Content:   createdArticle.Content,
-		Date:      createdArticle.Date,
-		ImageUrl:  createdArticle.ImageUrl,
-		ViewCount: createdArticle.ViewCount,
+		ID:          createdArticle.ID,
+		DoctorID:    createdArticle.DoctorID,
+		Title:       createdArticle.Title,
+		Content:     createdArticle.Content,
+		Date:        createdArticle.Date,
+		ImageUrl:    createdArticle.ImageUrl,
+		ViewCount:   createdArticle.ViewCount,
+		ReadingTime: createdArticle.ReadingTime,
 		Doctor: response.DoctorInfoResponse{
 			ID:   createdArticle.Doctor.ID,
 			Name: createdArticle.Doctor.Name,
@@ -77,12 +82,14 @@ func (controller *ArticleController) GetAllArticle(c echo.Context) error {
 	pageParam := c.QueryParam("page")
 	limitParam := c.QueryParam("limit")
 
+	search := c.QueryParam("search")
+
 	metadata := utilities.GetMetadata(pageParam, limitParam)
 
 	token := c.Request().Header.Get("Authorization")
 	userId, _ := utilities.GetUserIdFromToken(token)
 
-	articles, err := controller.articleUseCase.GetAllArticle(*metadata, userId)
+	articles, err := controller.articleUseCase.GetAllArticle(*metadata, userId, search)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
@@ -108,14 +115,15 @@ func (controller *ArticleController) GetArticleById(c echo.Context) error {
 	}
 
 	articleResp := response.ArticleCreatedResponse{
-		ID:        article.ID,
-		DoctorID:  article.DoctorID,
-		Title:     article.Title,
-		Content:   article.Content,
-		Date:      article.Date,
-		ImageUrl:  article.ImageUrl,
-		ViewCount: article.ViewCount,
-		IsLiked:   article.IsLiked,
+		ID:          article.ID,
+		DoctorID:    article.DoctorID,
+		Title:       article.Title,
+		Content:     article.Content,
+		Date:        article.Date,
+		ImageUrl:    article.ImageUrl,
+		ViewCount:   article.ViewCount,
+		IsLiked:     article.IsLiked,
+		ReadingTime: article.ReadingTime,
 		Doctor: response.DoctorInfoResponse{
 			ID:   article.Doctor.ID,
 			Name: article.Doctor.Name,
@@ -142,14 +150,15 @@ func (controller *ArticleController) GetLikedArticle(c echo.Context) error {
 	articleResponse := make([]response.ArticleCreatedResponse, len(articles))
 	for i, article := range articles {
 		articleResponse[i] = response.ArticleCreatedResponse{
-			ID:        article.ID,
-			DoctorID:  article.DoctorID,
-			Title:     article.Title,
-			Content:   article.Content,
-			Date:      article.Date,
-			ImageUrl:  article.ImageUrl,
-			ViewCount: article.ViewCount,
-			IsLiked:   article.IsLiked,
+			ID:          article.ID,
+			DoctorID:    article.DoctorID,
+			Title:       article.Title,
+			Content:     article.Content,
+			Date:        article.Date,
+			ImageUrl:    article.ImageUrl,
+			ViewCount:   article.ViewCount,
+			IsLiked:     article.IsLiked,
+			ReadingTime: article.ReadingTime,
 			Doctor: response.DoctorInfoResponse{
 				ID:   article.Doctor.ID,
 				Name: article.Doctor.Name,
@@ -201,6 +210,7 @@ func (controller *ArticleController) GetArticleByIdForDoctor(c echo.Context) err
 	resp.Date = article.Date
 	resp.ImageUrl = article.ImageUrl
 	resp.ViewCount = article.ViewCount
+	resp.ReadingTime = article.ReadingTime
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Article For Doctor", resp))
 }
@@ -226,13 +236,14 @@ func (controller *ArticleController) GetAllArticleByDoctorId(c echo.Context) err
 
 	for i, article := range articles {
 		articleResp[i] = response.ArticleGetDoctorResponse{
-			ID:        article.ID,
-			DoctorID:  article.DoctorID,
-			Title:     article.Title,
-			Content:   article.Content,
-			Date:      article.Date,
-			ImageUrl:  article.ImageUrl,
-			ViewCount: article.ViewCount,
+			ID:          article.ID,
+			DoctorID:    article.DoctorID,
+			Title:       article.Title,
+			Content:     article.Content,
+			Date:        article.Date,
+			ImageUrl:    article.ImageUrl,
+			ViewCount:   article.ViewCount,
+			ReadingTime: article.ReadingTime,
 		}
 	}
 
@@ -319,6 +330,7 @@ func (controller *ArticleController) EditArticle(c echo.Context) error {
 	resp.Date = article.Date
 	resp.ImageUrl = article.ImageUrl
 	resp.ViewCount = article.ViewCount
+	resp.ReadingTime = article.ReadingTime
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Edit Article", resp))
 }

@@ -12,13 +12,14 @@ import (
 
 type Article struct {
 	gorm.Model
-	Title     string `gorm:"type:varchar(100);not null"`
-	Content   string `gorm:"type:text"`
-	Date      time.Time
-	ImageUrl  string        `gorm:"type:varchar(255)"`
-	ViewCount int           `gorm:"type:int"`
-	DoctorID  uint          `gorm:"type:int;not null"`
-	Doctor    doctor.Doctor `gorm:"foreignKey:doctor_id;references:id"`
+	Title       string `gorm:"type:varchar(100);not null"`
+	Content     string `gorm:"type:text"`
+	Date        time.Time
+	ImageUrl    string        `gorm:"type:varchar(255)"`
+	ViewCount   int           `gorm:"type:int"`
+	DoctorID    uint          `gorm:"type:int;not null"`
+	Doctor      doctor.Doctor `gorm:"foreignKey:doctor_id;references:id"`
+	ReadingTime int           `gorm:"type:int"`
 }
 
 type ArticleLikes struct {

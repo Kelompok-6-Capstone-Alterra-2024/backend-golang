@@ -40,27 +40,45 @@ func (f *ForumRepo) LeaveForum(forumId uint, userId uint) error {
 	return nil
 }
 
-func (f *ForumRepo) GetJoinedForum(userId uint, metadata entities.Metadata) ([]forum.Forum, error) {
-	var forumMemberDB []ForumMember
+func (f *ForumRepo) GetJoinedForum(userId uint, metadata entities.Metadata, search string) ([]forum.Forum, error) {
+	var temps []ForumMember
 
-	err := f.db.Preload("Forum").Where("user_id = ?", userId).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&forumMemberDB).Error
+	err := f.db.Where("user_id = ?", userId).Find(&temps).Error
 	if err != nil {
 		return nil, constants.ErrServer
 	}
 
-	counter := make([]int64, len(forumMemberDB))
-	for i, forumMemberDBTemp := range forumMemberDB {
-		err = f.db.Model(&ForumMember{}).Where("forum_id = ?", forumMemberDBTemp.Forum.ID).Count(&counter[i]).Error
+	var forumIds []uint
+	for _, temp := range temps {
+		forumIds = append(forumIds, temp.ForumID)
+	}
+
+	var forumDBs []Forum
+
+	query := f.db.Where("id IN ?", forumIds)
+
+	if search != "" {
+		query = query.Where("name LIKE ?", "%"+search+"%")
+	}
+
+	err = query.Find(&forumDBs).Error
+	if err != nil {
+		return nil, constants.ErrServer
+	}
+	
+	counter := make([]int64, len(forumDBs))
+	for i, forumDB := range forumDBs {
+		err = f.db.Model(&ForumMember{}).Where("forum_id = ?", forumDB.ID).Count(&counter[i]).Error
 		if err != nil {
 			return nil, constants.ErrServer
 		}
 	}
 
-	forumEnts := make([]forum.Forum, len(forumMemberDB))
-	for i, forumMemberDBTemp := range forumMemberDB {
-		forumEnts[i].ID = forumMemberDBTemp.Forum.ID
-		forumEnts[i].Name = forumMemberDBTemp.Forum.Name
-		forumEnts[i].ImageUrl = forumMemberDBTemp.Forum.ImageUrl
+	forumEnts := make([]forum.Forum, len(forumDBs))
+	for i, forumDB := range forumDBs {
+		forumEnts[i].ID = forumDB.ID
+		forumEnts[i].Name = forumDB.Name
+		forumEnts[i].ImageUrl = forumDB.ImageUrl
 		forumEnts[i].NumberOfMembers = int(counter[i])
 	}
 
@@ -88,7 +106,7 @@ func (f *ForumRepo) GetJoinedForum(userId uint, metadata entities.Metadata) ([]f
 	return forumEnts, nil
 }
 
-func (f *ForumRepo) GetRecommendationForum(userId uint, metadata entities.Metadata) ([]forum.Forum, error) {
+func (f *ForumRepo) GetRecommendationForum(userId uint, metadata entities.Metadata, search string) ([]forum.Forum, error) {
 	var forumMemberDB []ForumMember
 	err := f.db.Preload("Forum").Where("user_id = ?", userId).Find(&forumMemberDB).Error
 	if err != nil {
@@ -101,7 +119,13 @@ func (f *ForumRepo) GetRecommendationForum(userId uint, metadata entities.Metada
 	}
 
 	var forumDB []Forum
-	err = f.db.Model(&Forum{}).Where("id NOT IN ?", forumIDs).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&forumDB).Error
+	query := f.db.Model(&Forum{}).Where("id NOT IN ?", forumIDs).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit)
+
+	if search != "" {
+		query = query.Where("name LIKE ?", "%"+search+"%")
+	}
+
+	err = query.Find(&forumDB).Error
 	if err != nil {
 		return nil, constants.ErrServer
 	}
@@ -142,4 +166,116 @@ func (f *ForumRepo) GetForumById(forumId uint) (forum.Forum, error) {
 	forumEnt.ImageUrl = forumDB.ImageUrl
 
 	return forumEnt, nil
+}
+
+func (f *ForumRepo) CreateForum(forumEnt forum.Forum) (forum.Forum, error) {
+	var forumDB Forum
+	forumDB.Name = forumEnt.Name
+	forumDB.Description = forumEnt.Description
+	forumDB.ImageUrl = forumEnt.ImageUrl
+	forumDB.DoctorID = forumEnt.DoctorID
+
+	err := f.db.Create(&forumDB).Error
+	if err != nil {
+		return forum.Forum{}, constants.ErrServer
+	}
+
+	return forum.Forum{
+		ID:           forumDB.ID,
+		Name:         forumDB.Name,
+		Description:  forumDB.Description,
+		ImageUrl:     forumDB.ImageUrl,
+		DoctorID:     forumDB.DoctorID,
+		NumberOfMembers: 0,
+	}, nil
+}
+
+func (f *ForumRepo) GetAllForumsByDoctorId(doctorId uint, metadata entities.Metadata, search string) ([]forum.Forum, error) {
+	var forumDBs []Forum
+	query := f.db.Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Where("doctor_id = ?", doctorId)
+
+	if search != "" {
+		query = query.Where("name LIKE ?", "%"+search+"%")
+	}
+
+	err := query.Find(&forumDBs).Error
+	if err != nil {
+		return nil, constants.ErrServer
+	}
+
+	counter := make([]int64, len(forumDBs))
+	for i, forumDB := range forumDBs {
+		err = f.db.Model(&ForumMember{}).Where("forum_id = ?", forumDB.ID).Count(&counter[i]).Error
+		if err != nil {
+			return nil, constants.ErrServer
+		}
+	}
+
+	var forumEnts []forum.Forum
+	for i, forumDB := range forumDBs {
+		forumEnts = append(forumEnts, forum.Forum{
+			ID:               forumDB.ID,
+			Name:             forumDB.Name,
+			ImageUrl:         forumDB.ImageUrl,
+			NumberOfMembers:  int(counter[i]),
+		})
+	}
+
+	return forumEnts, nil
+}
+
+func (f *ForumRepo) UpdateForum(forumEnt forum.Forum) (forum.Forum, error) {
+	var forumDB Forum
+
+	err := f.db.Where("id = ?", forumEnt.ID).First(&forumDB).Error
+	if err != nil {
+		return forum.Forum{}, constants.ErrServer
+	}
+
+	forumDB.Name = forumEnt.Name
+	forumDB.Description = forumEnt.Description
+
+	if forumEnt.ImageUrl != "" {
+		forumDB.ImageUrl = forumEnt.ImageUrl
+	}
+
+	err = f.db.Save(&forumDB).Error
+	if err != nil {
+		return forum.Forum{}, constants.ErrServer
+	}
+
+	return forum.Forum{
+		ID:           forumDB.ID,
+		Name:         forumDB.Name,
+		Description:  forumDB.Description,
+		ImageUrl:     forumDB.ImageUrl,
+	}, nil
+}
+
+func (f *ForumRepo) DeleteForum(forumId uint) error {
+	err := f.db.Where("id = ?", forumId).Delete(&Forum{}).Error
+	if err != nil {
+		return constants.ErrServer
+	}
+	return nil
+}
+
+func (f *ForumRepo) GetForumMemberByForumId(forumId uint, metadata entities.Metadata) ([]userEntities.User, error) {
+	var forumMemberDBs []ForumMember
+	err := f.db.Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Preload("User").Where("forum_id = ?", forumId).Find(&forumMemberDBs).Error
+	if err != nil {
+		return nil, constants.ErrServer
+	}
+
+	userEnts := make([]userEntities.User, len(forumMemberDBs))
+	for i, forumMemberDB := range forumMemberDBs {
+		userEnts[i] = userEntities.User{
+			Id:       forumMemberDB.User.Id,
+			Username: forumMemberDB.User.Username,
+			Name:     forumMemberDB.User.Name,
+			ProfilePicture: forumMemberDB.User.ProfilePicture,
+		}
+	}
+
+	return userEnts, nil
 }

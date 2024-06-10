@@ -125,6 +125,31 @@ func (u *UserUseCase) HandleGoogleCallback(ctx context.Context, code string) (us
 	return result, nil
 }
 
+func (u *UserUseCase) GetPointsByUserId(id int) (int, error) {
+	result, err := u.repository.GetPointsByUserId(id)
+	if err != nil {
+		return 0, err
+	}
+	return result, nil
+}
+
+func (u *UserUseCase) ResetPassword(email string, password string) error {
+	if password == "" {
+		return constants.ErrEmptyResetPassword
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	err = u.repository.ResetPassword(email, string(hashedPassword))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (u *UserUseCase) HandleFacebookLogin() string {
 	return u.oauthConfig.AuthCodeURL("state-token", myoauth.AccessTypeOffline)
 }

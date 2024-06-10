@@ -52,10 +52,10 @@ func GetFacebookOAuthConfig() *oauth2.Config {
 	return &oauth2.Config{
 		ClientID:     os.Getenv("FACEBOOK_CLIENT_ID"),
 		ClientSecret: os.Getenv("FACEBOOK_CLIENT_SECRET"),
-		// RedirectURL:  "https://dev-capstone.practiceproject.tech/v1/users/auth/facebook/callback",
-		RedirectURL: "http://localhost:8080/v1/users/auth/facebook/callback",
-		Scopes:      []string{"public_profile", "email"},
-		Endpoint:    facebook.Endpoint,
+		RedirectURL:  "https://dev-capstone.practiceproject.tech/v1/users/auth/facebook/callback",
+		// RedirectURL: "http://localhost:8080/v1/users/auth/facebook/callback",
+		Scopes:   []string{"public_profile", "email"},
+		Endpoint: facebook.Endpoint,
 	}
 }
 
@@ -69,4 +69,12 @@ func InitConfigCloudinary() string {
 
 func InitConfigKeyChatbot() string {
 	return os.Getenv("AI_KEY")
+}
+
+func InitConfigMyEmail() string {
+	return os.Getenv("MY_EMAIL")
+}
+
+func InitConfigAppPassword() string {
+	return os.Getenv("APP_PASSWORD")
 }

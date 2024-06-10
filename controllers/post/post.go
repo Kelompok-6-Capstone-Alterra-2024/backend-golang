@@ -43,6 +43,7 @@ func (postController *PostController) GetAllPostsByForumId(c echo.Context) error
 			ID:       post.ID,
 			Content:  post.Content,
 			ImageUrl: post.ImageUrl,
+			NumberOfComments: post.NumberOfComments,
 			User: response.UserPostResponse{
 				ID:             uint(post.User.Id),
 				Username:       post.User.Username,
@@ -180,6 +181,7 @@ func (postController *PostController) GetAllCommentByPostId(c echo.Context) erro
 		respComment.CreatedAt = comment.CreatedAt
 		respComment.User = response.UserPostCommentResponse{
 			Id:             uint(comment.User.Id),
+			Name:           comment.User.Name,
 			Username:       comment.User.Username,
 			ProfilePicture: comment.User.ProfilePicture,
 		}

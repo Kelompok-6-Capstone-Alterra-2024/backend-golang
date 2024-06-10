@@ -19,13 +19,18 @@ func NewStoryRepo(db *gorm.DB) *StoriesRepo {
 	}
 }
 
-func (repository *StoriesRepo) GetAllStories(metadata entities.Metadata, userId int) ([]storyEntities.Story, error) {
+func (repository *StoriesRepo) GetAllStories(metadata entities.Metadata, userId int, search string) ([]storyEntities.Story, error) {
 	var storiesDb []Story
 
-	err := repository.DB.Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Preload("Doctor").Find(&storiesDb).Error
+	query := repository.DB.Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Preload("Doctor")
 
+	if search != "" {
+		query = query.Where("title LIKE ?", "%"+search+"%")
+	}
+
+	err := query.Find(&storiesDb).Error
 	if err != nil {
-		return nil, constants.ErrDataNotFound
+		return nil, constants.ErrServer
 	}
 
 	storyLikes := make([]StoryLikes, len(storiesDb))

@@ -2,12 +2,14 @@ package mysql
 
 import (
 	"capstone/repositories/mysql/article"
+	"capstone/repositories/mysql/chat"
 	"capstone/repositories/mysql/complaint"
 	"capstone/repositories/mysql/consultation"
 	"capstone/repositories/mysql/doctor"
 	"capstone/repositories/mysql/forum"
 	"capstone/repositories/mysql/mood"
 	"capstone/repositories/mysql/music"
+	"capstone/repositories/mysql/otp"
 	"capstone/repositories/mysql/post"
 	"capstone/repositories/mysql/rating"
 	"capstone/repositories/mysql/story"
@@ -50,7 +52,7 @@ func ConnectDB(config Config) *gorm.DB {
 }
 
 func InitMigrate(db *gorm.DB) {
-	if err := db.AutoMigrate(user.User{}, doctor.Doctor{}, consultation.Consultation{}, story.Story{}, story.StoryLikes{}, complaint.Complaint{}, transaction.Transaction{}, music.Music{}, music.MusicLikes{}, rating.Rating{}, mood.Mood{}, mood.MoodType{}, forum.Forum{}, forum.ForumMember{}, post.Post{}, post.PostLike{}, post.PostComment{}, article.Article{}, article.ArticleLikes{}, consultation.ConstultationNotes{}); err != nil {
+	if err := db.AutoMigrate(user.User{}, doctor.Doctor{}, consultation.Consultation{}, story.Story{}, story.StoryLikes{}, complaint.Complaint{}, transaction.Transaction{}, music.Music{}, music.MusicLikes{}, rating.Rating{}, mood.Mood{}, mood.MoodType{}, forum.Forum{}, forum.ForumMember{}, post.Post{}, post.PostLike{}, post.PostComment{}, article.Article{}, article.ArticleLikes{}, consultation.ConstultationNotes{}, chat.Chat{}, chat.ChatMessage{}, otp.Otp{}); err != nil {
 		log.Println("Error migrating user table")
 	}
 }

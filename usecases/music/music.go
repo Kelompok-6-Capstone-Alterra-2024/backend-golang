@@ -18,8 +18,8 @@ func NewMusicUseCase(musicInterface musicEntities.RepositoryInterface) *MusicUse
 	}
 }
 
-func (musicUseCase *MusicUseCase) GetAllMusics(metadata entities.Metadata, userId int) ([]musicEntities.Music, error) {
-	musics, err := musicUseCase.musicInterface.GetAllMusics(metadata, userId)
+func (musicUseCase *MusicUseCase) GetAllMusics(metadata entities.Metadata, userId int, search string) ([]musicEntities.Music, error) {
+	musics, err := musicUseCase.musicInterface.GetAllMusics(metadata, userId, search)
 	if err != nil {
 		return []musicEntities.Music{}, err
 	}
