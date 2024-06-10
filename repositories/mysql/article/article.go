@@ -22,12 +22,13 @@ func NewArticleRepo(db *gorm.DB) *ArticleRepo {
 
 func (repository *ArticleRepo) CreateArticle(article *articleEntities.Article, userId int) (*articleEntities.Article, error) {
 	articleDB := Article{
-		Title:     article.Title,
-		Content:   article.Content,
-		ImageUrl:  article.ImageUrl,
-		DoctorID:  uint(userId), // Assuming userId is the ID of the doctor creating the article
-		ViewCount: 0,            // Initialize view count to 0
-		Date:      time.Now(),
+		Title:       article.Title,
+		Content:     article.Content,
+		ImageUrl:    article.ImageUrl,
+		DoctorID:    uint(userId), // Assuming userId is the ID of the doctor creating the article
+		ViewCount:   0,            // Initialize view count to 0
+		ReadingTime: article.ReadingTime,
+		Date:        time.Now(),
 	}
 
 	err := repository.db.Create(&articleDB).Error
@@ -42,13 +43,14 @@ func (repository *ArticleRepo) CreateArticle(article *articleEntities.Article, u
 	}
 
 	articleResp := articleEntities.Article{
-		ID:        articleDB.ID,
-		Title:     articleDB.Title,
-		Content:   articleDB.Content,
-		Date:      articleDB.Date,
-		ImageUrl:  articleDB.ImageUrl,
-		ViewCount: articleDB.ViewCount,
-		DoctorID:  articleDB.DoctorID,
+		ID:          articleDB.ID,
+		Title:       articleDB.Title,
+		Content:     articleDB.Content,
+		Date:        articleDB.Date,
+		ImageUrl:    articleDB.ImageUrl,
+		ViewCount:   articleDB.ViewCount,
+		ReadingTime: articleDB.ReadingTime,
+		DoctorID:    articleDB.DoctorID,
 		Doctor: doctorEntities.Doctor{
 			ID:   articleDB.Doctor.ID,
 			Name: articleDB.Doctor.Name,
@@ -104,13 +106,14 @@ func (repository *ArticleRepo) GetAllArticle(metadata entities.Metadata, userId 
 	articlesEnt := make([]articleEntities.Article, len(articlesDb))
 	for i := 0; i < len(articlesDb); i++ {
 		articlesEnt[i] = articleEntities.Article{
-			ID:        articlesDb[i].ID,
-			Title:     articlesDb[i].Title,
-			Content:   articlesDb[i].Content,
-			Date:      articlesDb[i].Date,
-			ImageUrl:  articlesDb[i].ImageUrl,
-			ViewCount: articlesDb[i].ViewCount,
-			DoctorID:  articlesDb[i].DoctorID,
+			ID:          articlesDb[i].ID,
+			Title:       articlesDb[i].Title,
+			Content:     articlesDb[i].Content,
+			Date:        articlesDb[i].Date,
+			ImageUrl:    articlesDb[i].ImageUrl,
+			ViewCount:   articlesDb[i].ViewCount,
+			ReadingTime: articlesDb[i].ReadingTime,
+			DoctorID:    articlesDb[i].DoctorID,
 			Doctor: doctorEntities.Doctor{
 				ID:   articlesDb[i].Doctor.ID,
 				Name: articlesDb[i].Doctor.Name,
@@ -146,13 +149,14 @@ func (repository *ArticleRepo) GetArticleById(articleId int, userId int) (articl
 	}
 
 	articleResp := articleEntities.Article{
-		ID:        articleDb.ID,
-		Title:     articleDb.Title,
-		Content:   articleDb.Content,
-		Date:      articleDb.Date,
-		ImageUrl:  articleDb.ImageUrl,
-		ViewCount: articleDb.ViewCount,
-		DoctorID:  articleDb.DoctorID,
+		ID:          articleDb.ID,
+		Title:       articleDb.Title,
+		Content:     articleDb.Content,
+		Date:        articleDb.Date,
+		ImageUrl:    articleDb.ImageUrl,
+		ViewCount:   articleDb.ViewCount,
+		ReadingTime: articleDb.ReadingTime,
+		DoctorID:    articleDb.DoctorID,
 		Doctor: doctorEntities.Doctor{
 			ID:   articleDb.Doctor.ID,
 			Name: articleDb.Doctor.Name,
@@ -184,13 +188,14 @@ func (repository *ArticleRepo) GetLikedArticle(metadata entities.Metadata, userI
 	articlesEnt := make([]articleEntities.Article, len(articlesDb))
 	for i := 0; i < len(articlesDb); i++ {
 		articlesEnt[i] = articleEntities.Article{
-			ID:        articlesDb[i].ID,
-			Title:     articlesDb[i].Title,
-			Content:   articlesDb[i].Content,
-			Date:      articlesDb[i].Date,
-			ImageUrl:  articlesDb[i].ImageUrl,
-			ViewCount: articlesDb[i].ViewCount,
-			DoctorID:  articlesDb[i].DoctorID,
+			ID:          articlesDb[i].ID,
+			Title:       articlesDb[i].Title,
+			Content:     articlesDb[i].Content,
+			Date:        articlesDb[i].Date,
+			ImageUrl:    articlesDb[i].ImageUrl,
+			ViewCount:   articlesDb[i].ViewCount,
+			ReadingTime: articlesDb[i].ReadingTime,
+			DoctorID:    articlesDb[i].DoctorID,
 			Doctor: doctorEntities.Doctor{
 				ID:   articlesDb[i].Doctor.ID,
 				Name: articlesDb[i].Doctor.Name,
@@ -237,13 +242,14 @@ func (repository *ArticleRepo) GetArticleByIdForDoctor(articleId int) (articleEn
 	}
 
 	return articleEntities.Article{
-		ID:        articleDb.ID,
-		Title:     articleDb.Title,
-		Content:   articleDb.Content,
-		Date:      articleDb.Date,
-		ImageUrl:  articleDb.ImageUrl,
-		ViewCount: articleDb.ViewCount,
-		DoctorID:  articleDb.DoctorID,
+		ID:          articleDb.ID,
+		Title:       articleDb.Title,
+		Content:     articleDb.Content,
+		Date:        articleDb.Date,
+		ImageUrl:    articleDb.ImageUrl,
+		ViewCount:   articleDb.ViewCount,
+		ReadingTime: articleDb.ReadingTime,
+		DoctorID:    articleDb.DoctorID,
 	}, nil
 }
 
@@ -264,13 +270,14 @@ func (repository *ArticleRepo) GetAllArticleByDoctorId(metadata entities.Metadat
 	articlesEnt := make([]articleEntities.Article, len(articleDb))
 	for i := 0; i < len(articleDb); i++ {
 		articlesEnt[i] = articleEntities.Article{
-			ID:        articleDb[i].ID,
-			Title:     articleDb[i].Title,
-			Content:   articleDb[i].Content,
-			Date:      articleDb[i].Date,
-			ImageUrl:  articleDb[i].ImageUrl,
-			ViewCount: articleDb[i].ViewCount,
-			DoctorID:  articleDb[i].DoctorID,
+			ID:          articleDb[i].ID,
+			Title:       articleDb[i].Title,
+			Content:     articleDb[i].Content,
+			Date:        articleDb[i].Date,
+			ImageUrl:    articleDb[i].ImageUrl,
+			ViewCount:   articleDb[i].ViewCount,
+			ReadingTime: articleDb[i].ReadingTime,
+			DoctorID:    articleDb[i].DoctorID,
 		}
 	}
 
@@ -332,13 +339,14 @@ func (repository *ArticleRepo) EditArticle(article articleEntities.Article) (art
 	}
 
 	return articleEntities.Article{
-		ID:        articleDb.ID,
-		Title:     articleDb.Title,
-		Content:   articleDb.Content,
-		Date:      articleDb.Date,
-		ImageUrl:  articleDb.ImageUrl,
-		ViewCount: articleDb.ViewCount,
-		DoctorID:  articleDb.DoctorID,
+		ID:          articleDb.ID,
+		Title:       articleDb.Title,
+		Content:     articleDb.Content,
+		Date:        articleDb.Date,
+		ImageUrl:    articleDb.ImageUrl,
+		ViewCount:   articleDb.ViewCount,
+		ReadingTime: articleDb.ReadingTime,
+		DoctorID:    articleDb.DoctorID,
 	}, nil
 }
 

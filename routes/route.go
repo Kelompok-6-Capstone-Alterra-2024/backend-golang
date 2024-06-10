@@ -160,6 +160,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("articles", r.articleController.GetAllArticle) // Get All Article
 	userRoute.GET("articles/:id", r.articleController.GetArticleById)
 	userRoute.GET("articles/liked", r.articleController.GetLikedArticle)
+	userRoute.POST("articles/like", r.articleController.LikeArticle)
 
 	// Consultation Notes
 	userRoute.GET("consultation-notes/consultation/:id", r.consultationController.GetConsultationNotesByID) // Get Consultation Note By ID

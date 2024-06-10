@@ -9,15 +9,16 @@ import (
 )
 
 type Article struct {
-	ID        uint
-	Title     string
-	Content   string
-	Date      time.Time
-	ImageUrl  string
-	ViewCount int
-	DoctorID  uint
-	Doctor    doctor.Doctor
-	IsLiked   bool
+	ID          uint
+	Title       string
+	Content     string
+	Date        time.Time
+	ImageUrl    string
+	ViewCount   int
+	DoctorID    uint
+	Doctor      doctor.Doctor
+	IsLiked     bool
+	ReadingTime int
 }
 
 type ArticleRepositoryInterface interface {
@@ -52,14 +53,15 @@ type ArticleUseCaseInterface interface {
 
 func (ar *Article) ToResponse() response.ArticleListResponse {
 	return response.ArticleListResponse{
-		ID:        ar.ID,
-		DoctorID:  ar.DoctorID,
-		Title:     ar.Title,
-		Content:   ar.Content,
-		ImageUrl:  ar.ImageUrl,
-		Date:      ar.Date,
-		ViewCount: ar.ViewCount,
-		IsLiked:   ar.IsLiked,
+		ID:          ar.ID,
+		DoctorID:    ar.DoctorID,
+		Title:       ar.Title,
+		Content:     ar.Content,
+		ImageUrl:    ar.ImageUrl,
+		Date:        ar.Date,
+		ViewCount:   ar.ViewCount,
+		IsLiked:     ar.IsLiked,
+		ReadingTime: ar.ReadingTime,
 		Doctor: response.DoctorInfoResponse{
 			ID:   ar.Doctor.ID,
 			Name: ar.Doctor.Name,
