@@ -7,8 +7,8 @@ import (
 )
 
 func SendEmail(to string, otp string) error {
-	from := configs.InitConfigMyEmail()    // Ganti dengan email Anda
-	password := configs.InitConfigAppPassword() // Ganti dengan App Password Gmail Anda
+	from := configs.InitConfigMyEmail()
+	password := "otdl otda orgr ahzp"
 
 	// Konfigurasi SMTP server
 	smtpHost := "smtp.gmail.com"
