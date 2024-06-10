@@ -89,6 +89,9 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userAuth.GET("/auth/google/login", r.userController.GoogleLogin)
 	userAuth.GET("/auth/google/callback", r.userController.GoogleCallback)
 
+	userAuth.GET("/auth/facebook/login", r.userController.FacebookLogin)
+	userAuth.GET("/auth/facebook/callback", r.userController.FacebookCallback)
+
 	userRoute := userAuth.Group("/")
 	userRoute.Use(echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))
 	// Doctor

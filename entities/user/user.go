@@ -21,7 +21,7 @@ type User struct {
 type RepositoryInterface interface {
 	Register(user *User) (User, int64, error)
 	Login(user *User) (User, error)
-	Create(email string, picture string, name string, username string) (User ,error)
+	Create(email string, picture string, name string, username string) (User, error)
 	OauthFindByEmail(email string) (User, int, error)
 }
 
@@ -30,4 +30,6 @@ type UseCaseInterface interface {
 	Login(user *User) (User, error)
 	HandleGoogleLogin() string
 	HandleGoogleCallback(ctx context.Context, code string) (User, error)
+	HandleFacebookLogin() string
+	HandleFacebookCallback(ctx context.Context, code string) (User, error)
 }

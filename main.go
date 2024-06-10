@@ -56,6 +56,7 @@ func main() {
 	validate := validator.New()
 	oauthConfig := configs.GetGoogleOAuthConfig()
 	oauthConfigDoctor := configs.GetGoogleOAuthConfigDoctor()
+	oauthConfigFB := configs.GetFacebookOAuthConfig()
 
 	userRepo := userRepositories.NewUserRepo(db)
 	doctorRepo := doctorRepositories.NewDoctorRepo(db)
@@ -70,7 +71,7 @@ func main() {
 	postRepo := postRepositories.NewPostRepo(db)
 	articleRepo := articleRepositories.NewArticleRepo(db)
 
-	userUC := userUseCase.NewUserUseCase(userRepo, oauthConfig)
+	userUC := userUseCase.NewUserUseCase(userRepo, oauthConfig, oauthConfigFB)
 	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo, oauthConfigDoctor)
 	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo)
 	storyUC := storyUseCase.NewStoryUseCase(storyRepo)
