@@ -151,16 +151,16 @@ func (u *UserUseCase) ResetPassword(email string, password string) error {
 }
 
 func (u *UserUseCase) HandleFacebookLogin() string {
-	return u.oauthConfig.AuthCodeURL("state-token", myoauth.AccessTypeOffline)
+	return u.oauthConfigFB.AuthCodeURL("state-token", myoauth.AccessTypeOffline)
 }
 
 func (u *UserUseCase) HandleFacebookCallback(ctx context.Context, code string) (userEntitites.User, error) {
-	token, err := u.oauthConfig.Exchange(ctx, code)
+	token, err := u.oauthConfigFB.Exchange(ctx, code)
 	if err != nil {
 		return userEntitites.User{}, constants.ErrExcange
 	}
 
-	client := u.oauthConfig.Client(ctx, token)
+	client := u.oauthConfigFB.Client(ctx, token)
 	resp, err := client.Get("https://graph.facebook.com/me?fields=id,name,email,picture")
 	if err != nil {
 		return userEntitites.User{}, constants.ErrNewUserInfo
