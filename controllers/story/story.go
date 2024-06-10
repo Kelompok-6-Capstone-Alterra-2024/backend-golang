@@ -27,12 +27,14 @@ func (storyController *StoryController) GetAllStories(c echo.Context) error {
 	pageParam := c.QueryParam("page")
 	limitParam := c.QueryParam("limit")
 
+	search := c.QueryParam("search")
+
 	metadata := utilities.GetMetadata(pageParam, limitParam)
 
 	token := c.Request().Header.Get("Authorization")
 	userId, _ := utilities.GetUserIdFromToken(token)
 
-	stories, err := storyController.storyUseCase.GetAllStories(*metadata, userId)
+	stories, err := storyController.storyUseCase.GetAllStories(*metadata, userId, search)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}

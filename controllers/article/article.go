@@ -77,12 +77,14 @@ func (controller *ArticleController) GetAllArticle(c echo.Context) error {
 	pageParam := c.QueryParam("page")
 	limitParam := c.QueryParam("limit")
 
+	search := c.QueryParam("search")
+
 	metadata := utilities.GetMetadata(pageParam, limitParam)
 
 	token := c.Request().Header.Get("Authorization")
 	userId, _ := utilities.GetUserIdFromToken(token)
 
-	articles, err := controller.articleUseCase.GetAllArticle(*metadata, userId)
+	articles, err := controller.articleUseCase.GetAllArticle(*metadata, userId, search)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}

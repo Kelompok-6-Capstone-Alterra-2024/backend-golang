@@ -3,7 +3,6 @@ package response
 import (
 	complaintResponse "capstone/controllers/complaint/response"
 	doctorResponse "capstone/controllers/doctor/response"
-	"time"
 )
 
 type ConsultationUserResponse struct {
@@ -13,7 +12,8 @@ type ConsultationUserResponse struct {
 	PaymentStatus string
 	IsAccepted    bool
 	IsActive      bool
-	Date          time.Time
+	Date          string
+	Time          string
 }
 
 type ConsultationDoctorResponse struct {
@@ -22,6 +22,7 @@ type ConsultationDoctorResponse struct {
 	PaymentStatus string
 	IsAccepted    bool
 	IsActive      bool
-	Date          time.Time
+	Date          string
+	Time          string
 	Complaint     *complaintResponse.ComplaintResponse
 }

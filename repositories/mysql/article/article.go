@@ -58,7 +58,7 @@ func (repository *ArticleRepo) CreateArticle(article *articleEntities.Article, u
 	return &articleResp, nil
 }
 
-func (repository *ArticleRepo) GetAllArticle(metadata entities.Metadata, userId int) ([]articleEntities.Article, error) {
+func (repository *ArticleRepo) GetAllArticle(metadata entities.Metadata, userId int, search string) ([]articleEntities.Article, error) {
 	var articlesDb []Article
 
 	// Pagination
@@ -68,6 +68,14 @@ func (repository *ArticleRepo) GetAllArticle(metadata entities.Metadata, userId 
 		Find(&articlesDb).Error
 	if err != nil {
 		return nil, err
+	}
+
+	// Search
+	if search != "" {
+		err = repository.db.Where("title LIKE ?", "%"+search+"%").Preload("Doctor").Find(&articlesDb).Error
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	articleLikes := make([]ArticleLikes, len(articlesDb))

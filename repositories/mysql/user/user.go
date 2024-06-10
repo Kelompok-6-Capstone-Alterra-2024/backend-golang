@@ -138,3 +138,20 @@ func (r *UserRepo) OauthFindByEmail(email string) (userEntities.User, int, error
 
     return userEnt, 0, nil
 }
+
+func (r *UserRepo) GetPointsByUserId(id int) (int, error) {
+	var userDB User
+	if err := r.DB.Where("id = ?", id).First(&userDB).Error; err != nil {
+		return 0, err
+	}
+
+	return userDB.Points, nil
+}
+
+func (r *UserRepo) ResetPassword(email string, password string) error {
+	err := r.DB.Model(&User{}).Where("email = ?", email).Update("password", password).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

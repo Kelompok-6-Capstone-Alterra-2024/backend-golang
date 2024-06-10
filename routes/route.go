@@ -2,6 +2,7 @@ package routes
 
 import (
 	"capstone/controllers/article"
+	"capstone/controllers/chat"
 	"capstone/controllers/chatbot"
 	"capstone/controllers/complaint"
 	"capstone/controllers/consultation"
@@ -9,6 +10,7 @@ import (
 	"capstone/controllers/forum"
 	"capstone/controllers/mood"
 	"capstone/controllers/music"
+	"capstone/controllers/otp"
 	"capstone/controllers/post"
 	"capstone/controllers/rating"
 	"capstone/controllers/story"
@@ -36,6 +38,8 @@ type RouteController struct {
 	postController         *post.PostController
 	chatbotController      *chatbot.ChatbotController
 	articleController      *article.ArticleController
+	chatController         *chat.ChatController
+	otpController          *otp.OtpController
 }
 
 func NewRoute(
@@ -51,7 +55,9 @@ func NewRoute(
 	forumController *forum.ForumController,
 	postController *post.PostController,
 	chatbotController *chatbot.ChatbotController,
-	articleController *article.ArticleController) *RouteController {
+	articleController *article.ArticleController,
+	chatController *chat.ChatController,
+	otpController *otp.OtpController) *RouteController {
 	return &RouteController{
 		userController:         userController,
 		doctorController:       doctorController,
@@ -66,6 +72,8 @@ func NewRoute(
 		postController:         postController,
 		chatbotController:      chatbotController,
 		articleController:      articleController,
+		chatController:         chatController,
+		otpController:          otpController,
 	}
 }
 
@@ -83,8 +91,9 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	e.GET("/v1/doctors/chatbots/treatment", r.chatbotController.ChatbotTreatment)      //Chatbot Treatment
 
 	userAuth := e.Group("/v1/users")
-	userAuth.POST("/register", r.userController.Register) //Register User
-	userAuth.POST("/login", r.userController.Login)       //Login User
+	userAuth.POST("/register", r.userController.Register)           //Register User
+	userAuth.POST("/login", r.userController.Login)                 //Login User
+	userAuth.PUT("/reset-password", r.userController.ResetPassword) //Reset Password
 
 	userAuth.GET("/auth/google/login", r.userController.GoogleLogin)
 	userAuth.GET("/auth/google/callback", r.userController.GoogleCallback)
@@ -152,8 +161,22 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("articles/:id", r.articleController.GetArticleById)
 	userRoute.GET("articles/liked", r.articleController.GetLikedArticle)
 
-	// consultation notes
+	// Consultation Notes
 	userRoute.GET("consultation-notes/consultation/:id", r.consultationController.GetConsultationNotesByID) // Get Consultation Note By ID
+
+	// Points
+	userRoute.GET("points", r.userController.GetPointsByUserId) // Get Points
+
+	// Chat
+	userRoute.GET("chats", r.chatController.GetAllChatByUserId) // Get All Chat
+
+	// Chat Messages
+	userRoute.POST("chats/messages", r.chatController.SendMessage)           // Send Message
+	userRoute.GET("chats/:chatId/messages", r.chatController.GetAllMessages) // Get All Message
+
+	// OTP
+	userRoute.POST("send-otp", r.otpController.SendOtp)     // Send OTP
+	userRoute.POST("verify-otp", r.otpController.VerifyOtp) // Verify OTP
 
 	doctorAuth := e.Group("/v1/doctors")
 
@@ -191,10 +214,50 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("stories/:id", r.storyController.GetStoryByIdForDoctor)            // Get Story By ID
 	doctorRoute.GET("stories/count", r.storyController.CountStoriesByDoctorId)         // Count Stories By Doctor ID
 	doctorRoute.GET("stories/like/count", r.storyController.CountStoryLikesByDoctorId) // Count Stories Likes By Doctor ID
-	doctorRoute.GET("stories/view/count", r.storyController.CountStoryViewByDoctorId)  // Count Stories View Count By Doctor ID
-	doctorRoute.PUT("stories/:id", r.storyController.EditStory)                        // Update Story
-	doctorRoute.DELETE("stories/:id", r.storyController.DeleteStory)                   // Delete Story
+
+	doctorRoute.GET("stories/view/count", r.storyController.CountStoryViewByDoctorId) // Count Stories View Count By Doctor ID
+	doctorRoute.PUT("stories/:id", r.storyController.EditStory)                       // Update Story
+	doctorRoute.DELETE("stories/:id", r.storyController.DeleteStory)                  // Delete Story
+
+	// Consultation
+	doctorRoute.GET("consultations", r.consultationController.GetAllDoctorConsultation) //Get All Consultation
+	doctorRoute.GET("consultations/count", r.consultationController.CountConsultationByDoctorID)
+	doctorRoute.GET("consultations/today/count", r.consultationController.CountConsultationToday)
+	doctorRoute.GET("consultations/:id", r.consultationController.GetConsultationByID)      //Get Consultation By ID
+	doctorRoute.PUT("consultations/:id", r.consultationController.UpdateStatusConsultation) // Update Status Consultation
+
+	doctorRoute.GET("stories/view/count", r.storyController.CountStoryViewByDoctorId) // Count Stories View Count By Doctor ID
+	doctorRoute.PUT("stories/:id", r.storyController.EditStory)                       // Update Story
+	doctorRoute.DELETE("stories/:id", r.storyController.DeleteStory)                  // Delete Story
 
 	// consultation notes
 	doctorRoute.POST("consultation-notes", r.consultationController.CreateConsultationNotes) // Post Consultation Note
+
+	// Rating
+	doctorRoute.GET("feedbacks", r.ratingController.GetAllFeedbacks) // Get All Feedbacks
+	doctorRoute.GET("ratings", r.ratingController.GetSummaryRating)  // Get Summary Rating
+
+	// Forum
+	doctorRoute.POST("forums", r.forumController.CreateForum)                             // Create Forum
+	doctorRoute.GET("forums", r.forumController.GetAllForumsByDoctorId)                   // Get All Forum By Doctor ID
+	doctorRoute.PUT("forums/:id", r.forumController.UpdateForum)                          // Update Forum
+	doctorRoute.DELETE("forums/:id", r.forumController.DeleteForum)                       // Delete Forum
+	doctorRoute.GET("forums/:id", r.forumController.GetForumById)                         // Get Forum By ID
+	doctorRoute.GET("forums/:forumId/members", r.forumController.GetForumMemberByForumId) // Get Members By Forum ID
+
+	// Post
+	doctorRoute.GET("forums/:forumId/posts", r.postController.GetAllPostsByForumId)   // Get All Posts By Forum ID
+	doctorRoute.GET("posts/:postId/comments", r.postController.GetAllCommentByPostId) // Get All Comment By Post ID
+
+	// Chat
+	doctorRoute.GET("chats", r.chatController.GetAllChatByDoctorId) // Get All Chat By Doctor ID
+
+	// Chat Message
+	doctorRoute.POST("chats/messages", r.chatController.SendMessageDoctor)     // Send Message
+	doctorRoute.GET("chats/:chatId/messages", r.chatController.GetAllMessages) // Get All Message
+
+	// Transaction
+	doctorRoute.GET("transactions", r.transactionController.FindAllByDoctorID) // Get All Transaction By Doctor ID
+	doctorRoute.GET("transaction/:id", r.transactionController.FindByID)       // Get Transaction By ID
+	doctorRoute.GET("transactions/count", r.transactionController.CountTransactionByDoctorID)
 }

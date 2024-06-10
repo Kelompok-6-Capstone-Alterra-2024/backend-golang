@@ -31,8 +31,8 @@ func (useCase *ArticleUseCase) CreateArticle(article *articleEntities.Article, u
 	return createdArticle, nil
 }
 
-func (useCase *ArticleUseCase) GetAllArticle(metadata entities.Metadata, userId int) ([]articleEntities.Article, error) {
-	articles, err := useCase.articleRepository.GetAllArticle(metadata, userId)
+func (useCase *ArticleUseCase) GetAllArticle(metadata entities.Metadata, userId int, search string) ([]articleEntities.Article, error) {
+	articles, err := useCase.articleRepository.GetAllArticle(metadata, userId, search)
 	if err != nil {
 		return []articleEntities.Article{}, err
 	}

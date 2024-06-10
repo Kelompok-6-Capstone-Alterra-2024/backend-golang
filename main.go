@@ -3,6 +3,7 @@ package main
 import (
 	"capstone/configs"
 	articleController "capstone/controllers/article"
+	chatController "capstone/controllers/chat"
 	chatbotController "capstone/controllers/chatbot"
 	complaintController "capstone/controllers/complaint"
 	consultationController "capstone/controllers/consultation"
@@ -10,6 +11,7 @@ import (
 	forumController "capstone/controllers/forum"
 	moodController "capstone/controllers/mood"
 	musicController "capstone/controllers/music"
+	otpController "capstone/controllers/otp"
 	postController "capstone/controllers/post"
 	ratingController "capstone/controllers/rating"
 	storyController "capstone/controllers/story"
@@ -17,12 +19,14 @@ import (
 	userController "capstone/controllers/user"
 	"capstone/repositories/mysql"
 	articleRepositories "capstone/repositories/mysql/article"
+	chatRepositories "capstone/repositories/mysql/chat"
 	complaintRepositories "capstone/repositories/mysql/complaint"
 	consultationRepositories "capstone/repositories/mysql/consultation"
 	doctorRepositories "capstone/repositories/mysql/doctor"
 	forumRepositories "capstone/repositories/mysql/forum"
 	moodRepositories "capstone/repositories/mysql/mood"
 	musicRepositories "capstone/repositories/mysql/music"
+	otpRepositories "capstone/repositories/mysql/otp"
 	postRepositories "capstone/repositories/mysql/post"
 	ratingRepositories "capstone/repositories/mysql/rating"
 	storyRepositories "capstone/repositories/mysql/story"
@@ -30,6 +34,7 @@ import (
 	userRepositories "capstone/repositories/mysql/user"
 	"capstone/routes"
 	articleUseCase "capstone/usecases/article"
+	chatUseCase "capstone/usecases/chat"
 	chatbotUseCase "capstone/usecases/chatbot"
 	complaintUseCase "capstone/usecases/complaint"
 	consultationUseCase "capstone/usecases/consultation"
@@ -38,6 +43,7 @@ import (
 	midtransUseCase "capstone/usecases/midtrans"
 	moodUseCase "capstone/usecases/mood"
 	musicUseCase "capstone/usecases/music"
+	otpUseCase "capstone/usecases/otp"
 	postUseCase "capstone/usecases/post"
 	ratingUseCase "capstone/usecases/rating"
 	storyUseCase "capstone/usecases/story"
@@ -69,10 +75,12 @@ func main() {
 	forumRepo := forumRepositories.NewForumRepo(db)
 	postRepo := postRepositories.NewPostRepo(db)
 	articleRepo := articleRepositories.NewArticleRepo(db)
+	chatRepo := chatRepositories.NewChatRepo(db)
+	otpRepo := otpRepositories.NewOtpRepo(db)
 
 	userUC := userUseCase.NewUserUseCase(userRepo, oauthConfig)
 	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo, oauthConfigDoctor)
-	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo)
+	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo, validate, chatRepo)
 	storyUC := storyUseCase.NewStoryUseCase(storyRepo)
 	complaintUC := complaintUseCase.NewComplaintUseCase(complaintRepo)
 	midtransUC := midtransUseCase.NewMidtransUseCase(midtransConfig)
@@ -84,6 +92,8 @@ func main() {
 	postUC := postUseCase.NewPostUseCase(postRepo)
 	chatbotUC := chatbotUseCase.NewChatbotUsecase()
 	articleUC := articleUseCase.NewArticleUseCase(articleRepo)
+	chatUC := chatUseCase.NewChatUseCase(chatRepo)
+	otpUC := otpUseCase.NewOtpUseCase(otpRepo)
 
 	userCont := userController.NewUserController(userUC)
 	doctorCont := doctorController.NewDoctorController(doctorUC)
@@ -98,8 +108,10 @@ func main() {
 	postCont := postController.NewPostController(postUC)
 	chatbotCont := chatbotController.NewChatbotController(chatbotUC)
 	articleCont := articleController.NewArticleController(articleUC)
+	chatCont := chatController.NewChatController(chatUC)
+	otpCont := otpController.NewOtpController(otpUC)
 
-	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont, ratingCont, moodCont, forumCont, postCont, chatbotCont, articleCont)
+	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont, ratingCont, moodCont, forumCont, postCont, chatbotCont, articleCont, chatCont, otpCont)
 
 	e := echo.New()
 	route.InitRoute(e)

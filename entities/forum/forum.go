@@ -5,6 +5,7 @@ import (
 	"capstone/entities/doctor"
 	"capstone/entities/post"
 	"capstone/entities/user"
+	"mime/multipart"
 )
 
 type Forum struct {
@@ -30,15 +31,25 @@ type ForumMember struct {
 type RepositoryInterface interface {
 	JoinForum(forumId uint, userId uint) (error)
 	LeaveForum(forumId uint, userId uint) (error)
-	GetJoinedForum(userId uint, metadata entities.Metadata) ([]Forum, error)
-	GetRecommendationForum(userId uint, metadata entities.Metadata) ([]Forum, error)
+	GetJoinedForum(userId uint, metadata entities.Metadata, search string) ([]Forum, error)
+	GetRecommendationForum(userId uint, metadata entities.Metadata, search string) ([]Forum, error)
 	GetForumById(forumId uint) (Forum, error)
+	CreateForum(forum Forum) (Forum, error)
+	GetAllForumsByDoctorId(doctorId uint, metadata entities.Metadata, search string) ([]Forum, error)
+	UpdateForum(forum Forum) (Forum, error)
+	DeleteForum(forumId uint) (error)
+	GetForumMemberByForumId(forumId uint, metadata entities.Metadata) ([]user.User, error)
 }
 
 type UseCaseInterface interface {
 	JoinForum(forumId uint, userId uint) (error)
 	LeaveForum(forumId uint, userId uint) (error)
-	GetJoinedForum(userId uint, metadata entities.Metadata) ([]Forum, error)
-	GetRecommendationForum(userId uint, metadata entities.Metadata) ([]Forum, error)
+	GetJoinedForum(userId uint, metadata entities.Metadata, search string) ([]Forum, error)
+	GetRecommendationForum(userId uint, metadata entities.Metadata, search string) ([]Forum, error)
 	GetForumById(forumId uint) (Forum, error)
+	CreateForum(forum Forum, fileImage *multipart.FileHeader) (Forum, error)
+	GetAllForumsByDoctorId(doctorId uint, metadata entities.Metadata, search string) ([]Forum, error)
+	UpdateForum(forum Forum, fileImage *multipart.FileHeader) (Forum, error)
+	DeleteForum(forumId uint) (error)
+	GetForumMemberByForumId(forumId uint, metadata entities.Metadata) ([]user.User, error)
 }

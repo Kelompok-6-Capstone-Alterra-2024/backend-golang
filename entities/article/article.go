@@ -22,7 +22,7 @@ type Article struct {
 
 type ArticleRepositoryInterface interface {
 	CreateArticle(article *Article, userId int) (*Article, error)
-	GetAllArticle(metadata entities.Metadata, userId int) ([]Article, error)
+	GetAllArticle(metadata entities.Metadata, userId int, search string) ([]Article, error)
 	GetArticleById(articleId int, userId int) (Article, error)
 	GetLikedArticle(metadata entities.Metadata, userId int) ([]Article, error)
 	LikeArticle(articleId int, userId int) error
@@ -37,7 +37,7 @@ type ArticleRepositoryInterface interface {
 
 type ArticleUseCaseInterface interface {
 	CreateArticle(article *Article, userId int) (*Article, error)
-	GetAllArticle(metadata entities.Metadata, userId int) ([]Article, error)
+	GetAllArticle(metadata entities.Metadata, userId int, search string) ([]Article, error)
 	GetArticleById(articleId int, userId int) (Article, error)
 	GetLikedArticle(metadata entities.Metadata, userId int) ([]Article, error)
 	LikeArticle(articleId int, userId int) error
