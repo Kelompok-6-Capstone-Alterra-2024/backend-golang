@@ -63,6 +63,7 @@ func main() {
 	oauthConfig := configs.GetGoogleOAuthConfig()
 	oauthConfigDoctor := configs.GetGoogleOAuthConfigDoctor()
 	oauthConfigFB := configs.GetFacebookOAuthConfig()
+	oauthConfigFBDoctor := configs.GetFacebookOAuthConfigDoctor()
 
 	userRepo := userRepositories.NewUserRepo(db)
 	doctorRepo := doctorRepositories.NewDoctorRepo(db)
@@ -80,7 +81,7 @@ func main() {
 	otpRepo := otpRepositories.NewOtpRepo(db)
 
 	userUC := userUseCase.NewUserUseCase(userRepo, oauthConfig, oauthConfigFB)
-	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo, oauthConfigDoctor)
+	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo, oauthConfigDoctor, oauthConfigFBDoctor)
 	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo, validate, chatRepo)
 	storyUC := storyUseCase.NewStoryUseCase(storyRepo)
 	complaintUC := complaintUseCase.NewComplaintUseCase(complaintRepo)

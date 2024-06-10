@@ -53,9 +53,18 @@ func GetFacebookOAuthConfig() *oauth2.Config {
 		ClientID:     os.Getenv("FACEBOOK_CLIENT_ID"),
 		ClientSecret: os.Getenv("FACEBOOK_CLIENT_SECRET"),
 		RedirectURL:  "https://dev-capstone.practiceproject.tech/v1/users/auth/facebook/callback",
-		// RedirectURL: "http://localhost:8080/v1/users/auth/facebook/callback",
-		Scopes:   []string{"public_profile", "email"},
-		Endpoint: facebook.Endpoint,
+		Scopes:       []string{"public_profile", "email"},
+		Endpoint:     facebook.Endpoint,
+	}
+}
+
+func GetFacebookOAuthConfigDoctor() *oauth2.Config {
+	return &oauth2.Config{
+		ClientID:     os.Getenv("FACEBOOK_CLIENT_ID_DOCTOR"),
+		ClientSecret: os.Getenv("FACEBOOK_CLIENT_SECRET_DOCTOR"),
+		RedirectURL:  "https://dev-capstone.practiceproject.tech/v1/doctors/auth/facebook/callback",
+		Scopes:       []string{"public_profile", "email"},
+		Endpoint:     facebook.Endpoint,
 	}
 }
 
