@@ -29,6 +29,7 @@ type Doctor struct {
 	Specialist       string
 	Token            string
 	IsOauth          bool
+	Amount           int
 }
 
 type DoctorRepositoryInterface interface {
@@ -39,6 +40,7 @@ type DoctorRepositoryInterface interface {
 	GetActiveDoctor(metadata *entities.Metadata) (*[]Doctor, error)
 	Create(email string, picture string, name string, username string) (Doctor, error)
 	OauthFindByEmail(email string) (Doctor, int, error)
+	UpdateAmount(doctorID uint, amount int) error
 }
 
 type DoctorUseCaseInterface interface {
@@ -79,5 +81,6 @@ func (r *Doctor) ToDoctorResponse() *response.DoctorResponse {
 		StrNumber:        r.StrNumber,
 		Fee:              r.Fee,
 		Specialist:       r.Specialist,
+		Amount:           r.Amount,
 	}
 }
