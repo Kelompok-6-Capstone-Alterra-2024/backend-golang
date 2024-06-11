@@ -16,6 +16,7 @@ type Complaint struct {
 }
 
 func (r *Complaint) ToEntities() *complaint.Complaint {
+
 	return &complaint.Complaint{
 		ID:                 r.ID,
 		Name:               r.Name,

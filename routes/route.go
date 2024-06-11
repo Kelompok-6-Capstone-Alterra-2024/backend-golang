@@ -267,4 +267,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("transactions", r.transactionController.FindAllByDoctorID) // Get All Transaction By Doctor ID
 	doctorRoute.GET("transaction/:id", r.transactionController.FindByID)       // Get Transaction By ID
 	doctorRoute.GET("transactions/count", r.transactionController.CountTransactionByDoctorID)
+
+	// Patient
+	doctorRoute.GET("patients", r.complaintController.GetAllByDoctorID) // Get All Patient
+	doctorRoute.GET("patients/:id", r.complaintController.GetByComplaintID)
 }
