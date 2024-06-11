@@ -22,12 +22,13 @@ func NewArticleRepo(db *gorm.DB) *ArticleRepo {
 
 func (repository *ArticleRepo) CreateArticle(article *articleEntities.Article, userId int) (*articleEntities.Article, error) {
 	articleDB := Article{
-		Title:     article.Title,
-		Content:   article.Content,
-		ImageUrl:  article.ImageUrl,
-		DoctorID:  uint(userId), // Assuming userId is the ID of the doctor creating the article
-		ViewCount: 0,            // Initialize view count to 0
-		Date:      time.Now(),
+		Title:       article.Title,
+		Content:     article.Content,
+		ImageUrl:    article.ImageUrl,
+		DoctorID:    uint(userId), // Assuming userId is the ID of the doctor creating the article
+		ViewCount:   0,            // Initialize view count to 0
+		ReadingTime: article.ReadingTime,
+		Date:        time.Now(),
 	}
 
 	err := repository.db.Create(&articleDB).Error
@@ -42,13 +43,14 @@ func (repository *ArticleRepo) CreateArticle(article *articleEntities.Article, u
 	}
 
 	articleResp := articleEntities.Article{
-		ID:        articleDB.ID,
-		Title:     articleDB.Title,
-		Content:   articleDB.Content,
-		Date:      articleDB.Date,
-		ImageUrl:  articleDB.ImageUrl,
-		ViewCount: articleDB.ViewCount,
-		DoctorID:  articleDB.DoctorID,
+		ID:          articleDB.ID,
+		Title:       articleDB.Title,
+		Content:     articleDB.Content,
+		Date:        articleDB.Date,
+		ImageUrl:    articleDB.ImageUrl,
+		ViewCount:   articleDB.ViewCount,
+		ReadingTime: articleDB.ReadingTime,
+		DoctorID:    articleDB.DoctorID,
 		Doctor: doctorEntities.Doctor{
 			ID:   articleDB.Doctor.ID,
 			Name: articleDB.Doctor.Name,
@@ -58,7 +60,7 @@ func (repository *ArticleRepo) CreateArticle(article *articleEntities.Article, u
 	return &articleResp, nil
 }
 
-func (repository *ArticleRepo) GetAllArticle(metadata entities.Metadata, userId int) ([]articleEntities.Article, error) {
+func (repository *ArticleRepo) GetAllArticle(metadata entities.Metadata, userId int, search string) ([]articleEntities.Article, error) {
 	var articlesDb []Article
 
 	// Pagination
@@ -68,6 +70,14 @@ func (repository *ArticleRepo) GetAllArticle(metadata entities.Metadata, userId 
 		Find(&articlesDb).Error
 	if err != nil {
 		return nil, err
+	}
+
+	// Search
+	if search != "" {
+		err = repository.db.Where("title LIKE ?", "%"+search+"%").Preload("Doctor").Find(&articlesDb).Error
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	articleLikes := make([]ArticleLikes, len(articlesDb))
@@ -96,13 +106,14 @@ func (repository *ArticleRepo) GetAllArticle(metadata entities.Metadata, userId 
 	articlesEnt := make([]articleEntities.Article, len(articlesDb))
 	for i := 0; i < len(articlesDb); i++ {
 		articlesEnt[i] = articleEntities.Article{
-			ID:        articlesDb[i].ID,
-			Title:     articlesDb[i].Title,
-			Content:   articlesDb[i].Content,
-			Date:      articlesDb[i].Date,
-			ImageUrl:  articlesDb[i].ImageUrl,
-			ViewCount: articlesDb[i].ViewCount,
-			DoctorID:  articlesDb[i].DoctorID,
+			ID:          articlesDb[i].ID,
+			Title:       articlesDb[i].Title,
+			Content:     articlesDb[i].Content,
+			Date:        articlesDb[i].Date,
+			ImageUrl:    articlesDb[i].ImageUrl,
+			ViewCount:   articlesDb[i].ViewCount,
+			ReadingTime: articlesDb[i].ReadingTime,
+			DoctorID:    articlesDb[i].DoctorID,
 			Doctor: doctorEntities.Doctor{
 				ID:   articlesDb[i].Doctor.ID,
 				Name: articlesDb[i].Doctor.Name,
@@ -138,13 +149,14 @@ func (repository *ArticleRepo) GetArticleById(articleId int, userId int) (articl
 	}
 
 	articleResp := articleEntities.Article{
-		ID:        articleDb.ID,
-		Title:     articleDb.Title,
-		Content:   articleDb.Content,
-		Date:      articleDb.Date,
-		ImageUrl:  articleDb.ImageUrl,
-		ViewCount: articleDb.ViewCount,
-		DoctorID:  articleDb.DoctorID,
+		ID:          articleDb.ID,
+		Title:       articleDb.Title,
+		Content:     articleDb.Content,
+		Date:        articleDb.Date,
+		ImageUrl:    articleDb.ImageUrl,
+		ViewCount:   articleDb.ViewCount,
+		ReadingTime: articleDb.ReadingTime,
+		DoctorID:    articleDb.DoctorID,
 		Doctor: doctorEntities.Doctor{
 			ID:   articleDb.Doctor.ID,
 			Name: articleDb.Doctor.Name,
@@ -176,13 +188,14 @@ func (repository *ArticleRepo) GetLikedArticle(metadata entities.Metadata, userI
 	articlesEnt := make([]articleEntities.Article, len(articlesDb))
 	for i := 0; i < len(articlesDb); i++ {
 		articlesEnt[i] = articleEntities.Article{
-			ID:        articlesDb[i].ID,
-			Title:     articlesDb[i].Title,
-			Content:   articlesDb[i].Content,
-			Date:      articlesDb[i].Date,
-			ImageUrl:  articlesDb[i].ImageUrl,
-			ViewCount: articlesDb[i].ViewCount,
-			DoctorID:  articlesDb[i].DoctorID,
+			ID:          articlesDb[i].ID,
+			Title:       articlesDb[i].Title,
+			Content:     articlesDb[i].Content,
+			Date:        articlesDb[i].Date,
+			ImageUrl:    articlesDb[i].ImageUrl,
+			ViewCount:   articlesDb[i].ViewCount,
+			ReadingTime: articlesDb[i].ReadingTime,
+			DoctorID:    articlesDb[i].DoctorID,
 			Doctor: doctorEntities.Doctor{
 				ID:   articlesDb[i].Doctor.ID,
 				Name: articlesDb[i].Doctor.Name,
@@ -192,4 +205,151 @@ func (repository *ArticleRepo) GetLikedArticle(metadata entities.Metadata, userI
 	}
 
 	return articlesEnt, nil
+}
+
+func (repository *ArticleRepo) LikeArticle(articleId int, userId int) error {
+	var articleLikes ArticleLikes
+
+	err := repository.db.Where("user_id = ? AND article_id = ?", userId, articleId).First(&articleLikes).Error
+	if err == nil {
+		return constants.ErrAlreadyLiked
+	}
+
+	var article Article
+	err = repository.db.Where("id = ?", articleId).First(&article).Error
+	if err != nil {
+		return constants.ErrServer
+	}
+
+	articleLikes = ArticleLikes{
+		UserId:    uint(userId),
+		ArticleID: uint(articleId),
+	}
+
+	err = repository.db.Create(&articleLikes).Error
+	if err != nil {
+		return constants.ErrServer
+	}
+
+	return nil
+}
+
+func (repository *ArticleRepo) GetArticleByIdForDoctor(articleId int) (articleEntities.Article, error) {
+	var articleDb Article
+	err := repository.db.Where("id = ?", articleId).First(&articleDb).Error
+	if err != nil {
+		return articleEntities.Article{}, constants.ErrDataNotFound
+	}
+
+	return articleEntities.Article{
+		ID:          articleDb.ID,
+		Title:       articleDb.Title,
+		Content:     articleDb.Content,
+		Date:        articleDb.Date,
+		ImageUrl:    articleDb.ImageUrl,
+		ViewCount:   articleDb.ViewCount,
+		ReadingTime: articleDb.ReadingTime,
+		DoctorID:    articleDb.DoctorID,
+	}, nil
+}
+
+func (repository *ArticleRepo) GetAllArticleByDoctorId(metadata entities.MetadataFull, doctorId int) ([]articleEntities.Article, error) {
+	var articleDb []Article
+
+	query := repository.db.Where("doctor_id = ?", doctorId).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Order(metadata.Sort + " " + metadata.Order)
+
+	if metadata.Search != "" {
+		query = query.Where("title LIKE ?", "%"+metadata.Search+"%")
+	}
+
+	err := query.Find(&articleDb).Error
+	if err != nil {
+		return []articleEntities.Article{}, constants.ErrServer
+	}
+
+	articlesEnt := make([]articleEntities.Article, len(articleDb))
+	for i := 0; i < len(articleDb); i++ {
+		articlesEnt[i] = articleEntities.Article{
+			ID:          articleDb[i].ID,
+			Title:       articleDb[i].Title,
+			Content:     articleDb[i].Content,
+			Date:        articleDb[i].Date,
+			ImageUrl:    articleDb[i].ImageUrl,
+			ViewCount:   articleDb[i].ViewCount,
+			ReadingTime: articleDb[i].ReadingTime,
+			DoctorID:    articleDb[i].DoctorID,
+		}
+	}
+
+	return articlesEnt, nil
+}
+
+func (repository *ArticleRepo) CountArticleByDoctorId(doctorId int) (int, error) {
+	var counter int64
+	err := repository.db.Model(&Article{}).Where("doctor_id = ?", doctorId).Count(&counter).Error
+	if err != nil {
+		return 0, constants.ErrServer
+	}
+
+	return int(counter), nil
+}
+
+func (repository *ArticleRepo) CountArticleLikesByDoctorId(doctorId int) (int, error) {
+	var counter int64
+	err := repository.db.Table("article_likes").
+		Joins("JOIN articles ON article_likes.article_id = articles.id").
+		Where("articles.doctor_id = ?", doctorId).
+		Count(&counter).Error
+	if err != nil {
+		return 0, constants.ErrServer
+	}
+
+	return int(counter), nil
+}
+
+func (repository *ArticleRepo) CountArticleViewByDoctorId(doctorId int) (int, error) {
+	var counter int64
+	err := repository.db.Model(&Article{}).Where("doctor_id = ?", doctorId).Select("SUM(view_count)").Scan(&counter).Error
+	if err != nil {
+		return 0, constants.ErrServer
+	}
+
+	return int(counter), nil
+}
+
+func (repository *ArticleRepo) EditArticle(article articleEntities.Article) (articleEntities.Article, error) {
+	var articleDb Article
+
+	err := repository.db.Where("id = ?", article.ID).First(&articleDb).Error
+	if err != nil {
+		return articleEntities.Article{}, constants.ErrDataNotFound
+	}
+
+	articleDb.Title = article.Title
+	articleDb.Content = article.Content
+	articleDb.Date = time.Now()
+
+	if article.ImageUrl != "" {
+		articleDb.ImageUrl = article.ImageUrl
+	}
+
+	err = repository.db.Save(&articleDb).Error
+	if err != nil {
+		return articleEntities.Article{}, constants.ErrServer
+	}
+
+	return articleEntities.Article{
+		ID:          articleDb.ID,
+		Title:       articleDb.Title,
+		Content:     articleDb.Content,
+		Date:        articleDb.Date,
+		ImageUrl:    articleDb.ImageUrl,
+		ViewCount:   articleDb.ViewCount,
+		ReadingTime: articleDb.ReadingTime,
+		DoctorID:    articleDb.DoctorID,
+	}, nil
+}
+
+func (repository *ArticleRepo) DeleteArticle(articleId int) error {
+	return repository.db.Where("id = ?", articleId).Delete(&Article{}).Error
 }

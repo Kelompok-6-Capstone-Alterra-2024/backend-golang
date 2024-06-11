@@ -31,8 +31,8 @@ func (forumUseCase *ForumUseCase) JoinForum(forumId uint, userId uint) error {
 	return nil
 }
 
-func (forumUseCase *ForumUseCase) GetJoinedForum(userId uint, metadata entities.Metadata) ([]forumEntities.Forum, error) {
-	forums, err := forumUseCase.forumInterface.GetJoinedForum(userId, metadata)
+func (forumUseCase *ForumUseCase) GetJoinedForum(userId uint, metadata entities.Metadata, search string) ([]forumEntities.Forum, error) {
+	forums, err := forumUseCase.forumInterface.GetJoinedForum(userId, metadata, search)
 	if err != nil {
 		return nil, err
 	}
@@ -51,8 +51,8 @@ func (forumUseCase *ForumUseCase) LeaveForum(forumId uint, userId uint) error {
 	return nil
 }
 
-func (forumUseCase *ForumUseCase) GetRecommendationForum(userId uint, metadata entities.Metadata) ([]forumEntities.Forum, error) {
-	forums, err := forumUseCase.forumInterface.GetRecommendationForum(userId, metadata)
+func (forumUseCase *ForumUseCase) GetRecommendationForum(userId uint, metadata entities.Metadata, search string) ([]forumEntities.Forum, error) {
+	forums, err := forumUseCase.forumInterface.GetRecommendationForum(userId, metadata, search)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (forumUseCase *ForumUseCase) GetForumById(forumId uint) (forumEntities.Foru
 }
 
 func (forumUseCase *ForumUseCase) CreateForum(forum forumEntities.Forum, fileImage *multipart.FileHeader) (forumEntities.Forum, error) {
-	if forum.Name == "" || forum.Description == ""  || fileImage == nil {
+	if forum.Name == "" || forum.Description == "" {
 		return forumEntities.Forum{}, constants.ErrEmptyInputForum
 	}
 

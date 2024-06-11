@@ -51,6 +51,8 @@ type DoctorUseCaseInterface interface {
 	GetActiveDoctor(metadata *entities.Metadata) (*[]Doctor, error)
 	HandleGoogleLogin() string
 	HandleGoogleCallback(ctx context.Context, code string) (Doctor, error)
+	HandleFacebookLogin() string
+	HandleFacebookCallback(ctx context.Context, code string) (Doctor, error)
 }
 
 func (r *Doctor) ToResponse() response.DoctorLoginAndRegisterResponse {

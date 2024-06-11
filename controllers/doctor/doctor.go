@@ -106,20 +106,39 @@ func (controller *DoctorController) GetActive(c echo.Context) error {
 }
 
 func (c *DoctorController) GoogleLogin(ctx echo.Context) error {
-    url := c.doctorUseCase.HandleGoogleLogin()
-    return ctx.Redirect(http.StatusTemporaryRedirect, url)
+	url := c.doctorUseCase.HandleGoogleLogin()
+	return ctx.Redirect(http.StatusTemporaryRedirect, url)
 }
 
 func (c *DoctorController) GoogleCallback(ctx echo.Context) error {
-    code := ctx.QueryParam("code")
-    result, err := c.doctorUseCase.HandleGoogleCallback(ctx.Request().Context(), code)
-    if err != nil {
-        return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
-    }
+	code := ctx.QueryParam("code")
+	result, err := c.doctorUseCase.HandleGoogleCallback(ctx.Request().Context(), code)
+	if err != nil {
+		return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
 
 	var res response.DoctorLoginAndRegisterResponse
 	res.ID = result.ID
 	res.Token = result.Token
 
-    return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Login Oauth", res))
+	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Login Oauth", res))
+}
+
+func (c *DoctorController) FacebookLogin(ctx echo.Context) error {
+	url := c.doctorUseCase.HandleFacebookLogin()
+	return ctx.Redirect(http.StatusTemporaryRedirect, url)
+}
+
+func (c *DoctorController) FacebookCallback(ctx echo.Context) error {
+	code := ctx.QueryParam("code")
+	result, err := c.doctorUseCase.HandleFacebookCallback(ctx.Request().Context(), code)
+	if err != nil {
+		return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var res response.DoctorLoginAndRegisterResponse
+	res.ID = result.ID
+	res.Token = result.Token
+
+	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Login Oauth", res))
 }

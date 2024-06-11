@@ -4,6 +4,8 @@ import (
 	"capstone/constants"
 	"capstone/entities"
 	articleEntities "capstone/entities/article"
+	"capstone/utilities"
+	"mime/multipart"
 )
 
 type ArticleUseCase struct {
@@ -29,8 +31,8 @@ func (useCase *ArticleUseCase) CreateArticle(article *articleEntities.Article, u
 	return createdArticle, nil
 }
 
-func (useCase *ArticleUseCase) GetAllArticle(metadata entities.Metadata, userId int) ([]articleEntities.Article, error) {
-	articles, err := useCase.articleRepository.GetAllArticle(metadata, userId)
+func (useCase *ArticleUseCase) GetAllArticle(metadata entities.Metadata, userId int, search string) ([]articleEntities.Article, error) {
+	articles, err := useCase.articleRepository.GetAllArticle(metadata, userId, search)
 	if err != nil {
 		return []articleEntities.Article{}, err
 	}
@@ -51,4 +53,81 @@ func (useCase *ArticleUseCase) GetLikedArticle(metadata entities.Metadata, userI
 		return []articleEntities.Article{}, err
 	}
 	return articles, nil
+}
+
+func (useCase *ArticleUseCase) LikeArticle(articleId int, userId int) error {
+	err := useCase.articleRepository.LikeArticle(articleId, userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (useCase *ArticleUseCase) GetArticleByIdForDoctor(articleId int) (articleEntities.Article, error) {
+	articles, err := useCase.articleRepository.GetArticleByIdForDoctor(articleId)
+	if err != nil {
+		return articleEntities.Article{}, err
+	}
+	return articles, nil
+}
+
+func (useCase *ArticleUseCase) GetAllArticleByDoctorId(metadata entities.MetadataFull, doctorId int) ([]articleEntities.Article, error) {
+	articles, err := useCase.articleRepository.GetAllArticleByDoctorId(metadata, doctorId)
+	if err != nil {
+		return []articleEntities.Article{}, err
+	}
+	return articles, nil
+}
+
+func (useCase *ArticleUseCase) CountArticleByDoctorId(doctorId int) (int, error) {
+	count, err := useCase.articleRepository.CountArticleByDoctorId(doctorId)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (useCase *ArticleUseCase) CountArticleLikesByDoctorId(doctorId int) (int, error) {
+	count, err := useCase.articleRepository.CountArticleLikesByDoctorId(doctorId)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (useCase *ArticleUseCase) CountArticleViewByDoctorId(doctorId int) (int, error) {
+	count, err := useCase.articleRepository.CountArticleViewByDoctorId(doctorId)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (useCase *ArticleUseCase) EditArticle(article articleEntities.Article, file *multipart.FileHeader) (articleEntities.Article, error) {
+	if article.Title == "" || article.Content == "" {
+		return articleEntities.Article{}, constants.ErrEmptyInputArticle
+	}
+	if file != nil {
+		secureUrl, err := utilities.UploadImage(file)
+		if err != nil {
+			return articleEntities.Article{}, constants.ErrUploadImage
+		}
+		article.ImageUrl = secureUrl
+	} else {
+		article.ImageUrl = ""
+	}
+
+	article, err := useCase.articleRepository.EditArticle(article)
+	if err != nil {
+		return articleEntities.Article{}, err
+	}
+	return article, nil
+}
+
+func (useCase *ArticleUseCase) DeleteArticle(articleId int) error {
+	err := useCase.articleRepository.DeleteArticle(articleId)
+	if err != nil {
+		return err
+	}
+	return nil
 }

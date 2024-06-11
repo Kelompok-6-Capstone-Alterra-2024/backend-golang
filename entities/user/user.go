@@ -22,9 +22,10 @@ type User struct {
 type RepositoryInterface interface {
 	Register(user *User) (User, int64, error)
 	Login(user *User) (User, error)
-	Create(email string, picture string, name string, username string) (User ,error)
+	Create(email string, picture string, name string, username string) (User, error)
 	OauthFindByEmail(email string) (User, int, error)
 	GetPointsByUserId(id int) (int, error)
+	ResetPassword(email string, password string) error
 }
 
 type UseCaseInterface interface {
@@ -33,4 +34,7 @@ type UseCaseInterface interface {
 	HandleGoogleLogin() string
 	HandleGoogleCallback(ctx context.Context, code string) (User, error)
 	GetPointsByUserId(id int) (int, error)
+	ResetPassword(email string, password string) error
+	HandleFacebookLogin() string
+	HandleFacebookCallback(ctx context.Context, code string) (User, error)
 }

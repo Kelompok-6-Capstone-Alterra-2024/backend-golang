@@ -20,7 +20,7 @@ type Story struct {
 }
 
 type RepositoryInterface interface {
-	GetAllStories(metadata entities.Metadata, userId int) ([]Story, error)
+	GetAllStories(metadata entities.Metadata, userId int, search string) ([]Story, error)
 	GetStoryById(storyId int, userId int) (Story, error)
 	GetLikedStories(metadata entities.Metadata, userId int) ([]Story, error)
 	LikeStory(storyId int, userId int) error
@@ -35,7 +35,7 @@ type RepositoryInterface interface {
 }
 
 type UseCaseInterface interface {
-	GetAllStories(metadata entities.Metadata, userId int) ([]Story, error)
+	GetAllStories(metadata entities.Metadata, userId int, search string) ([]Story, error)
 	GetStoryById(storyId int, userId int) (Story, error)
 	GetLikedStories(metadata entities.Metadata, userId int) ([]Story, error)
 	LikeStory(storyId int, userId int) error

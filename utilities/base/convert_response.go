@@ -102,6 +102,24 @@ func ConvertResponseCode(err error) int {
 
 	case constants.ErrEmptyCreateForum:
 		return http.StatusBadRequest
+
+	case constants.ErrEmptyChat:
+		return http.StatusBadRequest
+
+	case constants.ErrEmptyInputEmailOTP:
+		return http.StatusBadRequest
+
+	case constants.ErrEmptyInputVerifyOTP:
+		return http.StatusBadRequest
+
+	case constants.ErrInvalidOTP:
+		return http.StatusUnauthorized
+
+	case constants.ErrExpiredOTP:
+		return http.StatusGone
+
+	case constants.ErrEmptyResetPassword:
+		return http.StatusBadRequest
 		
 	default:
 		return http.StatusInternalServerError

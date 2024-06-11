@@ -6,6 +6,7 @@ import (
 	"capstone/middlewares"
 	"capstone/utilities"
 	"context"
+	"encoding/json"
 
 	"golang.org/x/crypto/bcrypt"
 	myoauth "golang.org/x/oauth2"
@@ -14,14 +15,16 @@ import (
 )
 
 type UserUseCase struct {
-	repository userEntitites.RepositoryInterface
-	oauthConfig *myoauth.Config
+	repository    userEntitites.RepositoryInterface
+	oauthConfig   *myoauth.Config
+	oauthConfigFB *myoauth.Config
 }
 
-func NewUserUseCase(repository userEntitites.RepositoryInterface, oauthConfig *myoauth.Config) *UserUseCase {
+func NewUserUseCase(repository userEntitites.RepositoryInterface, oauthConfig *myoauth.Config, oauthConfigFB *myoauth.Config) *UserUseCase {
 	return &UserUseCase{
-		repository: repository,
-		oauthConfig: oauthConfig,
+		repository:    repository,
+		oauthConfig:   oauthConfig,
+		oauthConfigFB: oauthConfigFB,
 	}
 }
 
@@ -36,7 +39,7 @@ func (userUseCase *UserUseCase) Register(user *userEntitites.User) (userEntitite
 	}
 
 	user.Password = string(hashedPassword)
-	
+
 	var kode int64
 	userResult, kode, err := userUseCase.repository.Register(user)
 	if err != nil {
@@ -74,43 +77,43 @@ func (userUseCase *UserUseCase) Login(user *userEntitites.User) (userEntitites.U
 }
 
 func (u *UserUseCase) HandleGoogleLogin() string {
-    return u.oauthConfig.AuthCodeURL("state-token", myoauth.AccessTypeOffline)
+	return u.oauthConfig.AuthCodeURL("state-token", myoauth.AccessTypeOffline)
 }
 
 func (u *UserUseCase) HandleGoogleCallback(ctx context.Context, code string) (userEntitites.User, error) {
-    token, err := u.oauthConfig.Exchange(ctx, code)
-    if err != nil {
-        return userEntitites.User{}, constants.ErrExcange
-    }
+	token, err := u.oauthConfig.Exchange(ctx, code)
+	if err != nil {
+		return userEntitites.User{}, constants.ErrExcange
+	}
 
-    // Membuat layanan OAuth2
-    oauth2Service, err := oauth2.NewService(ctx, option.WithTokenSource(u.oauthConfig.TokenSource(ctx, token)))
-    if err != nil {
-        return userEntitites.User{}, constants.ErrNewServiceGoogle
-    }
+	// Membuat layanan OAuth2
+	oauth2Service, err := oauth2.NewService(ctx, option.WithTokenSource(u.oauthConfig.TokenSource(ctx, token)))
+	if err != nil {
+		return userEntitites.User{}, constants.ErrNewServiceGoogle
+	}
 
-    userInfoService := oauth2.NewUserinfoV2MeService(oauth2Service)
-    userInfo, err := userInfoService.Get().Do()
-    if err != nil {
-        return userEntitites.User{}, constants.ErrNewUserInfo
-    }
+	userInfoService := oauth2.NewUserinfoV2MeService(oauth2Service)
+	userInfo, err := userInfoService.Get().Do()
+	if err != nil {
+		return userEntitites.User{}, constants.ErrNewUserInfo
+	}
 
-    // Cek apakah pengguna sudah ada di database
+	// Cek apakah pengguna sudah ada di database
 	result, myCode, err := u.repository.OauthFindByEmail(userInfo.Email)
 
-    if err != nil && myCode == 0 {
+	if err != nil && myCode == 0 {
 		username := utilities.GetFirstNameWithNumbers(userInfo.Name)
 
-        newUser, err := u.repository.Create(userInfo.Email, userInfo.Picture, userInfo.Name, username)
+		newUser, err := u.repository.Create(userInfo.Email, userInfo.Picture, userInfo.Name, username)
 		if err != nil {
-            return userEntitites.User{}, constants.ErrInsertOAuth
-        }
+			return userEntitites.User{}, constants.ErrInsertOAuth
+		}
 
 		tokenJWT, _ := middlewares.CreateToken(newUser.Id)
 		newUser.Token = tokenJWT
 
 		return newUser, nil
-    }
+	}
 
 	if err != nil && myCode == 1 {
 		return userEntitites.User{}, err
@@ -119,7 +122,7 @@ func (u *UserUseCase) HandleGoogleCallback(ctx context.Context, code string) (us
 	tokenJWT, _ := middlewares.CreateToken(result.Id)
 	result.Token = tokenJWT
 
-    return result, nil
+	return result, nil
 }
 
 func (u *UserUseCase) GetPointsByUserId(id int) (int, error) {
@@ -127,5 +130,81 @@ func (u *UserUseCase) GetPointsByUserId(id int) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	return result, nil
+}
+
+func (u *UserUseCase) ResetPassword(email string, password string) error {
+	if password == "" {
+		return constants.ErrEmptyResetPassword
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	err = u.repository.ResetPassword(email, string(hashedPassword))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *UserUseCase) HandleFacebookLogin() string {
+	return u.oauthConfigFB.AuthCodeURL("state-token", myoauth.AccessTypeOffline)
+}
+
+func (u *UserUseCase) HandleFacebookCallback(ctx context.Context, code string) (userEntitites.User, error) {
+	token, err := u.oauthConfigFB.Exchange(ctx, code)
+	if err != nil {
+		return userEntitites.User{}, constants.ErrExcange
+	}
+
+	client := u.oauthConfigFB.Client(ctx, token)
+	resp, err := client.Get("https://graph.facebook.com/me?fields=id,name,email,picture")
+	if err != nil {
+		return userEntitites.User{}, constants.ErrNewUserInfo
+	}
+	defer resp.Body.Close()
+
+	var fbUser struct {
+		ID      string `json:"id"`
+		Name    string `json:"name"`
+		Email   string `json:"email"`
+		Picture struct {
+			Data struct {
+				URL string `json:"url"`
+			} `json:"data"`
+		} `json:"picture"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&fbUser); err != nil {
+		return userEntitites.User{}, err
+	}
+
+	// Cek apakah pengguna sudah ada di database
+	result, myCode, err := u.repository.OauthFindByEmail(fbUser.Email)
+
+	if err != nil && myCode == 0 {
+		username := utilities.GetFirstNameWithNumbers(fbUser.Name)
+
+		newUser, err := u.repository.Create(fbUser.Email, fbUser.Picture.Data.URL, fbUser.Name, username)
+		if err != nil {
+			return userEntitites.User{}, constants.ErrInsertOAuth
+		}
+
+		tokenJWT, _ := middlewares.CreateToken(newUser.Id)
+		newUser.Token = tokenJWT
+
+		return newUser, nil
+	}
+
+	if err != nil && myCode == 1 {
+		return userEntitites.User{}, err
+	}
+
+	tokenJWT, _ := middlewares.CreateToken(result.Id)
+	result.Token = tokenJWT
+
 	return result, nil
 }

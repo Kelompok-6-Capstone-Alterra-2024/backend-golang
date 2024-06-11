@@ -2,6 +2,7 @@ package routes
 
 import (
 	"capstone/controllers/article"
+	"capstone/controllers/chat"
 	"capstone/controllers/chatbot"
 	"capstone/controllers/complaint"
 	"capstone/controllers/consultation"
@@ -9,6 +10,7 @@ import (
 	"capstone/controllers/forum"
 	"capstone/controllers/mood"
 	"capstone/controllers/music"
+	"capstone/controllers/otp"
 	"capstone/controllers/post"
 	"capstone/controllers/rating"
 	"capstone/controllers/story"
@@ -36,6 +38,8 @@ type RouteController struct {
 	postController         *post.PostController
 	chatbotController      *chatbot.ChatbotController
 	articleController      *article.ArticleController
+	chatController         *chat.ChatController
+	otpController          *otp.OtpController
 }
 
 func NewRoute(
@@ -51,7 +55,9 @@ func NewRoute(
 	forumController *forum.ForumController,
 	postController *post.PostController,
 	chatbotController *chatbot.ChatbotController,
-	articleController *article.ArticleController) *RouteController {
+	articleController *article.ArticleController,
+	chatController *chat.ChatController,
+	otpController *otp.OtpController) *RouteController {
 	return &RouteController{
 		userController:         userController,
 		doctorController:       doctorController,
@@ -66,6 +72,8 @@ func NewRoute(
 		postController:         postController,
 		chatbotController:      chatbotController,
 		articleController:      articleController,
+		chatController:         chatController,
+		otpController:          otpController,
 	}
 }
 
@@ -83,11 +91,15 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	e.GET("/v1/doctors/chatbots/treatment", r.chatbotController.ChatbotTreatment)      //Chatbot Treatment
 
 	userAuth := e.Group("/v1/users")
-	userAuth.POST("/register", r.userController.Register) //Register User
-	userAuth.POST("/login", r.userController.Login)       //Login User
+	userAuth.POST("/register", r.userController.Register)           //Register User
+	userAuth.POST("/login", r.userController.Login)                 //Login User
+	userAuth.PUT("/reset-password", r.userController.ResetPassword) //Reset Password
 
 	userAuth.GET("/auth/google/login", r.userController.GoogleLogin)
 	userAuth.GET("/auth/google/callback", r.userController.GoogleCallback)
+
+	userAuth.GET("/auth/facebook/login", r.userController.FacebookLogin)
+	userAuth.GET("/auth/facebook/callback", r.userController.FacebookCallback)
 
 	userRoute := userAuth.Group("/")
 	userRoute.Use(echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))
@@ -151,12 +163,24 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("articles", r.articleController.GetAllArticle) // Get All Article
 	userRoute.GET("articles/:id", r.articleController.GetArticleById)
 	userRoute.GET("articles/liked", r.articleController.GetLikedArticle)
+	userRoute.POST("articles/like", r.articleController.LikeArticle)
 
 	// Consultation Notes
 	userRoute.GET("consultation-notes/consultation/:id", r.consultationController.GetConsultationNotesByID) // Get Consultation Note By ID
 
 	// Points
 	userRoute.GET("points", r.userController.GetPointsByUserId) // Get Points
+
+	// Chat
+	userRoute.GET("chats", r.chatController.GetAllChatByUserId) // Get All Chat
+
+	// Chat Messages
+	userRoute.POST("chats/messages", r.chatController.SendMessage)           // Send Message
+	userRoute.GET("chats/:chatId/messages", r.chatController.GetAllMessages) // Get All Message
+
+	// OTP
+	userRoute.POST("send-otp", r.otpController.SendOtp)     // Send OTP
+	userRoute.POST("verify-otp", r.otpController.VerifyOtp) // Verify OTP
 
 	doctorAuth := e.Group("/v1/doctors")
 
@@ -165,12 +189,21 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorAuth.GET("/auth/google/login", r.doctorController.GoogleLogin)       // Google Login
 	doctorAuth.GET("/auth/google/callback", r.doctorController.GoogleCallback) // Google Callback
 
+	doctorAuth.GET("/auth/facebook/login", r.doctorController.FacebookLogin)
+	doctorAuth.GET("/auth/facebook/callback", r.doctorController.FacebookCallback)
+
 	doctorRoute := doctorAuth.Group("/")
 	doctorRoute.Use(echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))
 
 	// articles
-	doctorRoute.POST("articles", r.articleController.CreateArticle) // Create Article
-	doctorRoute.GET("articles", r.articleController.GetAllArticle)  // Get All Article
+	doctorRoute.POST("articles", r.articleController.CreateArticle)                         // Post Article
+	doctorRoute.GET("articles", r.articleController.GetAllArticleByDoctorId)                // Get All Article
+	doctorRoute.GET("articles/:id", r.articleController.GetArticleByIdForDoctor)            // Get Article By ID
+	doctorRoute.GET("articles/count", r.articleController.CountArticleByDoctorId)           // Count Article By Doctor ID
+	doctorRoute.GET("articles/like/count", r.articleController.CountArticleLikesByDoctorId) // Count Article Likes By Doctor ID
+	doctorRoute.GET("articles/view/count", r.articleController.CountArticleViewByDoctorId)  // Count Article View Count By Doctor ID
+	doctorRoute.PUT("articles/:id", r.articleController.EditArticle)                        // Update Article
+	doctorRoute.DELETE("articles/:id", r.articleController.DeleteArticle)                   // Delete Article
 
 	// musics
 	doctorRoute.POST("musics", r.musicController.PostMusic)                               // Post Music
@@ -182,6 +215,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.PUT("musics/:id", r.musicController.EditMusic)                            // Update Music
 	doctorRoute.DELETE("musics/:id", r.musicController.DeleteMusic)                       // Delete Music
 
+	// Inspirational Stories
 	doctorRoute.POST("stories", r.storyController.PostStory)                           // Post Story
 	doctorRoute.GET("stories", r.storyController.GetAllStoriesByDoctorId)              // Get All Story By Doctor ID
 	doctorRoute.GET("stories/:id", r.storyController.GetStoryByIdForDoctor)            // Get Story By ID
@@ -196,8 +230,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("consultations", r.consultationController.GetAllDoctorConsultation) //Get All Consultation
 	doctorRoute.GET("consultations/count", r.consultationController.CountConsultationByDoctorID)
 	doctorRoute.GET("consultations/today/count", r.consultationController.CountConsultationToday)
-	doctorRoute.GET("consultations/:id", r.consultationController.GetConsultationByID)  //Get Consultation By ID
-	doctorRoute.PUT("consultations", r.consultationController.UpdateStatusConsultation) // Update Status Consultation
+	doctorRoute.GET("consultations/:id", r.consultationController.GetConsultationByID)      //Get Consultation By ID
+	doctorRoute.PUT("consultations/:id", r.consultationController.UpdateStatusConsultation) // Update Status Consultation
 
 	doctorRoute.GET("stories/view/count", r.storyController.CountStoryViewByDoctorId) // Count Stories View Count By Doctor ID
 	doctorRoute.PUT("stories/:id", r.storyController.EditStory)                       // Update Story
@@ -221,6 +255,13 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	// Post
 	doctorRoute.GET("forums/:forumId/posts", r.postController.GetAllPostsByForumId)   // Get All Posts By Forum ID
 	doctorRoute.GET("posts/:postId/comments", r.postController.GetAllCommentByPostId) // Get All Comment By Post ID
+
+	// Chat
+	doctorRoute.GET("chats", r.chatController.GetAllChatByDoctorId) // Get All Chat By Doctor ID
+
+	// Chat Message
+	doctorRoute.POST("chats/messages", r.chatController.SendMessageDoctor)     // Send Message
+	doctorRoute.GET("chats/:chatId/messages", r.chatController.GetAllMessages) // Get All Message
 
 	// Transaction
 	doctorRoute.GET("transactions", r.transactionController.FindAllByDoctorID) // Get All Transaction By Doctor ID
