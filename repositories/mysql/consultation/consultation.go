@@ -198,3 +198,16 @@ func (repository *ConsultationRepo) GetConsultationNotesByID(consultationID int)
 
 	return notesEnt, nil
 }
+
+func (repository *ConsultationRepo) GetConsultationByComplaintID(complaintID int) (*consultationEntities.Consultation, error) {
+	var consultationDB Consultation
+	if err := repository.db.Preload("Complaint").First(&consultationDB, "complaint_id LIKE ?", complaintID).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+	consultationResult, err := consultationDB.ToEntities()
+	if err != nil {
+		return nil, constants.ErrInputTime
+	}
+
+	return consultationResult, nil
+}

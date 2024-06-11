@@ -12,7 +12,7 @@ import (
 type ConsultationUseCase struct {
 	consultationRepo consultationEntities.ConsultationRepository
 	validate         *validator.Validate
-	chatRepo chatEntities.RepositoryInterface
+	chatRepo         chatEntities.RepositoryInterface
 }
 
 func NewConsultationUseCase(consultationRepo consultationEntities.ConsultationRepository, validate *validator.Validate, chatRepo chatEntities.RepositoryInterface) consultationEntities.ConsultationUseCase {
@@ -114,6 +114,14 @@ func (usecase *ConsultationUseCase) GetConsultationNotesByID(consultationID int)
 	result, err := usecase.consultationRepo.GetConsultationNotesByID(consultationID)
 	if err != nil {
 		return result, err
+	}
+	return result, nil
+}
+
+func (usecase *ConsultationUseCase) GetConsultationByComplaintID(complaintID int) (*consultationEntities.Consultation, error) {
+	result, err := usecase.consultationRepo.GetConsultationByComplaintID(complaintID)
+	if err != nil {
+		return nil, err
 	}
 	return result, nil
 }
