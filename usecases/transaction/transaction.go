@@ -4,6 +4,7 @@ import (
 	"capstone/constants"
 	"capstone/entities"
 	"capstone/entities/consultation"
+	doctorEntities "capstone/entities/doctor"
 	midtransEntities "capstone/entities/midtrans"
 	transactionEntities "capstone/entities/transaction"
 	"github.com/go-playground/validator/v10"
@@ -13,6 +14,7 @@ type Transaction struct {
 	transactionRepository  transactionEntities.TransactionRepository
 	midtransUseCase        midtransEntities.MidtransUseCase
 	consultationRepository consultation.ConsultationRepository
+	doctorRepository       doctorEntities.DoctorRepositoryInterface
 	validate               *validator.Validate
 }
 
@@ -20,12 +22,14 @@ func NewTransactionUseCase(
 	transactionRepository transactionEntities.TransactionRepository,
 	midtransUseCase midtransEntities.MidtransUseCase,
 	consultationRepository consultation.ConsultationRepository,
+	doctorRepository doctorEntities.DoctorRepositoryInterface,
 	validate *validator.Validate,
 ) transactionEntities.TransactionUseCase {
 	return &Transaction{
 		transactionRepository:  transactionRepository,
 		midtransUseCase:        midtransUseCase,
 		consultationRepository: consultationRepository,
+		doctorRepository:       doctorRepository,
 		validate:               validate,
 	}
 }
@@ -128,8 +132,18 @@ func (usecase *Transaction) ConfirmedPayment(id string, transactionStatus string
 		return transaction, nil
 	}
 
+	// Update Transaction Status
 	transaction.Status = transactionStatus
 	transactionResponse, err := usecase.transactionRepository.Update(transaction)
+
+	// Add Balance Doctor
+	doctorDB, err := usecase.doctorRepository.GetDoctorByID(int(transaction.Consultation.DoctorID))
+	if err != nil {
+		return nil, err
+	}
+
+	totalBalance := doctorDB.Amount + transaction.Price
+	err = usecase.doctorRepository.UpdateAmount(transaction.Consultation.DoctorID, totalBalance)
 	if err != nil {
 		return nil, err
 	}

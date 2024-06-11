@@ -90,14 +90,14 @@ func (repository *DoctorRepo) GetActiveDoctor(metadata *entities.Metadata) (*[]d
 	return &doctorsResponse, nil
 }
 
-func (r *DoctorRepo) Create(email string, picture string, name string, username string) (doctorEntities.Doctor ,error) {
+func (r *DoctorRepo) Create(email string, picture string, name string, username string) (doctorEntities.Doctor, error) {
 	var doctorDB Doctor
 	doctorDB.Email = email
 	doctorDB.ProfilePicture = picture
 	doctorDB.Name = name
 	doctorDB.IsOauth = true
 	doctorDB.Username = username
-    
+
 	err := r.db.Create(&doctorDB).Error
 	if err != nil {
 		return doctorEntities.Doctor{}, err
@@ -114,10 +114,10 @@ func (r *DoctorRepo) Create(email string, picture string, name string, username 
 }
 
 func (r *DoctorRepo) OauthFindByEmail(email string) (doctorEntities.Doctor, int, error) {
-    var doctorDB Doctor
-    if err := r.db.Where("email = ?", email).First(&doctorDB).Error; err != nil {
-        return doctorEntities.Doctor{}, 0, err
-    }
+	var doctorDB Doctor
+	if err := r.db.Where("email = ?", email).First(&doctorDB).Error; err != nil {
+		return doctorEntities.Doctor{}, 0, err
+	}
 
 	if !doctorDB.IsOauth {
 		return doctorEntities.Doctor{}, 1, constants.ErrEmailAlreadyExist
@@ -130,5 +130,13 @@ func (r *DoctorRepo) OauthFindByEmail(email string) (doctorEntities.Doctor, int,
 	doctorEnt.ProfilePicture = doctorDB.ProfilePicture
 	doctorEnt.IsOauth = doctorDB.IsOauth
 
-    return doctorEnt, 0, nil
+	return doctorEnt, 0, nil
+}
+
+func (r *DoctorRepo) UpdateAmount(doctorID uint, amount int) error {
+	if err := r.db.Model(&Doctor{}).Where("id = ?", doctorID).Update("amount", amount).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
