@@ -17,12 +17,12 @@ type ConsultationUserResponse struct {
 }
 
 type ConsultationDoctorResponse struct {
-	ID            int `json:"id"`
-	Status        string
-	PaymentStatus string
-	IsAccepted    bool
-	IsActive      bool
-	Date          string
-	Time          string
-	Complaint     *complaintResponse.ComplaintResponse
+	ID            int                                  `json:"id"`
+	Status        string                               `json:"status"`
+	PaymentStatus string                               `json:"payment_status"`
+	IsAccepted    bool                                 `json:"is_accepted"`
+	IsActive      bool                                 `json:"is_active"`
+	Date          string                               `json:"date"`
+	Time          string                               `json:"time"`
+	Complaint     *complaintResponse.ComplaintResponse `json:"complaint"`
 }

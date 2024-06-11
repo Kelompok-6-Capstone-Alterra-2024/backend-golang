@@ -22,11 +22,17 @@ func (usecase *ComplaintUseCase) Create(complaint *complaintEntities.Complaint) 
 }
 
 func (usecase *ComplaintUseCase) GetAllByUserID(metadata *entities.Metadata, userID int) (*[]complaintEntities.Complaint, error) {
-	//TODO implement me
-	panic("implement me")
+	result, err := usecase.complaintRepo.GetAllByUserID(metadata, userID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func (usecase *ComplaintUseCase) GetByID(complaintID int) (*complaintEntities.Complaint, error) {
-	//TODO implement me
-	panic("implement me")
+	result, err := usecase.complaintRepo.GetByID(complaintID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }

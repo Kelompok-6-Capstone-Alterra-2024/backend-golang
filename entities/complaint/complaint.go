@@ -6,9 +6,9 @@ import (
 
 type Complaint struct {
 	ID                 uint
-	ConsultationID     uint
 	Name               string
 	Age                int
+	ConsultationID     uint
 	Gender             string
 	Message            string
 	MedicalHistory     string

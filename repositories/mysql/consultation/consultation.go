@@ -54,7 +54,7 @@ func (repository *ConsultationRepo) GetConsultationByID(consultationID int) (con
 func (repository *ConsultationRepo) GetAllUserConsultation(metadata *entities.Metadata, userID int) (*[]consultationEntities.Consultation, error) {
 	var consultationDB []Consultation
 
-	if err := repository.db.Limit(metadata.Limit).Offset(metadata.Offset()).Preload("Doctor").Preload("Complaint").Find(&consultationDB, "user_id LIKE ?", userID).Error; err != nil {
+	if err := repository.db.Limit(metadata.Limit).Offset(metadata.Offset()).Preload("Doctor").Find(&consultationDB, "user_id LIKE ?", userID).Error; err != nil {
 		return nil, constants.ErrDataNotFound
 	}
 
