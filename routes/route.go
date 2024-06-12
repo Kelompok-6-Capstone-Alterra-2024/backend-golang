@@ -101,6 +101,10 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userAuth.GET("/auth/facebook/login", r.userController.FacebookLogin)
 	userAuth.GET("/auth/facebook/callback", r.userController.FacebookCallback)
 
+	// OTP
+	userAuth.POST("/send-otp", r.otpController.SendOtp)     // Send OTP
+	userAuth.POST("/verify-otp", r.otpController.VerifyOtp) // Verify OTP
+
 	userRoute := userAuth.Group("/")
 	userRoute.Use(echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))
 	// Doctor
@@ -177,10 +181,6 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	// Chat Messages
 	userRoute.POST("chats/messages", r.chatController.SendMessage)           // Send Message
 	userRoute.GET("chats/:chatId/messages", r.chatController.GetAllMessages) // Get All Message
-
-	// OTP
-	userRoute.POST("send-otp", r.otpController.SendOtp)     // Send OTP
-	userRoute.POST("verify-otp", r.otpController.VerifyOtp) // Verify OTP
 
 	doctorAuth := e.Group("/v1/doctors")
 
