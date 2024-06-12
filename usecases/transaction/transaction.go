@@ -7,6 +7,7 @@ import (
 	doctorEntities "capstone/entities/doctor"
 	midtransEntities "capstone/entities/midtrans"
 	transactionEntities "capstone/entities/transaction"
+	"fmt"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -124,6 +125,7 @@ func (usecase *Transaction) ConfirmedPayment(id string, transactionStatus string
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(transaction)
 	if *transaction == (transactionEntities.Transaction{}) {
 		return nil, constants.ErrDataNotFound
 	}
@@ -142,10 +144,12 @@ func (usecase *Transaction) ConfirmedPayment(id string, transactionStatus string
 		return nil, err
 	}
 
-	totalBalance := doctorDB.Amount + transaction.Price
-	err = usecase.doctorRepository.UpdateAmount(transaction.Consultation.DoctorID, totalBalance)
-	if err != nil {
-		return nil, err
+	if transaction.Status == constants.Success {
+		totalBalance := doctorDB.Amount + transaction.Price
+		err = usecase.doctorRepository.UpdateAmount(transaction.Consultation.DoctorID, totalBalance)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return transactionResponse, nil
 }

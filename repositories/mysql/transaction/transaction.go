@@ -4,6 +4,7 @@ import (
 	"capstone/constants"
 	"capstone/entities"
 	transactionEntities "capstone/entities/transaction"
+	"capstone/repositories/mysql/consultation"
 	"gorm.io/gorm"
 )
 
@@ -69,6 +70,7 @@ func (repository *TransactionRepo) Update(transaction *transactionEntities.Trans
 	if err := repository.db.Model(&Transaction{}).Where("id LIKE ?", transactionDB.ID).Update("status", transactionDB.Status).Error; err != nil {
 		return nil, constants.ErrInsertDatabase
 	}
+	transactionDB.Consultation = *consultation.ToConsultationModel(&transaction.Consultation)
 	return transactionDB.ToEntities(), nil
 }
 

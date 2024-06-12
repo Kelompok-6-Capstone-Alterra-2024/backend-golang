@@ -118,7 +118,6 @@ func (controller *TransactionController) CallbackTransaction(c echo.Context) err
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
-
 	fmt.Println(transactionCallback.TransactionID)
 	transaction, err := controller.transactionUseCase.ConfirmedPayment(transactionCallback.OrderID, statusCode)
 	if err != nil {
