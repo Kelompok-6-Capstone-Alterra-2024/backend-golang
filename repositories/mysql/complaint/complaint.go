@@ -20,7 +20,7 @@ func (repository *ComplaintRepo) Create(complaint *complaint.Complaint) (*compla
 	if err := repository.db.Create(&complaintModel).Error; err != nil {
 		return nil, constants.ErrInsertDatabase
 	}
-	if err := repository.db.Table("Consultations").Where("id LIKE ?", complaint.ConsultationID).Update("complaint_id", complaintModel.ID).Error; err != nil {
+	if err := repository.db.Table("consultations").Where("id LIKE ?", complaint.ConsultationID).Update("complaint_id", complaintModel.ID).Error; err != nil {
 		return nil, err
 	}
 	return complaintModel.ToEntities(), nil
