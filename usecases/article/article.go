@@ -40,6 +40,11 @@ func (useCase *ArticleUseCase) GetAllArticle(metadata entities.Metadata, userId 
 }
 
 func (useCase *ArticleUseCase) GetArticleById(articleId int, userId int) (articleEntities.Article, error) {
+	err := useCase.articleRepository.IncrementViewCount(articleId)
+	if err != nil {
+		return articleEntities.Article{}, err
+	}
+
 	article, err := useCase.articleRepository.GetArticleById(articleId, userId)
 	if err != nil {
 		return articleEntities.Article{}, err

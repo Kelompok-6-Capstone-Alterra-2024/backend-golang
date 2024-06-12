@@ -34,6 +34,7 @@ type ArticleRepositoryInterface interface {
 	CountArticleViewByDoctorId(doctorId int) (int, error)
 	EditArticle(article Article) (Article, error)
 	DeleteArticle(articleId int) error
+	IncrementViewCount(articleId int) error
 }
 
 type ArticleUseCaseInterface interface {

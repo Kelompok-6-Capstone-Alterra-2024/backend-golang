@@ -353,3 +353,7 @@ func (repository *ArticleRepo) EditArticle(article articleEntities.Article) (art
 func (repository *ArticleRepo) DeleteArticle(articleId int) error {
 	return repository.db.Where("id = ?", articleId).Delete(&Article{}).Error
 }
+
+func (repository *ArticleRepo) IncrementViewCount(articleId int) error {
+	return repository.db.Model(&Article{}).Where("id = ?", articleId).Update("view_count", gorm.Expr("view_count + 1")).Error
+}
