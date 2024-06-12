@@ -208,3 +208,16 @@ func (u *UserUseCase) HandleFacebookCallback(ctx context.Context, code string) (
 
 	return result, nil
 }
+
+func (userUseCase *UserUseCase) UpdateUserProfile(user *userEntitites.User) (userEntitites.User, error) {
+	if user.Id == 0 {
+		return userEntitites.User{}, constants.ErrUserNotFound
+	}
+
+	updatedUser, err := userUseCase.repository.UpdateUserProfile(user)
+	if err != nil {
+		return userEntitites.User{}, err
+	}
+
+	return updatedUser, nil
+}
