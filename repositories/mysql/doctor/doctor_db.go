@@ -28,6 +28,7 @@ type Doctor struct {
 	Fee              int    `gorm:"type:int"`
 	Specialist       string `gorm:"type:varchar(100)"`
 	IsOauth          bool   `gorm:"type:boolean;default:false"`
+	Amount           int    `gorm:"type:int;default:0"`
 }
 
 func (doctor *Doctor) ToEntities() *doctorEntities.Doctor {
@@ -52,6 +53,7 @@ func (doctor *Doctor) ToEntities() *doctorEntities.Doctor {
 		StrNumber:        doctor.StrNumber,
 		Fee:              doctor.Fee,
 		Specialist:       doctor.Specialist,
+		Amount:           doctor.Amount,
 	}
 }
 
@@ -74,5 +76,6 @@ func ToDoctorModel(request *doctorEntities.Doctor) *Doctor {
 		PracticeProvince: request.PracticeProvince,
 		StrNumber:        request.StrNumber,
 		Specialist:       request.Specialist,
+		Amount:           request.Amount,
 	}
 }

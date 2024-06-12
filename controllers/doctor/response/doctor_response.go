@@ -20,4 +20,5 @@ type DoctorResponse struct {
 	StrNumber        string `json:"str_number"`
 	Fee              int    `json:"fee"`
 	Specialist       string `json:"specialist"`
+	Amount           int    `json:"amount"`
 }
