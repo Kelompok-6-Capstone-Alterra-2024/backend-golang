@@ -91,10 +91,11 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	e.GET("/v1/doctors/chatbots/treatment", r.chatbotController.ChatbotTreatment)      //Chatbot Treatment
 
 	userAuth := e.Group("/v1/users")
-	userAuth.POST("/register", r.userController.Register)           //Register User
-	userAuth.POST("/login", r.userController.Login)                 //Login User
-	userAuth.PUT("/reset-password", r.userController.ResetPassword) //Reset Password
-	userAuth.PUT("/update-profile", r.userController.UpdateProfile) //Update Profile
+	userAuth.POST("/register", r.userController.Register)             //Register User
+	userAuth.POST("/login", r.userController.Login)                   //Login User
+	userAuth.PUT("/reset-password", r.userController.ResetPassword)   //Reset Password
+	userAuth.PUT("/update-profile", r.userController.UpdateProfile)   //Update Profile
+	userAuth.PUT("/change-password", r.userController.ChangePassword) // Change Password
 
 	userAuth.GET("/auth/google/login", r.userController.GoogleLogin)
 	userAuth.GET("/auth/google/callback", r.userController.GoogleCallback)

@@ -81,3 +81,5 @@ var ErrInvalidOTP error = errors.New("invalid otp")
 var ErrExpiredOTP error = errors.New("expired otp")
 
 var ErrEmptyResetPassword error = errors.New("new password cannot be empty")
+
+var ErrInvalidCredentials error = errors.New("invalid credentials")

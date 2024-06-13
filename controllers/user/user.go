@@ -182,3 +182,26 @@ func (userController *UserController) UpdateProfile(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Update Profile", userResponse))
 }
+
+func (c *UserController) ChangePassword(ctx echo.Context) error {
+	var req request.ChangePasswordRequest
+	if err := ctx.Bind(&req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	token := ctx.Request().Header.Get("Authorization")
+	userId, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return ctx.JSON(http.StatusUnauthorized, base.NewErrorResponse("Invalid token"))
+	}
+
+	if req.NewPassword != req.NewPasswordConfirm {
+		return ctx.JSON(http.StatusBadRequest, base.NewErrorResponse("New password and confirmation do not match"))
+	}
+
+	err = c.userUseCase.ChangePassword(userId, req.OldPassword, req.NewPassword)
+	if err != nil {
+		return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Change Password", nil))
+}

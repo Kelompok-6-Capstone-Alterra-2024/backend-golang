@@ -192,3 +192,29 @@ func (userRepo *UserRepo) UpdateUserProfile(user *userEntities.User) (userEntiti
 
 	return updatedUser, nil
 }
+
+func (r *UserRepo) ChangePassword(userId int, oldPassword, newPassword string) error {
+	var userDB User
+	if err := r.DB.Where("id = ?", userId).First(&userDB).Error; err != nil {
+		return err
+	}
+
+	// Compare old password with hashed password in database
+	err := bcrypt.CompareHashAndPassword([]byte(userDB.Password), []byte(oldPassword))
+	if err != nil {
+		return constants.ErrInvalidCredentials
+	}
+
+	// Hash the new password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	// Update the password in the database
+	err = r.DB.Model(&User{}).Where("id = ?", userId).Update("password", string(hashedPassword)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
