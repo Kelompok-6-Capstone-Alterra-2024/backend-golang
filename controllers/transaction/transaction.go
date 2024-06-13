@@ -163,3 +163,12 @@ func (controller *TransactionController) FindAllByDoctorID(c echo.Context) error
 	}
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Get all transaction success", transactionResponses))
 }
+
+func (controller *TransactionController) DeleteTransaction(c echo.Context) error {
+	strID := c.Param("id")
+	err := controller.transactionUseCase.Delete(strID)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Transaction deleted", nil))
+}

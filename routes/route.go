@@ -264,9 +264,10 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("chats/:chatId/messages", r.chatController.GetAllMessages) // Get All Message
 
 	// Transaction
-	doctorRoute.GET("transactions", r.transactionController.FindAllByDoctorID) // Get All Transaction By Doctor ID
-	doctorRoute.GET("transaction/:id", r.transactionController.FindByID)       // Get Transaction By ID
-	doctorRoute.GET("transactions/count", r.transactionController.CountTransactionByDoctorID)
+	doctorRoute.GET("transactions", r.transactionController.FindAllByDoctorID)                // Get All Transaction By Doctor ID
+	doctorRoute.GET("transaction/:id", r.transactionController.FindByID)                      // Get Transaction By ID
+	doctorRoute.GET("transactions/count", r.transactionController.CountTransactionByDoctorID) // Count Transaction By Doctor ID
+	doctorRoute.DELETE("transactions/:id", r.transactionController.DeleteTransaction)         // Delete Transaction
 
 	// Patient
 	doctorRoute.GET("patients", r.complaintController.GetAllByDoctorID) // Get All Patient

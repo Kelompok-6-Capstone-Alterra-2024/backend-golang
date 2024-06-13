@@ -75,9 +75,15 @@ func (repository *TransactionRepo) Update(transaction *transactionEntities.Trans
 	return transactionDB.ToEntities(), nil
 }
 
-func (repository *TransactionRepo) Delete(ID uint) error {
-	//TODO implement me
-	panic("implement me")
+func (repository *TransactionRepo) Delete(ID string) error {
+	_, err := repository.FindByID(ID)
+	if err != nil {
+		return constants.ErrDataNotFound
+	}
+	if err = repository.db.Delete(&Transaction{}, "id LIKE ?", ID).Error; err != nil {
+		return constants.ErrDeleteDatabase
+	}
+	return nil
 }
 
 func (repository *TransactionRepo) FindAllByDoctorID(metadata *entities.Metadata, doctorID uint, status string) (*[]transactionEntities.Transaction, error) {

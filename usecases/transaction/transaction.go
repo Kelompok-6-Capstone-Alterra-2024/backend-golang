@@ -118,9 +118,11 @@ func (usecase *Transaction) Update(transaction *transactionEntities.Transaction)
 	panic("implement me")
 }
 
-func (usecase *Transaction) Delete(ID uint) error {
-	//TODO implement me
-	panic("implement me")
+func (usecase *Transaction) Delete(ID string) error {
+	if err := usecase.transactionRepository.Delete(ID); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (usecase *Transaction) ConfirmedPayment(id string, transactionStatus string) (*transactionEntities.Transaction, error) {

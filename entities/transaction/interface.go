@@ -9,7 +9,7 @@ type TransactionRepository interface {
 	FindAllByUserID(metadata *entities.Metadata, userID uint, status string) (*[]Transaction, error)
 	FindAllByDoctorID(metadata *entities.Metadata, doctorID uint, status string) (*[]Transaction, error)
 	Update(transaction *Transaction) (*Transaction, error)
-	Delete(ID uint) error
+	Delete(ID string) error
 	CountTransactionByDoctorID(doctorID uint) (int, error)
 }
 
@@ -22,6 +22,6 @@ type TransactionUseCase interface {
 	FindAllByUserID(metadata *entities.Metadata, userID uint, status string) (*[]Transaction, error)
 	FindAllByDoctorID(metadata *entities.Metadata, doctorID uint, status string) (*[]Transaction, error)
 	Update(transaction *Transaction) (*Transaction, error)
-	Delete(ID uint) error
+	Delete(ID string) error
 	CountTransactionByDoctorID(doctorID uint) (int, error)
 }
