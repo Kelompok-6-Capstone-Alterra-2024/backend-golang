@@ -45,11 +45,12 @@ func (repository *TransactionRepo) FindByConsultationID(consultationID uint) (*t
 	return transactionDB.ToEntities(), nil
 }
 
-func (repository *TransactionRepo) FindAllByUserID(metadata *entities.Metadata, userID uint) (*[]transactionEntities.Transaction, error) {
+func (repository *TransactionRepo) FindAllByUserID(metadata *entities.Metadata, userID uint, status string) (*[]transactionEntities.Transaction, error) {
 	transactionDB := new([]Transaction)
 	if err := repository.db.
 		Joins("JOIN consultations ON consultations.id = transactions.consultation_id").
 		Joins("JOIN users ON consultations.user_id = users.id").
+		Where("transactions.status LIKE ?", "%"+status+"%").
 		Where("users.id LIKE ?", userID).
 		Preload("Consultation").
 		Preload("Consultation.Doctor").
@@ -74,19 +75,27 @@ func (repository *TransactionRepo) Update(transaction *transactionEntities.Trans
 	return transactionDB.ToEntities(), nil
 }
 
-func (repository *TransactionRepo) Delete(ID uint) error {
-	//TODO implement me
-	panic("implement me")
+func (repository *TransactionRepo) Delete(ID string) error {
+	_, err := repository.FindByID(ID)
+	if err != nil {
+		return constants.ErrDataNotFound
+	}
+	if err = repository.db.Delete(&Transaction{}, "id LIKE ?", ID).Error; err != nil {
+		return constants.ErrDeleteDatabase
+	}
+	return nil
 }
 
-func (repository *TransactionRepo) FindAllByDoctorID(metadata *entities.Metadata, doctorID uint) (*[]transactionEntities.Transaction, error) {
+func (repository *TransactionRepo) FindAllByDoctorID(metadata *entities.Metadata, doctorID uint, status string) (*[]transactionEntities.Transaction, error) {
 	transactionDB := new([]Transaction)
 	if err := repository.db.
 		Joins("JOIN consultations ON consultations.id = transactions.consultation_id").
 		Joins("JOIN doctors ON consultations.doctor_id = doctors.id").
 		Where("doctors.id LIKE ?", doctorID).
+		Where("transactions.status LIKE ?", "%"+status+"%").
 		Preload("Consultation").
 		Preload("Consultation.User").
+		Preload("Consultation.Complaint").
 		Limit(metadata.Limit).
 		Offset(metadata.Offset()).
 		Find(&transactionDB).Error; err != nil {

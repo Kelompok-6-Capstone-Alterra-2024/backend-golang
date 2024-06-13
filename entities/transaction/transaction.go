@@ -20,10 +20,24 @@ type Transaction struct {
 	UpdatedAt      time.Time
 }
 
-func (r Transaction) ToResponse() *response.TransactionResponse {
-	return &response.TransactionResponse{
+func (r Transaction) ToUserResponse() *response.UserTransactionResponse {
+	return &response.UserTransactionResponse{
 		ID:           r.ID.String(),
 		Consultation: *r.Consultation.ToUserResponse(),
+		Price:        r.Price,
+		PaymentType:  r.PaymentType,
+		PaymentLink:  r.PaymentLink,
+		Bank:         r.Bank,
+		Status:       r.Status,
+		CreatedAt:    r.CreatedAt.String(),
+		UpdatedAt:    r.UpdatedAt.String(),
+	}
+}
+
+func (r Transaction) ToDoctorResponse() *response.DoctorTransactionResponse {
+	return &response.DoctorTransactionResponse{
+		ID:           r.ID.String(),
+		Consultation: *r.Consultation.ToDoctorResponse(),
 		Price:        r.Price,
 		PaymentType:  r.PaymentType,
 		PaymentLink:  r.PaymentLink,
