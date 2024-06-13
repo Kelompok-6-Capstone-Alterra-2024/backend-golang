@@ -138,17 +138,17 @@ func (userController *UserController) UpdateProfile(c echo.Context) error {
 	token := c.Request().Header.Get("Authorization")
 	userId, err := utilities.GetUserIdFromToken(token)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse("Invalid token"))
+		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse(err.Error()))
 	}
 
 	file, err := c.FormFile("image")
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("Invalid image format"))
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
 
 	imageURL, err := utilities.UploadImage(file)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, base.NewErrorResponse("Failed to upload image"))
+		return c.JSON(http.StatusInternalServerError, base.NewErrorResponse(err.Error()))
 	}
 
 	userEntities := userEntities.User{

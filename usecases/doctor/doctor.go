@@ -194,3 +194,15 @@ func (u *DoctorUseCase) HandleFacebookCallback(ctx context.Context, code string)
 
 	return result, nil
 }
+
+func (u *DoctorUseCase) UpdateDoctorProfile(doctor *doctorEntities.Doctor) (doctorEntities.Doctor, error) {
+	if doctor.ID == 0 {
+		return doctorEntities.Doctor{}, constants.ErrUserNotFound
+	}
+
+	updatedDoctor, err := u.doctorRepository.UpdateDoctorProfile(doctor)
+	if err != nil {
+		return doctorEntities.Doctor{}, err
+	}
+	return updatedDoctor, nil
+}

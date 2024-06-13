@@ -142,3 +142,72 @@ func (c *DoctorController) FacebookCallback(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Login Oauth", res))
 }
+
+func (c *DoctorController) UpdateDoctorProfile(ctx echo.Context) error {
+	var doctorFromRequest request.UpdateDoctorProfileRequest
+	if err := ctx.Bind(&doctorFromRequest); err != nil {
+		return ctx.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	token := ctx.Request().Header.Get("Authorization")
+	doctorID, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	file, err := ctx.FormFile("image")
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	imageURL, err := utilities.UploadImage(file)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, base.NewErrorResponse(err.Error()))
+	}
+
+	doctorEntities := doctorUseCase.Doctor{
+		ID:               uint(doctorID),
+		Username:         doctorFromRequest.Username,
+		Name:             doctorFromRequest.Name,
+		Address:          doctorFromRequest.Address,
+		PhoneNumber:      doctorFromRequest.PhoneNumber,
+		Gender:           doctorFromRequest.Gender,
+		ProfilePicture:   imageURL,
+		Experience:       doctorFromRequest.Experience,
+		Almamater:        doctorFromRequest.Almamater,
+		GraduationYear:   doctorFromRequest.GraduationYear,
+		PracticeLocation: doctorFromRequest.PracticeLocation,
+		PracticeCity:     doctorFromRequest.PracticeCity,
+		PracticeProvince: doctorFromRequest.PracticeProvince,
+		StrNumber:        doctorFromRequest.StrNumber,
+		Fee:              doctorFromRequest.Fee,
+		Specialist:       doctorFromRequest.Specialist,
+	}
+
+	updatedDoctor, err := c.doctorUseCase.UpdateDoctorProfile(&doctorEntities)
+	if err != nil {
+		return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	doctorResponse := response.DoctorUpdateProfileResponse{
+		ID:               updatedDoctor.ID,
+		Username:         updatedDoctor.Username,
+		Email:            updatedDoctor.Email,
+		Name:             updatedDoctor.Name,
+		Address:          updatedDoctor.Address,
+		PhoneNumber:      updatedDoctor.PhoneNumber,
+		Gender:           updatedDoctor.Gender,
+		ProfilePicture:   updatedDoctor.ProfilePicture,
+		Experience:       updatedDoctor.Experience,
+		Almamater:        updatedDoctor.Almamater,
+		GraduationYear:   updatedDoctor.GraduationYear,
+		PracticeLocation: updatedDoctor.PracticeLocation,
+		PracticeCity:     updatedDoctor.PracticeCity,
+		PracticeProvince: updatedDoctor.PracticeProvince,
+		StrNumber:        updatedDoctor.StrNumber,
+		Fee:              updatedDoctor.Fee,
+		Specialist:       updatedDoctor.Specialist,
+	}
+
+	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Update Profile", doctorResponse))
+}
