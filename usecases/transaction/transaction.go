@@ -99,8 +99,11 @@ func (usecase *Transaction) FindByConsultationID(consultationID uint) (*transact
 	return newTransaction, nil
 }
 
-func (usecase *Transaction) FindAllByUserID(metadata *entities.Metadata, userID uint) (*[]transactionEntities.Transaction, error) {
-	newTransaction, err := usecase.transactionRepository.FindAllByUserID(metadata, userID)
+func (usecase *Transaction) FindAllByUserID(metadata *entities.Metadata, userID uint, status string) (*[]transactionEntities.Transaction, error) {
+	if !(status == constants.Success || status == constants.Pending || status == constants.Deny || status == constants.Cancel) {
+		status = ""
+	}
+	newTransaction, err := usecase.transactionRepository.FindAllByUserID(metadata, userID, status)
 	if err != nil {
 		return nil, err
 	}
@@ -154,8 +157,11 @@ func (usecase *Transaction) ConfirmedPayment(id string, transactionStatus string
 	return transactionResponse, nil
 }
 
-func (usecase *Transaction) FindAllByDoctorID(metadata *entities.Metadata, doctorID uint) (*[]transactionEntities.Transaction, error) {
-	newTransaction, err := usecase.transactionRepository.FindAllByDoctorID(metadata, doctorID)
+func (usecase *Transaction) FindAllByDoctorID(metadata *entities.Metadata, doctorID uint, status string) (*[]transactionEntities.Transaction, error) {
+	if !(status == constants.Success || status == constants.Pending || status == constants.Deny || status == constants.Cancel) {
+		status = ""
+	}
+	newTransaction, err := usecase.transactionRepository.FindAllByDoctorID(metadata, doctorID, status)
 	if err != nil {
 		return nil, err
 	}
