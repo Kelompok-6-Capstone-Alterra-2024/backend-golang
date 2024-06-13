@@ -41,6 +41,7 @@ type DoctorRepositoryInterface interface {
 	Create(email string, picture string, name string, username string) (Doctor, error)
 	OauthFindByEmail(email string) (Doctor, int, error)
 	UpdateAmount(doctorID uint, amount int) error
+	SearchDoctor(search string, metadata *entities.Metadata) (*[]Doctor, error)
 	UpdateDoctorProfile(doctor *Doctor) (Doctor, error)
 }
 
@@ -54,6 +55,7 @@ type DoctorUseCaseInterface interface {
 	HandleGoogleCallback(ctx context.Context, code string) (Doctor, error)
 	HandleFacebookLogin() string
 	HandleFacebookCallback(ctx context.Context, code string) (Doctor, error)
+	SearchDoctor(search string, metadata *entities.Metadata) (*[]Doctor, error)
 	UpdateDoctorProfile(doctor *Doctor) (Doctor, error)
 }
 

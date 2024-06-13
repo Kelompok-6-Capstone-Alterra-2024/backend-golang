@@ -141,6 +141,18 @@ func (r *DoctorRepo) UpdateAmount(doctorID uint, amount int) error {
 	return nil
 }
 
+func (repository *DoctorRepo) SearchDoctor(search string, metadata *entities.Metadata) (*[]doctorEntities.Doctor, error) {
+	var doctorsDb []Doctor
+	if err := repository.db.Limit(metadata.Limit).Offset(metadata.Offset()).Find(&doctorsDb, "name LIKE ?", "%"+search+"%").Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+	var doctorsResponse []doctorEntities.Doctor
+	for _, doctor := range doctorsDb {
+		doctorsResponse = append(doctorsResponse, *doctor.ToEntities())
+	}
+	return &doctorsResponse, nil
+}
+
 func (r *DoctorRepo) UpdateDoctorProfile(doctor *doctorEntities.Doctor) (doctorEntities.Doctor, error) {
 	existingDoctor := Doctor{}
 	if err := r.db.Where("id = ?", doctor.ID).First(&existingDoctor).Error; err != nil {

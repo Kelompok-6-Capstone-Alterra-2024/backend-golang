@@ -35,7 +35,7 @@ func (controller *TransactionController) InsertWithBuiltIn(c echo.Context) error
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(http.StatusOK, transactionResponse.ToResponse())
+	return c.JSON(http.StatusOK, transactionResponse.ToUserResponse())
 }
 
 func (controller *TransactionController) FindByID(c echo.Context) error {
@@ -44,7 +44,7 @@ func (controller *TransactionController) FindByID(c echo.Context) error {
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(http.StatusOK, transactionResponse.ToResponse())
+	return c.JSON(http.StatusOK, transactionResponse.ToUserResponse())
 }
 
 func (controller *TransactionController) FindByConsultationID(c echo.Context) error {
@@ -53,12 +53,13 @@ func (controller *TransactionController) FindByConsultationID(c echo.Context) er
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(http.StatusOK, transactionResponse.ToResponse())
+	return c.JSON(http.StatusOK, transactionResponse.ToUserResponse())
 }
 
 func (controller *TransactionController) FindAll(c echo.Context) error {
 	pageParam := c.QueryParam("page")
 	limitParam := c.QueryParam("limit")
+	status := c.QueryParam("status")
 
 	metadata := utilities.GetMetadata(pageParam, limitParam)
 	token := c.Request().Header.Get("Authorization")
@@ -67,14 +68,14 @@ func (controller *TransactionController) FindAll(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
 
-	transactions, err := controller.transactionUseCase.FindAllByUserID(metadata, uint(userId))
+	transactions, err := controller.transactionUseCase.FindAllByUserID(metadata, uint(userId), status)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 
-	var transactionResponses []response.TransactionResponse
+	var transactionResponses []response.UserTransactionResponse
 	for _, transaction := range *transactions {
-		transactionResponses = append(transactionResponses, *transaction.ToResponse())
+		transactionResponses = append(transactionResponses, *transaction.ToUserResponse())
 	}
 	return c.JSON(http.StatusOK, transactionResponses)
 }
@@ -92,7 +93,7 @@ func (controller *TransactionController) BankTransfer(c echo.Context) error {
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(201, base.NewSuccessResponse("Transaction created", transactionResponse.ToResponse()))
+	return c.JSON(201, base.NewSuccessResponse("Transaction created", transactionResponse.ToUserResponse()))
 }
 
 func (controller *TransactionController) EWallet(c echo.Context) error {
@@ -106,7 +107,7 @@ func (controller *TransactionController) EWallet(c echo.Context) error {
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(201, base.NewSuccessResponse("Transaction created", transactionResponse.ToResponse()))
+	return c.JSON(201, base.NewSuccessResponse("Transaction created", transactionResponse.ToUserResponse()))
 }
 
 func (controller *TransactionController) CallbackTransaction(c echo.Context) error {
@@ -123,7 +124,7 @@ func (controller *TransactionController) CallbackTransaction(c echo.Context) err
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(http.StatusOK, base.NewSuccessResponse("Payment confirmed", transaction.ToResponse()))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Payment confirmed", transaction.ToUserResponse()))
 }
 
 func (controller *TransactionController) CountTransactionByDoctorID(c echo.Context) error {
@@ -142,6 +143,7 @@ func (controller *TransactionController) CountTransactionByDoctorID(c echo.Conte
 func (controller *TransactionController) FindAllByDoctorID(c echo.Context) error {
 	pageParam := c.QueryParam("page")
 	limitParam := c.QueryParam("limit")
+	query := c.QueryParam("status")
 
 	metadata := utilities.GetMetadata(pageParam, limitParam)
 	token := c.Request().Header.Get("Authorization")
@@ -150,14 +152,23 @@ func (controller *TransactionController) FindAllByDoctorID(c echo.Context) error
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
 
-	transactions, err := controller.transactionUseCase.FindAllByDoctorID(metadata, uint(doctorId))
+	transactions, err := controller.transactionUseCase.FindAllByDoctorID(metadata, uint(doctorId), query)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 
-	var transactionResponses []response.TransactionResponse
+	var transactionResponses []response.DoctorTransactionResponse
 	for _, transaction := range *transactions {
-		transactionResponses = append(transactionResponses, *transaction.ToResponse())
+		transactionResponses = append(transactionResponses, *transaction.ToDoctorResponse())
 	}
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Get all transaction success", transactionResponses))
+}
+
+func (controller *TransactionController) DeleteTransaction(c echo.Context) error {
+	strID := c.Param("id")
+	err := controller.transactionUseCase.Delete(strID)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Transaction deleted", nil))
 }

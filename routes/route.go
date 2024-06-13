@@ -104,8 +104,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userAuth.GET("/auth/facebook/callback", r.userController.FacebookCallback)
 
 	// OTP
-	userAuth.POST("/send-otp", r.otpController.SendOtp)     // Send OTP
-	userAuth.POST("/verify-otp", r.otpController.VerifyOtp) // Verify OTP
+	userAuth.POST("/otp/send", r.otpController.SendOtp)                     // Send OTP
+	userAuth.POST("/otp/verify/forgot-password", r.otpController.VerifyOtp) // Verify OTP
 
 	userRoute := userAuth.Group("/")
 	userRoute.Use(echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))
@@ -113,6 +113,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("doctors/:id", r.doctorController.GetByID)         //Get Doctor By ID
 	userRoute.GET("doctors", r.doctorController.GetAll)              //Get All Doctor
 	userRoute.GET("doctors/available", r.doctorController.GetActive) //Get All Active Doctor
+	userRoute.GET("doctors/search", r.doctorController.SearchDoctor) //Search Doctor
 
 	// Consultation
 	userRoute.POST("consultations", r.consultationController.CreateConsultation)     //Create Consultation
@@ -267,9 +268,10 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("chats/:chatId/messages", r.chatController.GetAllMessages) // Get All Message
 
 	// Transaction
-	doctorRoute.GET("transactions", r.transactionController.FindAllByDoctorID) // Get All Transaction By Doctor ID
-	doctorRoute.GET("transaction/:id", r.transactionController.FindByID)       // Get Transaction By ID
-	doctorRoute.GET("transactions/count", r.transactionController.CountTransactionByDoctorID)
+	doctorRoute.GET("transactions", r.transactionController.FindAllByDoctorID)                // Get All Transaction By Doctor ID
+	doctorRoute.GET("transaction/:id", r.transactionController.FindByID)                      // Get Transaction By ID
+	doctorRoute.GET("transactions/count", r.transactionController.CountTransactionByDoctorID) // Count Transaction By Doctor ID
+	doctorRoute.DELETE("transactions/:id", r.transactionController.DeleteTransaction)         // Delete Transaction
 
 	// Patient
 	doctorRoute.GET("patients", r.complaintController.GetAllByDoctorID) // Get All Patient

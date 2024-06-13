@@ -143,6 +143,25 @@ func (c *DoctorController) FacebookCallback(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Login Oauth", res))
 }
 
+func (controller *DoctorController) SearchDoctor(c echo.Context) error {
+	query := c.QueryParam("query")
+	pageParam := c.QueryParam("page")
+	limitParam := c.QueryParam("limit")
+
+	metadata := utilities.GetMetadata(pageParam, limitParam)
+
+	doctorResult, err := controller.doctorUseCase.SearchDoctor(query, metadata)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var doctorResponse []response.DoctorResponse
+	for _, doctor := range *doctorResult {
+		doctorResponse = append(doctorResponse, *doctor.ToDoctorResponse())
+	}
+	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("Success Search Doctor", metadata, doctorResponse))
+}
+
 func (c *DoctorController) UpdateDoctorProfile(ctx echo.Context) error {
 	var doctorFromRequest request.UpdateDoctorProfileRequest
 	if err := ctx.Bind(&doctorFromRequest); err != nil {

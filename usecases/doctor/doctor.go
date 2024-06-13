@@ -195,6 +195,14 @@ func (u *DoctorUseCase) HandleFacebookCallback(ctx context.Context, code string)
 	return result, nil
 }
 
+func (usecase *DoctorUseCase) SearchDoctor(search string, metadata *entities.Metadata) (*[]doctorEntities.Doctor, error) {
+	result, err := usecase.doctorRepository.SearchDoctor(search, metadata)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (u *DoctorUseCase) UpdateDoctorProfile(doctor *doctorEntities.Doctor) (doctorEntities.Doctor, error) {
 	if doctor.ID == 0 {
 		return doctorEntities.Doctor{}, constants.ErrUserNotFound
