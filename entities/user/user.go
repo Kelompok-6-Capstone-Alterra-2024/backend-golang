@@ -17,6 +17,7 @@ type User struct {
 	Token          string
 	IsOauth        bool
 	Points         int
+	IsActive       bool
 }
 
 type RepositoryInterface interface {

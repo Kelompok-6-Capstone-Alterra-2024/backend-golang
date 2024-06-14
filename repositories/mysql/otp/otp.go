@@ -3,6 +3,7 @@ package otp
 import (
 	"capstone/constants"
 	otpEntities "capstone/entities/otp"
+	"capstone/repositories/mysql/user"
 	"time"
 
 	"gorm.io/gorm"
@@ -36,6 +37,25 @@ func (otpRepo *OtpRepo) VerifyOTP(otp otpEntities.Otp) error {
 
 	if otpDB.ExpiredAt.Before(time.Now()) {
 		return constants.ErrExpiredOTP
+	}
+
+	return nil
+}
+
+func (otpRepo *OtpRepo) VerifyOTPRegister(otp otpEntities.Otp) error {
+	var otpDB Otp
+	err := otpRepo.db.Where("email = ? AND code = ?", otp.Email, otp.Code).First(&otpDB).Error
+	if err != nil {
+		return constants.ErrInvalidOTP
+	}
+
+	if otpDB.ExpiredAt.Before(time.Now()) {
+		return constants.ErrExpiredOTP
+	}
+
+	err = otpRepo.db.Model(&user.User{}).Where("email = ?", otp.Email).Update("is_active", true).Error
+	if err != nil {
+		return err
 	}
 
 	return nil

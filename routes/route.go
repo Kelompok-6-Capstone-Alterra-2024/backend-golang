@@ -105,7 +105,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	// OTP
 	userAuth.POST("/otp/send", r.otpController.SendOtp)                     // Send OTP
-	userAuth.POST("/otp/verify/forgot-password", r.otpController.VerifyOtp) // Verify OTP
+	userAuth.POST("/otp/verify/forgot-password", r.otpController.VerifyOtp) // Verify OTP Forgot Password
+	userAuth.POST("/otp/verify/register", r.otpController.VerifyOTPRegister)        // Verify OTP Register
 
 	userRoute := userAuth.Group("/")
 	userRoute.Use(echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))
@@ -218,6 +219,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("musics/view/count", r.musicController.CountMusicViewCountByDoctorId) // Count Music View Count By Doctor ID
 	doctorRoute.PUT("musics/:id", r.musicController.EditMusic)                            // Update Music
 	doctorRoute.DELETE("musics/:id", r.musicController.DeleteMusic)                       // Delete Music
+	doctorRoute.GET("musics/view/month/count", r.musicController.CountMusicViewByMonth)   // Count Music View By Month
 
 	// Inspirational Stories
 	doctorRoute.POST("stories", r.storyController.PostStory)                           // Post Story
@@ -225,7 +227,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("stories/:id", r.storyController.GetStoryByIdForDoctor)            // Get Story By ID
 	doctorRoute.GET("stories/count", r.storyController.CountStoriesByDoctorId)         // Count Stories By Doctor ID
 	doctorRoute.GET("stories/like/count", r.storyController.CountStoryLikesByDoctorId) // Count Stories Likes By Doctor ID
-
+	doctorRoute.GET("stories/view/month/count", r.storyController.CountStoryViewByMonth) // Count Stories View Count By Month
 	doctorRoute.GET("stories/view/count", r.storyController.CountStoryViewByDoctorId) // Count Stories View Count By Doctor ID
 	doctorRoute.PUT("stories/:id", r.storyController.EditStory)                       // Update Story
 	doctorRoute.DELETE("stories/:id", r.storyController.DeleteStory)                  // Delete Story
