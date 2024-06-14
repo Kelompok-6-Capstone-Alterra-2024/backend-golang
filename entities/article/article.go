@@ -32,9 +32,10 @@ type ArticleRepositoryInterface interface {
 	CountArticleByDoctorId(doctorId int) (int, error)
 	CountArticleLikesByDoctorId(doctorId int) (int, error)
 	CountArticleViewByDoctorId(doctorId int) (int, error)
+	CountArticleViewByMonth(doctorId int, startMonth string, endMonth string) (map[int]int, error)
 	EditArticle(article Article) (Article, error)
 	DeleteArticle(articleId int) error
-	IncrementViewCount(articleId int) error
+	// IncrementViewCount(articleId int) error
 }
 
 type ArticleUseCaseInterface interface {
@@ -48,6 +49,7 @@ type ArticleUseCaseInterface interface {
 	CountArticleByDoctorId(doctorId int) (int, error)
 	CountArticleLikesByDoctorId(doctorId int) (int, error)
 	CountArticleViewByDoctorId(doctorId int) (int, error)
+	CountArticleViewByMonth(doctorId int, startMonth string, endMonth string) (map[int]int, error)
 	EditArticle(article Article, file *multipart.FileHeader) (Article, error)
 	DeleteArticle(articleId int) error
 }

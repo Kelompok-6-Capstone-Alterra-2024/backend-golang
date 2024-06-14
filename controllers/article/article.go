@@ -68,7 +68,6 @@ func (controller *ArticleController) CreateArticle(c echo.Context) error {
 		Content:     createdArticle.Content,
 		Date:        createdArticle.Date,
 		ImageUrl:    createdArticle.ImageUrl,
-		ViewCount:   createdArticle.ViewCount,
 		ReadingTime: createdArticle.ReadingTime,
 		Doctor: response.DoctorInfoResponse{
 			ID:   createdArticle.Doctor.ID,
@@ -121,7 +120,6 @@ func (controller *ArticleController) GetArticleById(c echo.Context) error {
 		Content:     article.Content,
 		Date:        article.Date,
 		ImageUrl:    article.ImageUrl,
-		ViewCount:   article.ViewCount,
 		IsLiked:     article.IsLiked,
 		ReadingTime: article.ReadingTime,
 		Doctor: response.DoctorInfoResponse{
@@ -156,7 +154,6 @@ func (controller *ArticleController) GetLikedArticle(c echo.Context) error {
 			Content:     article.Content,
 			Date:        article.Date,
 			ImageUrl:    article.ImageUrl,
-			ViewCount:   article.ViewCount,
 			IsLiked:     article.IsLiked,
 			ReadingTime: article.ReadingTime,
 			Doctor: response.DoctorInfoResponse{
@@ -296,6 +293,21 @@ func (controller *ArticleController) CountArticleViewByDoctorId(c echo.Context) 
 	}
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Count Article View By Doctor Id", resp))
+}
+
+func (controller *ArticleController) CountArticleViewByMonth(c echo.Context) error {
+	startMonth := c.QueryParam("start_month")
+	endMonth := c.QueryParam("end_month")
+
+	token := c.Request().Header.Get("Authorization")
+	doctorId, _ := utilities.GetUserIdFromToken(token)
+
+	res, err := controller.articleUseCase.CountArticleViewByMonth(doctorId, startMonth, endMonth)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Count Article View By Month", res))
 }
 
 func (controller *ArticleController) EditArticle(c echo.Context) error {

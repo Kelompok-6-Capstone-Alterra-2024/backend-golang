@@ -57,3 +57,23 @@ func (otpController *OtpController) VerifyOtp(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success verify otp", nil))
 }
+
+func (otpController *OtpController) VerifyOTPRegister(c echo.Context) error {
+	var req request.OTPVerifyRequest
+	err := c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	otpEnt := otpEntities.Otp{
+		Email: req.Email,
+		Code:  req.Code,
+	}
+
+	err = otpController.otpUseCase.VerifyOTPRegister(otpEnt)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success verify otp", nil))
+}

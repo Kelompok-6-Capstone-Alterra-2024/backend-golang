@@ -63,7 +63,6 @@ func (repository *StoriesRepo) GetAllStories(metadata entities.Metadata, userId 
 			Content:   storiesDb[i].Content,
 			Date:      storiesDb[i].Date,
 			ImageUrl:  storiesDb[i].ImageUrl,
-			ViewCount: storiesDb[i].ViewCount,
 			DoctorId:  storiesDb[i].DoctorId,
 			Doctor: doctorEntities.Doctor{
 				ID:   storiesDb[i].Doctor.ID,
@@ -105,7 +104,6 @@ func (repository *StoriesRepo) GetStoryById(storyId int, userId int) (storyEntit
 		Content:   storyDb.Content,
 		Date:      storyDb.Date,
 		ImageUrl:  storyDb.ImageUrl,
-		ViewCount: storyDb.ViewCount,
 		DoctorId:  storyDb.DoctorId,
 		Doctor: doctorEntities.Doctor{
 			ID:   storyDb.Doctor.ID,
@@ -114,7 +112,7 @@ func (repository *StoriesRepo) GetStoryById(storyId int, userId int) (storyEntit
 		IsLiked: isLiked,
 	}
 
-	err = repository.DB.Model(&storyDb).Where("id = ?", storyId).Update("view_count", storyDb.ViewCount+1).Error
+	err = repository.DB.Model(&StoryViews{}).Create(&StoryViews{UserId: uint(userId), StoryId: uint(storyId)}).Error
 	if err != nil {
 		return storyEntities.Story{}, constants.ErrServer
 	}
@@ -148,7 +146,6 @@ func (repository *StoriesRepo) GetLikedStories(metadata entities.Metadata, userI
 			Content:   storiesDb[i].Content,
 			Date:      storiesDb[i].Date,
 			ImageUrl:  storiesDb[i].ImageUrl,
-			ViewCount: storiesDb[i].ViewCount,
 			DoctorId:  storiesDb[i].DoctorId,
 			Doctor: doctorEntities.Doctor{
 				ID:   storiesDb[i].Doctor.ID,
@@ -204,13 +201,65 @@ func (repository *StoriesRepo) CountStoryLikesByDoctorId(doctorId int) (int, err
 }
 
 func (repository *StoriesRepo) CountStoryViewByDoctorId(doctorId int) (int, error) {
-	var counter int64
-	err := repository.DB.Model(&Story{}).Where("doctor_id = ?", doctorId).Select("SUM(view_count)").Scan(&counter).Error
+	var storyDb []Story
+	err := repository.DB.Model(&Story{}).Where("doctor_id = ?", doctorId).Find(&storyDb).Error
 	if err != nil {
 		return 0, constants.ErrServer
 	}
 
-	return int(counter), nil
+	var storyDBIDs []int
+	for _, story := range storyDb {
+		storyDBIDs = append(storyDBIDs, int(story.ID))
+	}
+	
+	var totalViews int64
+	err = repository.DB.Model(&StoryViews{}).Where("story_id IN ?", storyDBIDs).Count(&totalViews).Error
+	if err != nil {
+		return 0, constants.ErrServer
+	}
+
+	return int(totalViews), nil
+}
+
+func (repository *StoriesRepo) CountStoryViewByMonth(doctorId int, startMonth string, endMonth string) (map[int]int, error) {
+	var storyDB []Story
+	err := repository.DB.Model(&Story{}).Where("doctor_id = ?", doctorId).Find(&storyDB).Error
+	if err != nil {
+		return nil, constants.ErrServer
+	}
+
+	var StoryDBIDs []int
+	for _, story := range storyDB {
+		StoryDBIDs = append(StoryDBIDs, int(story.ID))
+	}
+
+	if len(StoryDBIDs) == 0 {
+		return nil, constants.ErrDataNotFound
+	}
+
+	var results []struct {
+        Month int
+        Views int
+    }
+
+	query := repository.DB.Model(&StoryViews{}).Select("MONTH(created_at) as month, COUNT(*) as views").
+        Where("story_id IN ?", StoryDBIDs).
+        Where("created_at BETWEEN ? AND ?", startMonth+"-01", endMonth+"-31").
+        Where("deleted_at IS NULL").
+        Group("month").
+        Order("month")
+
+    err = query.Scan(&results).Error
+    if err != nil {
+        return nil, constants.ErrServer
+    }
+
+    viewsByMonth := make(map[int]int)
+    for _, result := range results {
+        viewsByMonth[result.Month] = result.Views
+    }
+
+    return viewsByMonth, nil
 }
 
 func (repository *StoriesRepo) PostStory(story storyEntities.Story) (storyEntities.Story, error) {
@@ -219,7 +268,6 @@ func (repository *StoriesRepo) PostStory(story storyEntities.Story) (storyEntiti
 		Content:   story.Content,
 		Date:      story.Date,
 		ImageUrl:  story.ImageUrl,
-		ViewCount: story.ViewCount,
 		DoctorId:  story.DoctorId,
 	}
 
@@ -234,7 +282,6 @@ func (repository *StoriesRepo) PostStory(story storyEntities.Story) (storyEntiti
 		Content:   storyDb.Content,
 		Date:      storyDb.Date,
 		ImageUrl:  storyDb.ImageUrl,
-		ViewCount: storyDb.ViewCount,
 		DoctorId:  storyDb.DoctorId,
 	}, nil
 }
@@ -246,14 +293,20 @@ func (repository *StoriesRepo) GetStoryByIdForDoctor(storyId int) (storyEntities
 		return storyEntities.Story{}, constants.ErrDataNotFound
 	}
 
+	var totalView int64
+	err = repository.DB.Model(&StoryViews{}).Where("story_id = ?", storyId).Count(&totalView).Error
+	if err != nil {
+		return storyEntities.Story{}, constants.ErrServer
+	}
+
 	return storyEntities.Story{
 		Id:        storyDb.ID,
 		Title:     storyDb.Title,
 		Content:   storyDb.Content,
 		Date:      storyDb.Date,
 		ImageUrl:  storyDb.ImageUrl,
-		ViewCount: storyDb.ViewCount,
 		DoctorId:  storyDb.DoctorId,
+		ViewCount: int(totalView),
 	}, nil
 }
 
@@ -271,6 +324,21 @@ func (repository *StoriesRepo) GetAllStoriesByDoctorId(metadata entities.Metadat
 		return []storyEntities.Story{}, constants.ErrServer
 	}
 
+	var storyDBIDs []int
+	for i := 0; i < len(storiesDb); i++ {
+		storyDBIDs = append(storyDBIDs, int(storiesDb[i].ID))
+	}
+
+	var totalViews []int
+	for i := 0; i < len(storyDBIDs); i++ {
+		var totalView int64
+		err = repository.DB.Model(&StoryViews{}).Where("story_id = ?", storyDBIDs[i]).Count(&totalView).Error
+		if err != nil {
+			return []storyEntities.Story{}, constants.ErrServer
+		}
+		totalViews = append(totalViews, int(totalView))
+	}
+
 	storiesEnt := make([]storyEntities.Story, len(storiesDb))
 	for i := 0; i < len(storiesDb); i++ {
 		storiesEnt[i] = storyEntities.Story{
@@ -279,8 +347,8 @@ func (repository *StoriesRepo) GetAllStoriesByDoctorId(metadata entities.Metadat
 			Content:   storiesDb[i].Content,
 			Date:      storiesDb[i].Date,
 			ImageUrl:  storiesDb[i].ImageUrl,
-			ViewCount: storiesDb[i].ViewCount,
 			DoctorId:  storiesDb[i].DoctorId,
+			ViewCount: totalViews[i],
 		}
 	}
 
@@ -313,7 +381,6 @@ func (repository *StoriesRepo) EditStory(story storyEntities.Story) (storyEntiti
 		Content:   storyDB.Content,
 		Date:      storyDB.Date,
 		ImageUrl:  storyDB.ImageUrl,
-		ViewCount: storyDB.ViewCount,
 		DoctorId:  storyDB.DoctorId,
 	}, nil
 }
