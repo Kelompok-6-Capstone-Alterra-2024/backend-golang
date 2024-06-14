@@ -207,6 +207,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("articles/count", r.articleController.CountArticleByDoctorId)           // Count Article By Doctor ID
 	doctorRoute.GET("articles/like/count", r.articleController.CountArticleLikesByDoctorId) // Count Article Likes By Doctor ID
 	doctorRoute.GET("articles/view/count", r.articleController.CountArticleViewByDoctorId)  // Count Article View Count By Doctor ID
+	doctorRoute.GET("articles/view/month/count", r.articleController.CountArticleViewByMonth) // Count Article View Count By Month
 	doctorRoute.PUT("articles/:id", r.articleController.EditArticle)                        // Update Article
 	doctorRoute.DELETE("articles/:id", r.articleController.DeleteArticle)                   // Delete Article
 

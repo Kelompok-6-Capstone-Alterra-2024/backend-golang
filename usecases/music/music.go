@@ -83,6 +83,10 @@ func (musicUseCase *MusicUseCase) CountMusicViewCountByDoctorId(doctorId int) (i
 }
 
 func (musicUseCase *MusicUseCase) CountMusicViewByMonth(doctorId int, startMonth string, endMonth string) (map[int]int, error) {
+	if startMonth == "" || endMonth == "" {
+		return map[int]int{}, constants.ErrEmptyInputViewByMonth
+	}
+	
 	count, err := musicUseCase.musicInterface.CountMusicViewByMonth(doctorId, startMonth, endMonth)
 	if err != nil {
 		return map[int]int{}, err

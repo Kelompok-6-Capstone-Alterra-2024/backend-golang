@@ -16,13 +16,20 @@ type Article struct {
 	Content     string `gorm:"type:text"`
 	Date        time.Time
 	ImageUrl    string        `gorm:"type:varchar(255)"`
-	ViewCount   int           `gorm:"type:int"`
 	DoctorID    uint          `gorm:"type:int;not null"`
 	Doctor      doctor.Doctor `gorm:"foreignKey:doctor_id;references:id"`
 	ReadingTime int           `gorm:"type:int"`
 }
 
 type ArticleLikes struct {
+	gorm.Model
+	ArticleID uint      `gorm:"type:int;index"`
+	Article   Article   `gorm:"foreignKey:article_id;references:id"`
+	UserId    uint      `gorm:"type:int;index"`
+	User      user.User `gorm:"foreignKey:user_id;references:id"`
+}
+
+type ArticleViews struct {
 	gorm.Model
 	ArticleID uint      `gorm:"type:int;index"`
 	Article   Article   `gorm:"foreignKey:article_id;references:id"`

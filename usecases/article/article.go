@@ -40,10 +40,10 @@ func (useCase *ArticleUseCase) GetAllArticle(metadata entities.Metadata, userId 
 }
 
 func (useCase *ArticleUseCase) GetArticleById(articleId int, userId int) (articleEntities.Article, error) {
-	err := useCase.articleRepository.IncrementViewCount(articleId)
-	if err != nil {
-		return articleEntities.Article{}, err
-	}
+	// err := useCase.articleRepository.IncrementViewCount(articleId)
+	// if err != nil {
+	// 	return articleEntities.Article{}, err
+	// }
 
 	article, err := useCase.articleRepository.GetArticleById(articleId, userId)
 	if err != nil {
@@ -104,6 +104,18 @@ func (useCase *ArticleUseCase) CountArticleViewByDoctorId(doctorId int) (int, er
 	count, err := useCase.articleRepository.CountArticleViewByDoctorId(doctorId)
 	if err != nil {
 		return 0, err
+	}
+	return count, nil
+}
+
+func (useCase *ArticleUseCase) CountArticleViewByMonth(doctorId int, startMonth string, endMonth string) (map[int]int, error) {
+	if startMonth == "" || endMonth == "" {
+		return map[int]int{}, constants.ErrEmptyInputViewByMonth
+	}
+
+	count, err := useCase.articleRepository.CountArticleViewByMonth(doctorId, startMonth, endMonth)
+	if err != nil {
+		return map[int]int{}, err
 	}
 	return count, nil
 }
