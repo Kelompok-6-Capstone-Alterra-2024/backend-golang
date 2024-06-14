@@ -21,8 +21,8 @@ func (usecase *ComplaintUseCase) Create(complaint *complaintEntities.Complaint) 
 	return result, nil
 }
 
-func (usecase *ComplaintUseCase) GetAllByUserID(metadata *entities.Metadata, userID int) (*[]complaintEntities.Complaint, error) {
-	result, err := usecase.complaintRepo.GetAllByUserID(metadata, userID)
+func (usecase *ComplaintUseCase) GetAllByDoctorID(metadata *entities.Metadata, doctorID int) (*[]complaintEntities.Complaint, error) {
+	result, err := usecase.complaintRepo.GetAllByDoctorID(metadata, doctorID)
 	if err != nil {
 		return nil, err
 	}
@@ -31,6 +31,14 @@ func (usecase *ComplaintUseCase) GetAllByUserID(metadata *entities.Metadata, use
 
 func (usecase *ComplaintUseCase) GetByID(complaintID int) (*complaintEntities.Complaint, error) {
 	result, err := usecase.complaintRepo.GetByID(complaintID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (usecase *ComplaintUseCase) SearchComplaintByPatientName(metadata *entities.Metadata, name string, doctorID uint) (*[]complaintEntities.Complaint, error) {
+	result, err := usecase.complaintRepo.SearchComplaintByPatientName(metadata, name, doctorID)
 	if err != nil {
 		return nil, err
 	}
