@@ -87,3 +87,5 @@ var ErrDeleteDatabase error = errors.New("failed delete data in database")
 var ErrInvalidCredentials error = errors.New("invalid credentials")
 
 var ErrEmptyInputViewByMonth error = errors.New("start month or end month cannot be empty")
+
+var ErrBadRequest error = errors.New("bad request")
