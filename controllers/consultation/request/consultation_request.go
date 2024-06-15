@@ -6,8 +6,8 @@ import (
 )
 
 type ConsultationRequest struct {
-	DoctorID uint `json:"doctor_id" form:"doctor_id" binding:"required"`
-	UserID   int
+	DoctorID uint   `json:"doctor_id" form:"doctor_id" binding:"required" validate:"required"`
+	UserID   int    `validate:"required"`
 	Date     string `json:"date" form:"date" binding:"required"`
 	Time     string `json:"time" form:"time" binding:"required"`
 }
