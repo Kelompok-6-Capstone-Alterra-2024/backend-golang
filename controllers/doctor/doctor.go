@@ -6,6 +6,7 @@ import (
 	doctorUseCase "capstone/entities/doctor"
 	"capstone/utilities"
 	"capstone/utilities/base"
+	"github.com/go-playground/validator/v10"
 	"net/http"
 	"strconv"
 
@@ -14,17 +15,22 @@ import (
 
 type DoctorController struct {
 	doctorUseCase doctorUseCase.DoctorUseCaseInterface
+	validator     *validator.Validate
 }
 
-func NewDoctorController(doctorUseCase doctorUseCase.DoctorUseCaseInterface) *DoctorController {
+func NewDoctorController(doctorUseCase doctorUseCase.DoctorUseCaseInterface, validator *validator.Validate) *DoctorController {
 	return &DoctorController{
 		doctorUseCase: doctorUseCase,
+		validator:     validator,
 	}
 }
 
 func (controller *DoctorController) Register(c echo.Context) error {
 	var doctorFromRequest request.DoctorRegisterRequest
 	c.Bind(&doctorFromRequest)
+	if err := controller.validator.Struct(doctorFromRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
 
 	imageFromRequest, err := c.FormFile("profile_picture")
 	doctorFromRequest.ProfilePicture = imageFromRequest

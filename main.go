@@ -98,7 +98,7 @@ func main() {
 	otpUC := otpUseCase.NewOtpUseCase(otpRepo)
 
 	userCont := userController.NewUserController(userUC)
-	doctorCont := doctorController.NewDoctorController(doctorUC)
+	doctorCont := doctorController.NewDoctorController(doctorUC, validate)
 	consultationCont := consultationController.NewConsultationController(consultationUC, validate)
 	storyCont := storyController.NewStoryController(storyUC)
 	complaintCont := complaintController.NewComplaintController(complaintUC, consultationUC, validate)
