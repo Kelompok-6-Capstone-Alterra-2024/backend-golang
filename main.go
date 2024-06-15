@@ -99,7 +99,7 @@ func main() {
 
 	userCont := userController.NewUserController(userUC)
 	doctorCont := doctorController.NewDoctorController(doctorUC)
-	consultationCont := consultationController.NewConsultationController(consultationUC)
+	consultationCont := consultationController.NewConsultationController(consultationUC, validate)
 	storyCont := storyController.NewStoryController(storyUC)
 	complaintCont := complaintController.NewComplaintController(complaintUC, consultationUC)
 	transactionCont := transactionController.NewTransactionController(transactionUC, midtransUC)
