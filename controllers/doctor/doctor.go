@@ -1,6 +1,7 @@
 package doctor
 
 import (
+	"capstone/constants"
 	"capstone/controllers/doctor/request"
 	"capstone/controllers/doctor/response"
 	doctorUseCase "capstone/entities/doctor"
@@ -29,7 +30,7 @@ func (controller *DoctorController) Register(c echo.Context) error {
 	var doctorFromRequest request.DoctorRegisterRequest
 	c.Bind(&doctorFromRequest)
 	if err := controller.validator.Struct(doctorFromRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(constants.ErrBadRequest.Error()))
 	}
 
 	imageFromRequest, err := c.FormFile("profile_picture")
