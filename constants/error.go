@@ -89,3 +89,5 @@ var ErrInvalidCredentials error = errors.New("invalid credentials")
 var ErrEmptyInputViewByMonth error = errors.New("start month or end month cannot be empty")
 
 var ErrBadRequest error = errors.New("bad request")
+
+var ErrEmptyNewEmail error = errors.New("new email cannot be empty")

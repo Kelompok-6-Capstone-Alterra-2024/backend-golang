@@ -229,3 +229,15 @@ func (u *UserUseCase) ChangePassword(userId int, oldPassword, newPassword string
 	}
 	return nil
 }
+
+func (u *UserUseCase) ChangeEmail(userId int, newEmail string) error {
+	if newEmail == "" {
+		return constants.ErrEmptyNewEmail
+	}
+
+	err := u.repository.ChangeEmail(userId, newEmail)
+	if err != nil {
+		return err
+	}
+	return nil
+}

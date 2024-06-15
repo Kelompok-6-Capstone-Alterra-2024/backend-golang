@@ -218,3 +218,11 @@ func (r *UserRepo) ChangePassword(userId int, oldPassword, newPassword string) e
 	}
 	return nil
 }
+
+func (r *UserRepo) ChangeEmail(userId int, email string) error {
+	err := r.DB.Model(&User{}).Where("id = ?", userId).Update("email", email).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

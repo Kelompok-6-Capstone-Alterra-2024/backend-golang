@@ -29,6 +29,7 @@ type RepositoryInterface interface {
 	ResetPassword(email string, password string) error
 	UpdateUserProfile(user *User) (User, error)
 	ChangePassword(userId int, oldPassword, newPassword string) error
+	ChangeEmail(userId int, email string) error
 }
 
 type UseCaseInterface interface {
@@ -42,4 +43,5 @@ type UseCaseInterface interface {
 	HandleFacebookCallback(ctx context.Context, code string) (User, error)
 	UpdateUserProfile(user *User) (User, error)
 	ChangePassword(userId int, oldPassword, newPassword string) error
+	ChangeEmail(userId int, newEmail string) error
 }
