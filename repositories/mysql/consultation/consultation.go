@@ -227,3 +227,21 @@ func (repository *ConsultationRepo) UpdatePaymentStatusConsultation(consultation
 
 	return nil
 }
+
+func (repository *ConsultationRepo) GetAllConsultation() *[]consultationEntities.Consultation {
+	var consultationDB []Consultation
+	if err := repository.db.Find(&consultationDB, "status NOT IN (?)", []string{constants.DONE, constants.REJECTED}).Error; err != nil {
+		return nil
+	}
+
+	var consultations []consultationEntities.Consultation
+	for _, consultation := range consultationDB {
+		consultationResult, err := consultation.ToEntities()
+		if err != nil {
+			return nil
+		}
+		consultations = append(consultations, *consultationResult)
+	}
+
+	return &consultations
+}

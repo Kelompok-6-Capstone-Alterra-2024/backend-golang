@@ -38,6 +38,7 @@ import (
 	chatbotUseCase "capstone/usecases/chatbot"
 	complaintUseCase "capstone/usecases/complaint"
 	consultationUseCase "capstone/usecases/consultation"
+	"capstone/usecases/cronjob"
 	doctorUseCase "capstone/usecases/doctor"
 	forumUseCase "capstone/usecases/forum"
 	midtransUseCase "capstone/usecases/midtrans"
@@ -49,8 +50,9 @@ import (
 	storyUseCase "capstone/usecases/story"
 	transactionUseCase "capstone/usecases/transaction"
 	userUseCase "capstone/usecases/user"
-
+	"github.com/go-co-op/gocron/v2"
 	"github.com/go-playground/validator/v10"
+	"log"
 
 	"github.com/labstack/echo/v4"
 )
@@ -64,6 +66,11 @@ func main() {
 	oauthConfigDoctor := configs.GetGoogleOAuthConfigDoctor()
 	oauthConfigFB := configs.GetFacebookOAuthConfig()
 	oauthConfigFBDoctor := configs.GetFacebookOAuthConfigDoctor()
+
+	gcron, err := gocron.NewScheduler()
+	if err != nil {
+		log.Print(err.Error())
+	}
 
 	userRepo := userRepositories.NewUserRepo(db)
 	doctorRepo := doctorRepositories.NewDoctorRepo(db)
@@ -96,6 +103,7 @@ func main() {
 	articleUC := articleUseCase.NewArticleUseCase(articleRepo)
 	chatUC := chatUseCase.NewChatUseCase(chatRepo)
 	otpUC := otpUseCase.NewOtpUseCase(otpRepo)
+	cronjobUC := cronjob.NewCronJob(gcron, consultationRepo)
 
 	userCont := userController.NewUserController(userUC)
 	doctorCont := doctorController.NewDoctorController(doctorUC, validate)
@@ -117,5 +125,9 @@ func main() {
 
 	e := echo.New()
 	route.InitRoute(e)
+	cronjobUC.InitCronJob()
+
+	go gcron.Start()
+
 	e.Logger.Fatal(e.Start(":8080"))
 }
