@@ -243,3 +243,16 @@ func (controller *ConsultationController) GetConsultationNotesByID(c echo.Contex
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation Notes", resp))
 }
+
+func (controller *ConsultationController) CountConsultation(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	doctorId, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	count, err := controller.consultationUseCase.CountConsultation(doctorId)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Count Consultation", count.ToResponse()))
+}

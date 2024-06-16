@@ -163,3 +163,44 @@ func (usecase *ConsultationUseCase) GetConsultationByComplaintID(complaintID int
 	}
 	return result, nil
 }
+
+func (usecase *ConsultationUseCase) CountConsultation(doctorID int) (*consultationEntities.CountConsultation, error) {
+	totalConsultation, err := usecase.consultationRepo.CountConsultationByDoctorID(doctorID)
+	if err != nil {
+		return nil, err
+	}
+
+	totalConsultationToday, err := usecase.consultationRepo.CountConsultationToday(doctorID)
+	if err != nil {
+		return nil, err
+	}
+
+	totalConsultationActive, err := usecase.consultationRepo.CountConsultationByStatus(doctorID, constants.ACTIVE)
+	if err != nil {
+		return nil, err
+	}
+
+	totalConsultationDone, err := usecase.consultationRepo.CountConsultationByStatus(doctorID, constants.DONE)
+	if err != nil {
+		return nil, err
+	}
+
+	totalConsultationRejected, err := usecase.consultationRepo.CountConsultationByStatus(doctorID, constants.REJECTED)
+	if err != nil {
+		return nil, err
+	}
+
+	totalConsultationIncoming, err := usecase.consultationRepo.CountConsultationByStatus(doctorID, constants.INCOMING)
+	if err != nil {
+		return nil, err
+	}
+
+	totalConsultationPending, err := usecase.consultationRepo.CountConsultationByStatus(doctorID, constants.PENDING)
+	if err != nil {
+		return nil, err
+	}
+
+	countConsultation := consultationEntities.ToCountConsultation(totalConsultation, totalConsultationToday, totalConsultationActive, totalConsultationDone, totalConsultationRejected, totalConsultationIncoming, totalConsultationPending)
+
+	return &countConsultation, nil
+}
