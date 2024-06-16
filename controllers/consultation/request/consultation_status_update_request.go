@@ -4,8 +4,8 @@ import "capstone/entities/consultation"
 
 type ConsultationStatusUpdateRequest struct {
 	ID       uint
-	Status   string `json:"status"`
 	DoctorID uint
+	Status   string `json:"status" validate:"required"`
 }
 
 func (r *ConsultationStatusUpdateRequest) ToEntities() *consultation.Consultation {

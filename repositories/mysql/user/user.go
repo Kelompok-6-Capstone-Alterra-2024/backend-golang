@@ -156,9 +156,72 @@ func (r *UserRepo) ResetPassword(email string, password string) error {
 	return nil
 }
 
+func (userRepo *UserRepo) UpdateUserProfile(user *userEntities.User) (userEntities.User, error) {
+	existingUser := User{}
+	if err := userRepo.DB.Where("id = ?", user.Id).First(&existingUser).Error; err != nil {
+		return userEntities.User{}, err
+	}
+
+	existingUser.Name = user.Name
+	existingUser.Username = user.Username
+	existingUser.Address = user.Address
+	existingUser.Bio = user.Bio
+	existingUser.PhoneNumber = user.PhoneNumber
+	existingUser.Gender = user.Gender
+	existingUser.Age = user.Age
+	existingUser.ProfilePicture = user.ProfilePicture
+
+	if err := userRepo.DB.Save(&existingUser).Error; err != nil {
+		return userEntities.User{}, err
+	}
+
+	updatedUser := userEntities.User{
+		Id:             existingUser.Id,
+		Name:           existingUser.Name,
+		Username:       existingUser.Username,
+		Email:          existingUser.Email,
+		Address:        existingUser.Address,
+		Bio:            existingUser.Bio,
+		PhoneNumber:    existingUser.PhoneNumber,
+		Gender:         existingUser.Gender,
+		Age:            existingUser.Age,
+		ProfilePicture: existingUser.ProfilePicture,
+		IsOauth:        existingUser.IsOauth,
+		Points:         existingUser.Points,
+	}
+
+	return updatedUser, nil
+}
+
+func (r *UserRepo) ChangePassword(userId int, oldPassword, newPassword string) error {
+	var userDB User
+	if err := r.DB.Where("id = ?", userId).First(&userDB).Error; err != nil {
+		return err
+	}
+
+	// Compare old password with hashed password in database
+	err := bcrypt.CompareHashAndPassword([]byte(userDB.Password), []byte(oldPassword))
+	if err != nil {
+		return constants.ErrInvalidCredentials
+	}
+
+	// Hash the new password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	// Update the password in the database
+	err = r.DB.Model(&User{}).Where("id = ?", userId).Update("password", string(hashedPassword)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *UserRepo) UpdatePointsByUserID(id int, points int) error {
 	err := r.DB.Model(&User{}).Where("id = ?", id).Update("points", points).Error
-	if err != nil {
+  if err != nil {
 		return err
 	}
 	return nil

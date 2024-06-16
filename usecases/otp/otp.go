@@ -52,3 +52,16 @@ func (otpUseCase *OtpUseCase) VerifyOTP(otp otpEntities.Otp) error {
 
 	return nil
 }
+
+func (otpUseCase *OtpUseCase) VerifyOTPRegister(otp otpEntities.Otp) error {
+	if otp.Email == "" || otp.Code == "" {
+		return constants.ErrEmptyInputVerifyOTP
+	}
+
+	err := otpUseCase.otpInterface.VerifyOTPRegister(otp)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

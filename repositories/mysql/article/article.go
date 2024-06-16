@@ -26,7 +26,7 @@ func (repository *ArticleRepo) CreateArticle(article *articleEntities.Article, u
 		Content:     article.Content,
 		ImageUrl:    article.ImageUrl,
 		DoctorID:    uint(userId), // Assuming userId is the ID of the doctor creating the article
-		ViewCount:   0,            // Initialize view count to 0
+		//ViewCount:   0,            // Initialize view count to 0
 		ReadingTime: article.ReadingTime,
 		Date:        time.Now(),
 	}
@@ -48,7 +48,7 @@ func (repository *ArticleRepo) CreateArticle(article *articleEntities.Article, u
 		Content:     articleDB.Content,
 		Date:        articleDB.Date,
 		ImageUrl:    articleDB.ImageUrl,
-		ViewCount:   articleDB.ViewCount,
+		//ViewCount:   articleDB.ViewCount,
 		ReadingTime: articleDB.ReadingTime,
 		DoctorID:    articleDB.DoctorID,
 		Doctor: doctorEntities.Doctor{
@@ -111,7 +111,7 @@ func (repository *ArticleRepo) GetAllArticle(metadata entities.Metadata, userId 
 			Content:     articlesDb[i].Content,
 			Date:        articlesDb[i].Date,
 			ImageUrl:    articlesDb[i].ImageUrl,
-			ViewCount:   articlesDb[i].ViewCount,
+			//ViewCount:   articlesDb[i].ViewCount,
 			ReadingTime: articlesDb[i].ReadingTime,
 			DoctorID:    articlesDb[i].DoctorID,
 			Doctor: doctorEntities.Doctor{
@@ -154,7 +154,7 @@ func (repository *ArticleRepo) GetArticleById(articleId int, userId int) (articl
 		Content:     articleDb.Content,
 		Date:        articleDb.Date,
 		ImageUrl:    articleDb.ImageUrl,
-		ViewCount:   articleDb.ViewCount,
+		//ViewCount:   articleDb.ViewCount,
 		ReadingTime: articleDb.ReadingTime,
 		DoctorID:    articleDb.DoctorID,
 		Doctor: doctorEntities.Doctor{
@@ -164,6 +164,11 @@ func (repository *ArticleRepo) GetArticleById(articleId int, userId int) (articl
 		IsLiked: isLiked,
 	}
 
+	err = repository.db.Model(&ArticleViews{}).Create(&ArticleViews{ArticleID: uint(articleId), UserId: uint(userId)}).Error
+	if err != nil {
+		return articleEntities.Article{}, constants.ErrServer
+	}
+	
 	return articleResp, nil
 }
 
@@ -193,7 +198,7 @@ func (repository *ArticleRepo) GetLikedArticle(metadata entities.Metadata, userI
 			Content:     articlesDb[i].Content,
 			Date:        articlesDb[i].Date,
 			ImageUrl:    articlesDb[i].ImageUrl,
-			ViewCount:   articlesDb[i].ViewCount,
+			//ViewCount:   articlesDb[i].ViewCount,
 			ReadingTime: articlesDb[i].ReadingTime,
 			DoctorID:    articlesDb[i].DoctorID,
 			Doctor: doctorEntities.Doctor{
@@ -247,7 +252,7 @@ func (repository *ArticleRepo) GetArticleByIdForDoctor(articleId int) (articleEn
 		Content:     articleDb.Content,
 		Date:        articleDb.Date,
 		ImageUrl:    articleDb.ImageUrl,
-		ViewCount:   articleDb.ViewCount,
+		//ViewCount:   articleDb.ViewCount,
 		ReadingTime: articleDb.ReadingTime,
 		DoctorID:    articleDb.DoctorID,
 	}, nil
@@ -275,7 +280,7 @@ func (repository *ArticleRepo) GetAllArticleByDoctorId(metadata entities.Metadat
 			Content:     articleDb[i].Content,
 			Date:        articleDb[i].Date,
 			ImageUrl:    articleDb[i].ImageUrl,
-			ViewCount:   articleDb[i].ViewCount,
+			//ViewCount:   articleDb[i].ViewCount,
 			ReadingTime: articleDb[i].ReadingTime,
 			DoctorID:    articleDb[i].DoctorID,
 		}
@@ -308,13 +313,65 @@ func (repository *ArticleRepo) CountArticleLikesByDoctorId(doctorId int) (int, e
 }
 
 func (repository *ArticleRepo) CountArticleViewByDoctorId(doctorId int) (int, error) {
+	var articleDB []Article
+	err := repository.db.Where("doctor_id = ?", doctorId).Find(&articleDB).Error
+	if err != nil {
+		return 0, constants.ErrServer
+	}
+
+	var articleDBIDs []int
+	for i := 0; i < len(articleDB); i++ {
+		articleDBIDs = append(articleDBIDs, int(articleDB[i].ID))
+	}
+
 	var counter int64
-	err := repository.db.Model(&Article{}).Where("doctor_id = ?", doctorId).Select("SUM(view_count)").Scan(&counter).Error
+	err = repository.db.Model(&ArticleViews{}).Where("article_id IN ?", articleDBIDs).Count(&counter).Error
 	if err != nil {
 		return 0, constants.ErrServer
 	}
 
 	return int(counter), nil
+}
+
+func (repository *ArticleRepo) CountArticleViewByMonth(doctorId int, startMonth string, endMonth string) (map[int]int, error) {
+	var articleDB []Article
+	err := repository.db.Where("doctor_id = ?", doctorId).Find(&articleDB).Error
+	if err != nil {
+		return nil, constants.ErrServer
+	}
+
+	var articleDBIDs []int
+	for i := 0; i < len(articleDB); i++ {
+		articleDBIDs = append(articleDBIDs, int(articleDB[i].ID))
+	}
+
+	if len(articleDBIDs) == 0 {
+		return nil, constants.ErrDataNotFound
+	}
+
+	var results []struct {
+        Month int
+        Views int
+    }
+
+	query := repository.db.Model(&ArticleViews{}).Select("MONTH(created_at) as month, COUNT(*) as views").
+        Where("article_id IN ?", articleDBIDs).
+        Where("created_at BETWEEN ? AND ?", startMonth+"-01", endMonth+"-31").
+        Where("deleted_at IS NULL").
+        Group("month").
+        Order("month")
+
+    err = query.Scan(&results).Error
+    if err != nil {
+        return nil, constants.ErrServer
+    }
+
+    viewsByMonth := make(map[int]int)
+    for _, result := range results {
+        viewsByMonth[result.Month] = result.Views
+    }
+
+    return viewsByMonth, nil
 }
 
 func (repository *ArticleRepo) EditArticle(article articleEntities.Article) (articleEntities.Article, error) {
@@ -344,7 +401,7 @@ func (repository *ArticleRepo) EditArticle(article articleEntities.Article) (art
 		Content:     articleDb.Content,
 		Date:        articleDb.Date,
 		ImageUrl:    articleDb.ImageUrl,
-		ViewCount:   articleDb.ViewCount,
+		//ViewCount:   articleDb.ViewCount,
 		ReadingTime: articleDb.ReadingTime,
 		DoctorID:    articleDb.DoctorID,
 	}, nil
@@ -353,3 +410,7 @@ func (repository *ArticleRepo) EditArticle(article articleEntities.Article) (art
 func (repository *ArticleRepo) DeleteArticle(articleId int) error {
 	return repository.db.Where("id = ?", articleId).Delete(&Article{}).Error
 }
+
+// func (repository *ArticleRepo) IncrementViewCount(articleId int) error {
+// 	return repository.db.Model(&Article{}).Where("id = ?", articleId).Update("view_count", gorm.Expr("view_count + 1")).Error
+// }

@@ -128,3 +128,80 @@ func (c *UserController) FacebookCallback(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Login Oauth", res))
 }
+
+func (userController *UserController) UpdateProfile(c echo.Context) error {
+	var userFromRequest request.UpdateProfileRequest
+	if err := c.Bind(&userFromRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	token := c.Request().Header.Get("Authorization")
+	userId, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse(err.Error()))
+	}
+
+	file, err := c.FormFile("image")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	imageURL, err := utilities.UploadImage(file)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, base.NewErrorResponse(err.Error()))
+	}
+
+	userEntities := userEntities.User{
+		Id:             userId,
+		Name:           userFromRequest.Name,
+		Username:       userFromRequest.Username,
+		Address:        userFromRequest.Address,
+		Bio:            userFromRequest.Bio,
+		PhoneNumber:    userFromRequest.PhoneNumber,
+		Gender:         userFromRequest.Gender,
+		Age:            userFromRequest.Age,
+		ProfilePicture: imageURL,
+	}
+
+	updatedUser, err := userController.userUseCase.UpdateUserProfile(&userEntities)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	userResponse := response.UserUpdateProfileResponse{
+		Id:             updatedUser.Id,
+		Name:           updatedUser.Name,
+		Username:       updatedUser.Username,
+		Address:        updatedUser.Address,
+		Bio:            updatedUser.Bio,
+		PhoneNumber:    updatedUser.PhoneNumber,
+		Gender:         updatedUser.Gender,
+		Age:            updatedUser.Age,
+		ProfilePicture: updatedUser.ProfilePicture,
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Update Profile", userResponse))
+}
+
+func (c *UserController) ChangePassword(ctx echo.Context) error {
+	var req request.ChangePasswordRequest
+	if err := ctx.Bind(&req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	token := ctx.Request().Header.Get("Authorization")
+	userId, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return ctx.JSON(http.StatusUnauthorized, base.NewErrorResponse("Invalid token"))
+	}
+
+	if req.NewPassword != req.NewPasswordConfirm {
+		return ctx.JSON(http.StatusBadRequest, base.NewErrorResponse("New password and confirmation do not match"))
+	}
+
+	err = c.userUseCase.ChangePassword(userId, req.OldPassword, req.NewPassword)
+	if err != nil {
+		return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Change Password", nil))
+}

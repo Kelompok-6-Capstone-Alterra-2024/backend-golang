@@ -9,6 +9,7 @@ import (
 	"capstone/utilities"
 	"capstone/utilities/base"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -16,12 +17,14 @@ import (
 type TransactionController struct {
 	transactionUseCase transactionEntities.TransactionUseCase
 	midtransUseCase    midtransEntities.MidtransUseCase
+	validator          *validator.Validate
 }
 
-func NewTransactionController(transactionUseCase transactionEntities.TransactionUseCase, midtransUseCase midtransEntities.MidtransUseCase) *TransactionController {
+func NewTransactionController(transactionUseCase transactionEntities.TransactionUseCase, midtransUseCase midtransEntities.MidtransUseCase, validator *validator.Validate) *TransactionController {
 	return &TransactionController{
 		transactionUseCase: transactionUseCase,
 		midtransUseCase:    midtransUseCase,
+		validator:          validator,
 	}
 }
 
@@ -29,6 +32,9 @@ func (controller *TransactionController) InsertWithBuiltIn(c echo.Context) error
 	var transactionRequest request.TransactionRequest
 	if err := c.Bind(&transactionRequest); err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+	if err := controller.validator.Struct(transactionRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(constants.ErrBadRequest.Error()))
 	}
 
 	userId, err := utilities.GetUserIdFromToken(c.Request().Header.Get("Authorization"))

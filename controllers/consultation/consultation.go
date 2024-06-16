@@ -1,11 +1,13 @@
 package consultation
 
 import (
+	"capstone/constants"
 	"capstone/controllers/consultation/request"
 	"capstone/controllers/consultation/response"
 	"capstone/entities/consultation"
 	"capstone/utilities"
 	"capstone/utilities/base"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
@@ -13,11 +15,13 @@ import (
 
 type ConsultationController struct {
 	consultationUseCase consultation.ConsultationUseCase
+	validator           *validator.Validate
 }
 
-func NewConsultationController(consultationUseCase consultation.ConsultationUseCase) *ConsultationController {
+func NewConsultationController(consultationUseCase consultation.ConsultationUseCase, validator *validator.Validate) *ConsultationController {
 	return &ConsultationController{
-		consultationUseCase,
+		consultationUseCase: consultationUseCase,
+		validator:           validator,
 	}
 }
 
@@ -35,6 +39,11 @@ func (controller *ConsultationController) CreateConsultation(c echo.Context) err
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
 	consultationRequest.UserID = userId
+
+	if err = controller.validator.Struct(consultationRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(constants.ErrBadRequest.Error()))
+	}
+
 	consultationResponse, err := controller.consultationUseCase.CreateConsultation(consultationRequest.ToEntities(date, time))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
@@ -93,6 +102,11 @@ func (controller *ConsultationController) UpdateStatusConsultation(c echo.Contex
 	consultationRequest.DoctorID = uint(doctorID)
 
 	consultationRequest.ID = uint(consultationID)
+
+	if err = controller.validator.Struct(consultationRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(constants.ErrBadRequest.Error()))
+	}
+
 	consultationResponse, err := controller.consultationUseCase.UpdateStatusConsultation(consultationRequest.ToEntities())
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))

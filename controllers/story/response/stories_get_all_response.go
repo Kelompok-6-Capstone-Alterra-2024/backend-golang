@@ -8,7 +8,6 @@ type StoriesGetAllResponse struct {
 	Content   string               `json:"content"`
 	Date      time.Time            `json:"date"`
 	ImageUrl  string               `json:"image_url"`
-	ViewCount int                  `json:"view_count"`
 	IsLiked   bool                 `json:"is_liked"`
 	Doctor    DoctorGetAllResponse `json:"doctor"`
 }

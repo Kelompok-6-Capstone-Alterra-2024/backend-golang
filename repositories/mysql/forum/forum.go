@@ -118,8 +118,13 @@ func (f *ForumRepo) GetRecommendationForum(userId uint, metadata entities.Metada
 		forumIDs = append(forumIDs, forumMemberDBTemp.Forum.ID)
 	}
 
+	var query *gorm.DB
 	var forumDB []Forum
-	query := f.db.Model(&Forum{}).Where("id NOT IN ?", forumIDs).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit)
+	if len(forumIDs) != 0 {
+		query = f.db.Model(&Forum{}).Where("id NOT IN ?", forumIDs).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit)
+	} else {
+		query = f.db.Model(&Forum{}).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit)
+	}
 
 	if search != "" {
 		query = query.Where("name LIKE ?", "%"+search+"%")

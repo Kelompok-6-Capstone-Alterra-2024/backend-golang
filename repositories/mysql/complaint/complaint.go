@@ -26,9 +26,14 @@ func (repository *ComplaintRepo) Create(complaint *complaint.Complaint) (*compla
 	return complaintModel.ToEntities(), nil
 }
 
-func (repository *ComplaintRepo) GetAllByUserID(metadata *entities.Metadata, userID int) (*[]complaint.Complaint, error) {
+func (repository *ComplaintRepo) GetAllByDoctorID(metadata *entities.Metadata, doctorID int) (*[]complaint.Complaint, error) {
 	var complaintDB []Complaint
-	if err := repository.db.Limit(metadata.Limit).Offset(metadata.Offset()).Where("user_id = ?", userID).Preload("Consultation").Find(&complaintDB).Error; err != nil {
+	if err := repository.db.
+		Joins("JOIN consultations ON consultations.complaint_id = complaints.id").
+		Where("consultations.doctor_id = ?", doctorID). // Use '=' instead of 'LIKE' for ID comparison
+		Limit(metadata.Limit).
+		Offset(metadata.Offset()).
+		Find(&complaintDB).Error; err != nil {
 		return nil, constants.ErrDataNotFound
 	}
 	var complaints []complaint.Complaint
@@ -44,4 +49,23 @@ func (repository *ComplaintRepo) GetByID(complaintID int) (*complaint.Complaint,
 		return nil, constants.ErrDataNotFound
 	}
 	return complaintDB.ToEntities(), nil
+}
+
+func (repository *ComplaintRepo) SearchComplaintByPatientName(metadata *entities.Metadata, name string, doctorID uint) (*[]complaint.Complaint, error) {
+	var complaintDB []Complaint
+	if err := repository.db.
+		Joins("JOIN consultations ON consultations.complaint_id = complaints.id").
+		Where("consultations.doctor_id = ?", doctorID).
+		Where("complaints.name LIKE ?", "%"+name+"%").
+		Limit(metadata.Limit).
+		Offset(metadata.Offset()).
+		Find(&complaintDB).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	var complaints []complaint.Complaint
+	for _, value := range complaintDB {
+		complaints = append(complaints, *value.ToEntities())
+	}
+	return &complaints, nil
 }
