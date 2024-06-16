@@ -83,7 +83,7 @@ func (usecase *ConsultationUseCase) UpdateStatusConsultation(consultation *consu
 			return nil, constants.ErrConsultationAlreadyRejected
 		}
 
-		err = usecase.userUseCase.UpdateFailedPointByUserID(int(transaction.Consultation.UserID), transaction.PointSpend)
+		err = usecase.userUseCase.UpdateFailedPointByUserID(int(transaction.Consultation.UserID), transaction.Price)
 		if err != nil {
 			return nil, err
 		}
