@@ -83,3 +83,5 @@ var ErrExpiredOTP error = errors.New("expired otp")
 var ErrEmptyResetPassword error = errors.New("new password cannot be empty")
 
 var ErrDeleteDatabase error = errors.New("failed delete data in database")
+
+var ErrInvalidPrice error = errors.New("price must be greater than 0")

@@ -40,6 +40,10 @@ func (usecase *Transaction) InsertWithBuiltInInterface(transaction *transactionE
 		return nil, err
 	}
 
+	if transaction.Price < 0 {
+		return nil, constants.ErrInvalidPrice
+	}
+
 	newTransaction, err := usecase.midtransUseCase.GenerateSnapURL(transaction)
 	if err != nil {
 		return nil, err
@@ -56,6 +60,10 @@ func (usecase *Transaction) InsertWithCustomInterface(transaction *transactionEn
 	var err error
 	if err = usecase.validate.Struct(transaction); err != nil {
 		return nil, err
+	}
+
+	if transaction.Price < 0 {
+		return nil, constants.ErrInvalidPrice
 	}
 
 	_, err = usecase.consultationRepository.GetConsultationByID(int(transaction.ConsultationID))
