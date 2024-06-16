@@ -105,9 +105,10 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userAuth.GET("/auth/facebook/callback", r.userController.FacebookCallback)
 
 	// OTP
-	userAuth.POST("/otp/send", r.otpController.SendOtp)                      // Send OTP
-	userAuth.POST("/otp/verify/forgot-password", r.otpController.VerifyOtp)  // Verify OTP Forgot Password
-	userAuth.POST("/otp/verify/register", r.otpController.VerifyOTPRegister) // Verify OTP Register
+	userAuth.POST("/otp/send", r.otpController.SendOtp)                             // Send OTP
+	userAuth.POST("/otp/verify/forgot-password", r.otpController.VerifyOtp)         // Verify OTP Forgot Password
+	userAuth.POST("/otp/verify/register", r.otpController.VerifyOTPRegister)        // Verify OTP Register
+	userAuth.POST("/otp/verify/change-email", r.otpController.VerifyOTPChangeEmail) // Verify OTP Change Email
 
 	userRoute := userAuth.Group("/")
 	userRoute.Use(echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))

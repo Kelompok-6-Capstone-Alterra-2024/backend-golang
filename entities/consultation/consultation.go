@@ -45,6 +45,7 @@ type ConsultationRepository interface {
 	GetConsultationByID(consultationID int) (*Consultation, error)
 	GetAllUserConsultation(metadata *entities.Metadata, userID int) (*[]Consultation, error)
 	UpdateStatusConsultation(consultation *Consultation) (*Consultation, error)
+	UpdatePaymentStatusConsultation(consultationID int, status string) error
 	GetAllDoctorConsultation(metadata *entities.Metadata, doctorID int) (*[]Consultation, error)
 	GetConsultationByComplaintID(complaintID int) (*Consultation, error)
 	CountConsultationByStatus(doctorID int, status string) (int64, error)

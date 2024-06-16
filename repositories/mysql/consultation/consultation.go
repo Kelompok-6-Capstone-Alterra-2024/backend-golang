@@ -72,13 +72,17 @@ func (repository *ConsultationRepo) GetAllUserConsultation(metadata *entities.Me
 
 func (repository *ConsultationRepo) UpdateStatusConsultation(consultation *consultationEntities.Consultation) (*consultationEntities.Consultation, error) {
 	var consultationDB Consultation
-	if err := repository.db.First(&consultationDB, "id LIKE ?", consultation.ID).Error; err != nil {
+	if err := repository.db.Preload("Complaint").First(&consultationDB, "id LIKE ?", consultation.ID).Error; err != nil {
 		return nil, constants.ErrDataNotFound
+	}
+
+	if consultationDB.Status == constants.REJECTED {
+		return nil, constants.ErrConsultationAlreadyRejected
 	}
 
 	consultationDB.Status = consultation.Status
 
-	if err := repository.db.Model(&consultationDB).Save(&consultationDB).Error; err != nil {
+	if err := repository.db.Model(&consultationDB).Where("id LIKE ?", consultation.ID).Update("status", consultationDB.Status).Error; err != nil {
 		return nil, err
 	}
 
@@ -210,4 +214,16 @@ func (repository *ConsultationRepo) GetConsultationByComplaintID(complaintID int
 	}
 
 	return consultationResult, nil
+}
+
+func (repository *ConsultationRepo) UpdatePaymentStatusConsultation(consultationID int, status string) error {
+	var consultationDB Consultation
+
+	consultationDB.PaymentStatus = status
+
+	if err := repository.db.Model(&consultationDB).Where("id LIKE ?", consultationID).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

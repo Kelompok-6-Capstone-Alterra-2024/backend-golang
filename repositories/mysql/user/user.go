@@ -219,8 +219,16 @@ func (r *UserRepo) ChangePassword(userId int, oldPassword, newPassword string) e
 	return nil
 }
 
+func (r *UserRepo) UpdatePointsByUserID(id int, points int) error {
+	err := r.DB.Model(&User{}).Where("id = ?", id).Update("points", points).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *UserRepo) ChangeEmail(userId int, email string) error {
-	err := r.DB.Model(&User{}).Where("id = ?", userId).Update("email", email).Error
+	err := r.DB.Model(&User{}).Where("id = ?", userId).Update("pending_email", email).Error
 	if err != nil {
 		return err
 	}

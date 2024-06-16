@@ -37,7 +37,12 @@ func (controller *TransactionController) InsertWithBuiltIn(c echo.Context) error
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(constants.ErrBadRequest.Error()))
 	}
 
-	transactionResponse, err := controller.transactionUseCase.InsertWithBuiltInInterface(transactionRequest.ToEntities())
+	userId, err := utilities.GetUserIdFromToken(c.Request().Header.Get("Authorization"))
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse(constants.ErrUnauthorized.Error()))
+	}
+
+	transactionResponse, err := controller.transactionUseCase.InsertWithBuiltInInterface(transactionRequest.ToEntities(), transactionRequest.UsePoint, userId)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
@@ -95,7 +100,12 @@ func (controller *TransactionController) BankTransfer(c echo.Context) error {
 	transaction.Bank = bankName
 	transaction.PaymentType = constants.BankTransfer
 	transactionRequest := transaction.ToEntities()
-	transactionResponse, err := controller.transactionUseCase.InsertWithCustomInterface(transactionRequest)
+	userId, err := utilities.GetUserIdFromToken(c.Request().Header.Get("Authorization"))
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse(constants.ErrUnauthorized.Error()))
+	}
+
+	transactionResponse, err := controller.transactionUseCase.InsertWithBuiltInInterface(transactionRequest, transaction.UsePoint, userId)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
@@ -109,7 +119,12 @@ func (controller *TransactionController) EWallet(c echo.Context) error {
 	}
 	transaction.PaymentType = constants.GoPay
 	transactionRequest := transaction.ToEntities()
-	transactionResponse, err := controller.transactionUseCase.InsertWithCustomInterface(transactionRequest)
+	userId, err := utilities.GetUserIdFromToken(c.Request().Header.Get("Authorization"))
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse(constants.ErrUnauthorized.Error()))
+	}
+
+	transactionResponse, err := controller.transactionUseCase.InsertWithBuiltInInterface(transactionRequest, transaction.UsePoint, userId)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}

@@ -18,4 +18,5 @@ type User struct {
 	IsOauth        bool   `gorm:"type:boolean;default:false"`
 	Points         int    `gorm:"type:int;default:0"`
 	IsActive       bool   `gorm:"type:boolean;default:false"`
+	PendingEmail   string `gorm:"type:varchar(100)"`
 }
