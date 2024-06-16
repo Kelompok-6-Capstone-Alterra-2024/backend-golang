@@ -82,11 +82,11 @@ func main() {
 
 	userUC := userUseCase.NewUserUseCase(userRepo, oauthConfig, oauthConfigFB)
 	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo, oauthConfigDoctor, oauthConfigFBDoctor)
-	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo, validate, chatRepo)
+	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo, transactionRepo, userUC, doctorRepo, validate, chatRepo)
 	storyUC := storyUseCase.NewStoryUseCase(storyRepo)
 	complaintUC := complaintUseCase.NewComplaintUseCase(complaintRepo)
 	midtransUC := midtransUseCase.NewMidtransUseCase(midtransConfig)
-	transactionUC := transactionUseCase.NewTransactionUseCase(transactionRepo, midtransUC, consultationRepo, doctorRepo, userRepo, validate)
+	transactionUC := transactionUseCase.NewTransactionUseCase(transactionRepo, midtransUC, consultationRepo, doctorRepo, userUC, validate)
 	musicUC := musicUseCase.NewMusicUseCase(musicRepo)
 	ratingUC := ratingUseCase.NewRatingUseCase(ratingRepo)
 	moodUC := moodUseCase.NewMoodUseCase(moodRepo)

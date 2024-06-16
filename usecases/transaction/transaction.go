@@ -256,6 +256,10 @@ func (usecase *Transaction) ConfirmedPayment(id string, transactionStatus string
 	// Update Transaction Status
 	transaction.Status = transactionStatus
 	transactionResponse, err := usecase.transactionRepository.Update(transaction)
+	err = usecase.consultationRepository.UpdatePaymentStatusConsultation(int(transactionResponse.ConsultationID), transactionResponse.Status)
+	if err != nil {
+		return nil, err
+	}
 
 	// Add Balance Doctor
 	doctorDB, err := usecase.doctorRepository.GetDoctorByID(int(transaction.Consultation.DoctorID))
