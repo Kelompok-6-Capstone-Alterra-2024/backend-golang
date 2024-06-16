@@ -237,7 +237,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	// Consultation
 	doctorRoute.GET("consultations", r.consultationController.GetAllDoctorConsultation) //Get All Consultation
-	doctorRoute.GET("consultations/count", r.consultationController.CountConsultationByDoctorID)
+	doctorRoute.GET("consultations/count", r.consultationController.CountConsultation)
 	doctorRoute.GET("consultations/today/count", r.consultationController.CountConsultationToday)
 	doctorRoute.GET("consultations/:id", r.consultationController.GetConsultationByID)      //Get Consultation By ID
 	doctorRoute.PUT("consultations/:id", r.consultationController.UpdateStatusConsultation) // Update Status Consultation
