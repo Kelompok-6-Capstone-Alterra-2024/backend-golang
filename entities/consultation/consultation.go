@@ -63,6 +63,7 @@ type ConsultationRepository interface {
 	CountConsultationByDoctorID(doctorID int) (int64, error)
 	CreateConsultationNotes(consultationNotes ConsultationNotes) (ConsultationNotes, error)
 	GetConsultationNotesByID(consultationID int) (ConsultationNotes, error)
+	GetAllConsultation() *[]Consultation
 }
 
 type ConsultationUseCase interface {
