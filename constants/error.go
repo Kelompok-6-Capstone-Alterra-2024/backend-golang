@@ -91,3 +91,9 @@ var ErrUnauthorized error = errors.New("unauthorized")
 var ErrPointSpend error = errors.New("point spend must be greater than 0")
 
 var ErrInsufficientPoint error = errors.New("insufficient point")
+
+var ErrInvalidCredentials error = errors.New("invalid credentials")
+
+var ErrEmptyInputViewByMonth error = errors.New("start month or end month cannot be empty")
+
+var ErrBadRequest error = errors.New("bad request")

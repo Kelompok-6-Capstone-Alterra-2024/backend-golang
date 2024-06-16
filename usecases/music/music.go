@@ -82,6 +82,18 @@ func (musicUseCase *MusicUseCase) CountMusicViewCountByDoctorId(doctorId int) (i
 	return count, nil
 }
 
+func (musicUseCase *MusicUseCase) CountMusicViewByMonth(doctorId int, startMonth string, endMonth string) (map[int]int, error) {
+	if startMonth == "" || endMonth == "" {
+		return map[int]int{}, constants.ErrEmptyInputViewByMonth
+	}
+	
+	count, err := musicUseCase.musicInterface.CountMusicViewByMonth(doctorId, startMonth, endMonth)
+	if err != nil {
+		return map[int]int{}, err
+	}
+	return count, nil
+}
+
 func (musicUseCase *MusicUseCase) PostMusic(music musicEntities.Music, fileImage *multipart.FileHeader, fileMusic *multipart.FileHeader) (musicEntities.Music, error) {
 	if music.Title == "" || music.Singer == "" {
 		return musicEntities.Music{}, constants.ErrEmptyInputMusic

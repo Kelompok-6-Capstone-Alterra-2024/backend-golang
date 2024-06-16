@@ -47,7 +47,6 @@ func (musicController *MusicController) GetAllMusics(c echo.Context) error {
 			Singer:    music.Singer,
 			MusicUrl:  music.MusicUrl,
 			ImageUrl:  music.ImageUrl,
-			ViewCount: music.ViewCount,
 			IsLiked:   music.IsLiked,
 		}
 	}
@@ -106,7 +105,6 @@ func (musicController *MusicController) GetMusicByID(c echo.Context) error {
 		Singer:    music.Singer,
 		MusicUrl:  music.MusicUrl,
 		ImageUrl:  music.ImageUrl,
-		ViewCount: music.ViewCount,
 		IsLiked:   music.IsLiked,
 	}
 
@@ -136,7 +134,6 @@ func (musicController *MusicController) GetLikedMusics(c echo.Context) error {
 			Singer:    music.Singer,
 			MusicUrl:  music.MusicUrl,
 			ImageUrl:  music.ImageUrl,
-			ViewCount: music.ViewCount,
 			IsLiked:   music.IsLiked,
 		}
 	}
@@ -209,6 +206,21 @@ func (musicController *MusicController) CountMusicViewCountByDoctorId(c echo.Con
 	}
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Count Music Viewed By Doctor Id", counterResp))
+}
+
+func (musicController *MusicController) CountMusicViewByMonth(c echo.Context) error {
+	startMonth := c.QueryParam("start_month")
+	endMonth := c.QueryParam("end_month")
+
+	token := c.Request().Header.Get("Authorization")
+	doctorId, _ := utilities.GetUserIdFromToken(token)
+
+	res, err := musicController.musicUseCase.CountMusicViewByMonth(doctorId, startMonth, endMonth)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Count Music View By Month", res))
 }
 
 func (musicController *MusicController) PostMusic(c echo.Context) error {

@@ -9,7 +9,7 @@ type ArticleCreatedResponse struct {
 	Content     string             `json:"content"`
 	ImageUrl    string             `json:"image_url"`
 	Date        time.Time          `json:"date"`
-	ViewCount   int                `json:"view_count"`
+	// ViewCount   int                `json:"view_count"`
 	IsLiked     bool               `json:"is_liked"`
 	ReadingTime int                `json:"reading_time"`
 	Doctor      DoctorInfoResponse `json:"doctor"`

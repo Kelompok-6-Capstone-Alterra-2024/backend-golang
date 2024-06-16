@@ -209,6 +209,27 @@ func (u *UserUseCase) HandleFacebookCallback(ctx context.Context, code string) (
 	return result, nil
 }
 
+func (u *UserUseCase) UpdateUserProfile(user *userEntitites.User) (userEntitites.User, error) {
+	if user.Id == 0 {
+		return userEntitites.User{}, constants.ErrUserNotFound
+	}
+
+	updatedUser, err := u.repository.UpdateUserProfile(user)
+	if err != nil {
+		return userEntitites.User{}, err
+	}
+
+	return updatedUser, nil
+}
+
+func (u *UserUseCase) ChangePassword(userId int, oldPassword, newPassword string) error {
+	err := u.repository.ChangePassword(userId, oldPassword, newPassword)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (u *UserUseCase) UpdateSuccessPointByUserID(id int, pointSpend int) error {
 	if pointSpend < 0 {
 		return constants.ErrPointSpend
@@ -251,6 +272,6 @@ func (u *UserUseCase) UpdateFailedPointByUserID(id int, pointSpend int) error {
 	if err != nil {
 		return err
 	}
-
-	return nil
+  
+  return nil
 }

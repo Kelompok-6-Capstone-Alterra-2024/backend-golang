@@ -17,6 +17,7 @@ type User struct {
 	Token          string
 	IsOauth        bool
 	Points         int
+	IsActive       bool
 }
 
 type RepositoryInterface interface {
@@ -27,6 +28,8 @@ type RepositoryInterface interface {
 	GetPointsByUserId(id int) (int, error)
 	ResetPassword(email string, password string) error
 	UpdatePointsByUserID(id int, point int) error
+	UpdateUserProfile(user *User) (User, error)
+	ChangePassword(userId int, oldPassword, newPassword string) error
 }
 
 type UseCaseInterface interface {
@@ -40,4 +43,6 @@ type UseCaseInterface interface {
 	HandleFacebookCallback(ctx context.Context, code string) (User, error)
 	UpdateSuccessPointByUserID(id int, pointSpend int) error
 	UpdateFailedPointByUserID(id int, pointSpend int) error
+	UpdateUserProfile(user *User) (User, error)
+	ChangePassword(userId int, oldPassword, newPassword string) error
 }

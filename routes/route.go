@@ -91,9 +91,11 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	e.GET("/v1/doctors/chatbots/treatment", r.chatbotController.ChatbotTreatment)      //Chatbot Treatment
 
 	userAuth := e.Group("/v1/users")
-	userAuth.POST("/register", r.userController.Register)           //Register User
-	userAuth.POST("/login", r.userController.Login)                 //Login User
-	userAuth.PUT("/reset-password", r.userController.ResetPassword) //Reset Password
+	userAuth.POST("/register", r.userController.Register)             //Register User
+	userAuth.POST("/login", r.userController.Login)                   //Login User
+	userAuth.PUT("/reset-password", r.userController.ResetPassword)   //Reset Password
+	userAuth.PUT("/update-profile", r.userController.UpdateProfile)   //Update Profile
+	userAuth.PUT("/change-password", r.userController.ChangePassword) // Change Password
 
 	userAuth.GET("/auth/google/login", r.userController.GoogleLogin)
 	userAuth.GET("/auth/google/callback", r.userController.GoogleCallback)
@@ -102,8 +104,9 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userAuth.GET("/auth/facebook/callback", r.userController.FacebookCallback)
 
 	// OTP
-	userAuth.POST("/send-otp", r.otpController.SendOtp)     // Send OTP
-	userAuth.POST("/verify-otp", r.otpController.VerifyOtp) // Verify OTP
+	userAuth.POST("/otp/send", r.otpController.SendOtp)                     // Send OTP
+	userAuth.POST("/otp/verify/forgot-password", r.otpController.VerifyOtp) // Verify OTP Forgot Password
+	userAuth.POST("/otp/verify/register", r.otpController.VerifyOTPRegister)        // Verify OTP Register
 
 	userRoute := userAuth.Group("/")
 	userRoute.Use(echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))
@@ -111,6 +114,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("doctors/:id", r.doctorController.GetByID)         //Get Doctor By ID
 	userRoute.GET("doctors", r.doctorController.GetAll)              //Get All Doctor
 	userRoute.GET("doctors/available", r.doctorController.GetActive) //Get All Active Doctor
+	userRoute.GET("doctors/search", r.doctorController.SearchDoctor) //Search Doctor
 
 	// Consultation
 	userRoute.POST("consultations", r.consultationController.CreateConsultation)     //Create Consultation
@@ -188,6 +192,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorAuth.POST("/login", r.doctorController.Login)                        //Login Doctor
 	doctorAuth.GET("/auth/google/login", r.doctorController.GoogleLogin)       // Google Login
 	doctorAuth.GET("/auth/google/callback", r.doctorController.GoogleCallback) // Google Callback
+	doctorAuth.PUT("/update-profile", r.doctorController.UpdateDoctorProfile)  // Update Doctor Profile
 
 	doctorAuth.GET("/auth/facebook/login", r.doctorController.FacebookLogin)
 	doctorAuth.GET("/auth/facebook/callback", r.doctorController.FacebookCallback)
@@ -202,6 +207,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("articles/count", r.articleController.CountArticleByDoctorId)           // Count Article By Doctor ID
 	doctorRoute.GET("articles/like/count", r.articleController.CountArticleLikesByDoctorId) // Count Article Likes By Doctor ID
 	doctorRoute.GET("articles/view/count", r.articleController.CountArticleViewByDoctorId)  // Count Article View Count By Doctor ID
+	doctorRoute.GET("articles/view/month/count", r.articleController.CountArticleViewByMonth) // Count Article View Count By Month
 	doctorRoute.PUT("articles/:id", r.articleController.EditArticle)                        // Update Article
 	doctorRoute.DELETE("articles/:id", r.articleController.DeleteArticle)                   // Delete Article
 
@@ -214,6 +220,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("musics/view/count", r.musicController.CountMusicViewCountByDoctorId) // Count Music View Count By Doctor ID
 	doctorRoute.PUT("musics/:id", r.musicController.EditMusic)                            // Update Music
 	doctorRoute.DELETE("musics/:id", r.musicController.DeleteMusic)                       // Delete Music
+	doctorRoute.GET("musics/view/month/count", r.musicController.CountMusicViewByMonth)   // Count Music View By Month
 
 	// Inspirational Stories
 	doctorRoute.POST("stories", r.storyController.PostStory)                           // Post Story
@@ -221,7 +228,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("stories/:id", r.storyController.GetStoryByIdForDoctor)            // Get Story By ID
 	doctorRoute.GET("stories/count", r.storyController.CountStoriesByDoctorId)         // Count Stories By Doctor ID
 	doctorRoute.GET("stories/like/count", r.storyController.CountStoryLikesByDoctorId) // Count Stories Likes By Doctor ID
-
+	doctorRoute.GET("stories/view/month/count", r.storyController.CountStoryViewByMonth) // Count Stories View Count By Month
 	doctorRoute.GET("stories/view/count", r.storyController.CountStoryViewByDoctorId) // Count Stories View Count By Doctor ID
 	doctorRoute.PUT("stories/:id", r.storyController.EditStory)                       // Update Story
 	doctorRoute.DELETE("stories/:id", r.storyController.DeleteStory)                  // Delete Story
@@ -272,4 +279,5 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	// Patient
 	doctorRoute.GET("patients", r.complaintController.GetAllByDoctorID) // Get All Patient
 	doctorRoute.GET("patients/:id", r.complaintController.GetByComplaintID)
+	doctorRoute.GET("patients/search", r.complaintController.SearchComplaintByPatientName)
 }

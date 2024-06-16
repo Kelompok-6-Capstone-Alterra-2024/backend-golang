@@ -1,12 +1,14 @@
 package complaint
 
 import (
+	"capstone/constants"
 	"capstone/controllers/complaint/request"
 	"capstone/controllers/complaint/response"
 	complaintUseCase "capstone/entities/complaint"
 	consultationEntities "capstone/entities/consultation"
 	"capstone/utilities"
 	"capstone/utilities/base"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
@@ -15,19 +17,23 @@ import (
 type ComplaintController struct {
 	complaintUseCase    complaintUseCase.ComplaintUseCase
 	consultationUseCase consultationEntities.ConsultationUseCase
+	validator           *validator.Validate
 }
 
-func NewComplaintController(complaint complaintUseCase.ComplaintUseCase, consultationUseCase consultationEntities.ConsultationUseCase) *ComplaintController {
+func NewComplaintController(complaint complaintUseCase.ComplaintUseCase, consultationUseCase consultationEntities.ConsultationUseCase, validator *validator.Validate) *ComplaintController {
 	return &ComplaintController{
 		complaintUseCase:    complaint,
 		consultationUseCase: consultationUseCase,
+		validator:           validator,
 	}
 }
 
 func (controller *ComplaintController) Create(c echo.Context) error {
 	var complaintRequest request.ComplaintRequest
 	c.Bind(&complaintRequest)
-
+	if err := controller.validator.Struct(complaintRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(constants.ErrBadRequest.Error()))
+	}
 	complaint, err := controller.complaintUseCase.Create(complaintRequest.ToEntities())
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
@@ -46,16 +52,14 @@ func (controller *ComplaintController) GetAllByDoctorID(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
-	consultations, err := controller.consultationUseCase.GetAllDoctorConsultation(metadata, doctorID)
+	complaintsResponse, err := controller.complaintUseCase.GetAllByDoctorID(metadata, doctorID)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 
 	var complaints []response.ComplaintResponse
-	for _, value := range *consultations {
-		if value.Complaint.ID != 0 {
-			complaints = append(complaints, *value.Complaint.ToResponse())
-		}
+	for _, value := range *complaintsResponse {
+		complaints = append(complaints, *value.ToResponse())
 	}
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Complaints Retrieved", complaints))
@@ -74,4 +78,29 @@ func (controller *ComplaintController) GetByComplaintID(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Complaint Retrieved", consultation.ToDoctorResponse()))
+}
+
+func (controller *ComplaintController) SearchComplaintByPatientName(c echo.Context) error {
+	pageParam := c.QueryParam("page")
+	limitParam := c.QueryParam("limit")
+	name := c.QueryParam("name")
+
+	metadata := utilities.GetMetadata(pageParam, limitParam)
+	token := c.Request().Header.Get("Authorization")
+	doctorID, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	complaints, err := controller.complaintUseCase.SearchComplaintByPatientName(metadata, name, uint(doctorID))
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	var complaintsResponse []response.ComplaintResponse
+	for _, value := range *complaints {
+		complaintsResponse = append(complaintsResponse, *value.ToResponse())
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Complaint Retrieved", complaintsResponse))
 }

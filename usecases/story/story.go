@@ -74,6 +74,18 @@ func (storiesUseCase *StoryUseCase) CountStoryViewByDoctorId(doctorId int) (int,
 	return count, nil
 }
 
+func (storiesUseCase *StoryUseCase) CountStoryViewByMonth(doctorId int, startMonth string, endMonth string) (map[int]int, error) {
+	if startMonth == "" || endMonth == "" {
+		return map[int]int{}, constants.ErrEmptyInputViewByMonth
+	}
+	
+	count, err := storiesUseCase.storyRepository.CountStoryViewByMonth(doctorId, startMonth, endMonth)
+	if err != nil {
+		return map[int]int{}, err
+	}
+	return count, nil
+}
+
 func (storiesUseCase *StoryUseCase) PostStory(story storyEntities.Story, file *multipart.FileHeader) (storyEntities.Story, error) {
 	if story.Title == "" || story.Content == "" {
 		return storyEntities.Story{}, constants.ErrEmptyInputStory

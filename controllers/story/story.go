@@ -48,7 +48,6 @@ func (storyController *StoryController) GetAllStories(c echo.Context) error {
 			Content:   story.Content,
 			Date:      story.Date,
 			ImageUrl:  story.ImageUrl,
-			ViewCount: story.ViewCount,
 			IsLiked:   story.IsLiked,
 			Doctor: response.DoctorGetAllResponse{
 				ID:   story.Doctor.ID,
@@ -78,7 +77,6 @@ func (storyController *StoryController) GetStoryById(c echo.Context) error {
 		Content:   story.Content,
 		Date:      story.Date,
 		ImageUrl:  story.ImageUrl,
-		ViewCount: story.ViewCount,
 		IsLiked:   story.IsLiked,
 		Doctor: response.DoctorGetAllResponse{
 			ID:   story.Doctor.ID,
@@ -112,7 +110,6 @@ func (storyController *StoryController) GetLikedStories(c echo.Context) error {
 			Content:   story.Content,
 			Date:      story.Date,
 			ImageUrl:  story.ImageUrl,
-			ViewCount: story.ViewCount,
 			IsLiked:   story.IsLiked,
 			Doctor: response.DoctorGetAllResponse{
 				ID:   story.Doctor.ID,
@@ -189,6 +186,21 @@ func (storyController *StoryController) CountStoryViewByDoctorId(c echo.Context)
 	}
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Count Story View Count By Doctor Id", resp))
+}
+
+func (storyController *StoryController) CountStoryViewByMonth(c echo.Context) error {
+	startMonth := c.QueryParam("start_month")
+	endMonth := c.QueryParam("end_month")
+
+	token := c.Request().Header.Get("Authorization")
+	doctorId, _ := utilities.GetUserIdFromToken(token)
+
+	res, err := storyController.storyUseCase.CountStoryViewByMonth(doctorId, startMonth, endMonth)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Count Story View Count By Month", res))
 }
 
 func (storyController *StoryController) PostStory(c echo.Context) error {

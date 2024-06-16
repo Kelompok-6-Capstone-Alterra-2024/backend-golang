@@ -140,3 +140,64 @@ func (r *DoctorRepo) UpdateAmount(doctorID uint, amount int) error {
 
 	return nil
 }
+
+func (repository *DoctorRepo) SearchDoctor(search string, metadata *entities.Metadata) (*[]doctorEntities.Doctor, error) {
+	var doctorsDb []Doctor
+	if err := repository.db.Limit(metadata.Limit).Offset(metadata.Offset()).Find(&doctorsDb, "name LIKE ?", "%"+search+"%").Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+	var doctorsResponse []doctorEntities.Doctor
+	for _, doctor := range doctorsDb {
+		doctorsResponse = append(doctorsResponse, *doctor.ToEntities())
+	}
+	return &doctorsResponse, nil
+}
+
+func (r *DoctorRepo) UpdateDoctorProfile(doctor *doctorEntities.Doctor) (doctorEntities.Doctor, error) {
+	existingDoctor := Doctor{}
+	if err := r.db.Where("id = ?", doctor.ID).First(&existingDoctor).Error; err != nil {
+		return doctorEntities.Doctor{}, err
+	}
+
+	existingDoctor.Username = doctor.Username
+	existingDoctor.Name = doctor.Name
+	existingDoctor.Address = doctor.Address
+	existingDoctor.PhoneNumber = doctor.PhoneNumber
+	existingDoctor.Gender = doctor.Gender
+	existingDoctor.ProfilePicture = doctor.ProfilePicture
+	existingDoctor.Experience = doctor.Experience
+	existingDoctor.Almamater = doctor.Almamater
+	existingDoctor.GraduationYear = doctor.GraduationYear
+	existingDoctor.PracticeLocation = doctor.PracticeLocation
+	existingDoctor.PracticeCity = doctor.PracticeCity
+	existingDoctor.PracticeProvince = doctor.PracticeProvince
+	existingDoctor.StrNumber = doctor.StrNumber
+	existingDoctor.Fee = doctor.Fee
+	existingDoctor.Specialist = doctor.Specialist
+
+	if err := r.db.Save(&existingDoctor).Error; err != nil {
+		return doctorEntities.Doctor{}, err
+	}
+
+	updatedDoctor := doctorEntities.Doctor{
+		ID:               existingDoctor.ID,
+		Username:         existingDoctor.Username,
+		Email:            existingDoctor.Email,
+		Name:             existingDoctor.Name,
+		Address:          existingDoctor.Address,
+		PhoneNumber:      existingDoctor.PhoneNumber,
+		Gender:           existingDoctor.Gender,
+		ProfilePicture:   existingDoctor.ProfilePicture,
+		Experience:       existingDoctor.Experience,
+		Almamater:        existingDoctor.Almamater,
+		GraduationYear:   existingDoctor.GraduationYear,
+		PracticeLocation: existingDoctor.PracticeLocation,
+		PracticeCity:     existingDoctor.PracticeCity,
+		PracticeProvince: existingDoctor.PracticeProvince,
+		StrNumber:        existingDoctor.StrNumber,
+		Fee:              existingDoctor.Fee,
+		Specialist:       existingDoctor.Specialist,
+	}
+
+	return updatedDoctor, nil
+}

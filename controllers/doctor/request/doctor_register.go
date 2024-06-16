@@ -8,9 +8,9 @@ import (
 )
 
 type DoctorRegisterRequest struct {
-	Username         string                `json:"username" form:"username"`
-	Email            string                `json:"email" form:"email"`
-	Password         string                `json:"password" form:"password"`
+	Username         string                `json:"username" form:"username" validate:"required,min=4,max=50"`
+	Email            string                `json:"email" form:"email" validate:"required,email"`
+	Password         string                `json:"password" form:"password" validate:"required,min=4,max=50"`
 	Name             string                `json:"name" form:"name"`
 	Address          string                `json:"address" form:"address"`
 	PhoneNumber      string                `json:"phone_number" form:"phone_number"`

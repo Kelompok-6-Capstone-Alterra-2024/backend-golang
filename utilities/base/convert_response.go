@@ -120,6 +120,9 @@ func ConvertResponseCode(err error) int {
 
 	case constants.ErrEmptyResetPassword:
 		return http.StatusBadRequest
+
+	case constants.ErrEmptyInputViewByMonth:
+		return http.StatusBadRequest
 		
 	default:
 		return http.StatusInternalServerError
