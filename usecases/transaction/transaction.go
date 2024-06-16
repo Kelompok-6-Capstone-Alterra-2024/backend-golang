@@ -158,7 +158,7 @@ func (usecase *Transaction) ConfirmedPayment(id string, transactionStatus string
 	}
 
 	if transaction.Status == constants.Success {
-		totalBalance := doctorDB.Amount + transaction.Price
+		totalBalance := doctorDB.Amount + transaction.Price - constants.ServiceFee
 		err = usecase.doctorRepository.UpdateAmount(transaction.Consultation.DoctorID, totalBalance)
 		if err != nil {
 			return nil, err
