@@ -91,3 +91,5 @@ var ErrUnauthorized error = errors.New("unauthorized")
 var ErrPointSpend error = errors.New("point spend must be greater than 0")
 
 var ErrInsufficientPoint error = errors.New("insufficient point")
+
+var ErrConsultationAlreadyRejected error = errors.New("status already rejected")

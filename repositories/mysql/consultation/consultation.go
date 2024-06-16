@@ -76,6 +76,10 @@ func (repository *ConsultationRepo) UpdateStatusConsultation(consultation *consu
 		return nil, constants.ErrDataNotFound
 	}
 
+	if consultationDB.Status == constants.REJECTED {
+		return nil, constants.ErrConsultationAlreadyRejected
+	}
+
 	consultationDB.Status = consultation.Status
 
 	if err := repository.db.Model(&consultationDB).Where("id LIKE ?", consultation.ID).Update("status", consultationDB.Status).Error; err != nil {

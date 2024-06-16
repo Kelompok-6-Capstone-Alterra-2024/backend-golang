@@ -80,7 +80,7 @@ func (usecase *ConsultationUseCase) UpdateStatusConsultation(consultation *consu
 		transaction := new(transactionEntities.Transaction)
 		transaction, err = usecase.transactionRepository.FindByConsultationID(consultation.ID)
 		if err != nil {
-			return nil, err
+			return nil, constants.ErrConsultationAlreadyRejected
 		}
 
 		err = usecase.userUseCase.UpdateFailedPointByUserID(int(transaction.Consultation.UserID), transaction.PointSpend)
