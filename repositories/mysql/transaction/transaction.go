@@ -39,7 +39,7 @@ func (repository *TransactionRepo) FindByID(ID string) (*transactionEntities.Tra
 
 func (repository *TransactionRepo) FindByConsultationID(consultationID uint) (*transactionEntities.Transaction, error) {
 	transactionDB := new(Transaction)
-	if err := repository.db.Preload("Consultation.Doctor").First(&transactionDB).Error; err != nil {
+	if err := repository.db.Preload("Consultation").Preload("Consultation.Doctor").First(&transactionDB, "consultation_id LIKE ?", consultationID).Error; err != nil {
 		return nil, constants.ErrDataNotFound
 	}
 	return transactionDB.ToEntities(), nil
@@ -68,7 +68,7 @@ func (repository *TransactionRepo) FindAllByUserID(metadata *entities.Metadata, 
 
 func (repository *TransactionRepo) Update(transaction *transactionEntities.Transaction) (*transactionEntities.Transaction, error) {
 	transactionDB := ToTransactionModel(transaction)
-	if err := repository.db.Model(&Transaction{}).Where("id LIKE ?", transactionDB.ID).Update("status", transactionDB.Status).Error; err != nil {
+	if err := repository.db.Model(&Transaction{}).Where("id LIKE ?", transactionDB.ID).Update("status", transactionDB.Status).Update("payment_status", transactionDB.Status).Error; err != nil {
 		return nil, constants.ErrInsertDatabase
 	}
 	transactionDB.Consultation = *consultation.ToConsultationModel(&transaction.Consultation)

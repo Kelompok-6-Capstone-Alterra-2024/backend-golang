@@ -218,3 +218,11 @@ func (r *UserRepo) ChangePassword(userId int, oldPassword, newPassword string) e
 	}
 	return nil
 }
+
+func (r *UserRepo) UpdatePointsByUserID(id int, points int) error {
+	err := r.DB.Model(&User{}).Where("id = ?", id).Update("points", points).Error
+  if err != nil {
+		return err
+	}
+	return nil
+}

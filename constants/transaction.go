@@ -8,4 +8,6 @@ const (
 
 	GoPay        string = "gopay"
 	BankTransfer string = "bank_transfer"
+
+	ServiceFee int = 2000
 )

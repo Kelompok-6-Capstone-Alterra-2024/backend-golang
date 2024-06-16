@@ -14,8 +14,8 @@ type TransactionRepository interface {
 }
 
 type TransactionUseCase interface {
-	InsertWithBuiltInInterface(transaction *Transaction) (*Transaction, error)
-	InsertWithCustomInterface(transaction *Transaction) (*Transaction, error)
+	InsertWithBuiltInInterface(transaction *Transaction, isUsePoint bool, userID int) (*Transaction, error)
+	InsertWithCustomInterface(transaction *Transaction, isUsePoint bool, userID int) (*Transaction, error)
 	ConfirmedPayment(id string, transactionStatus string) (*Transaction, error)
 	FindByID(ID string) (*Transaction, error)
 	FindByConsultationID(consultationID uint) (*Transaction, error)

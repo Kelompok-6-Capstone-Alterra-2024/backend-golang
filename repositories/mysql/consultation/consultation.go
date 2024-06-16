@@ -78,7 +78,7 @@ func (repository *ConsultationRepo) UpdateStatusConsultation(consultation *consu
 
 	consultationDB.Status = consultation.Status
 
-	if err := repository.db.Model(&consultationDB).Save(&consultationDB).Error; err != nil {
+	if err := repository.db.Model(&consultationDB).Where("id LIKE ?", consultation.ID).Update("status", consultationDB.Status).Error; err != nil {
 		return nil, err
 	}
 
@@ -210,4 +210,16 @@ func (repository *ConsultationRepo) GetConsultationByComplaintID(complaintID int
 	}
 
 	return consultationResult, nil
+}
+
+func (repository *ConsultationRepo) UpdatePaymentStatusConsultation(consultationID int, status string) error {
+	var consultationDB Consultation
+
+	consultationDB.PaymentStatus = status
+
+	if err := repository.db.Model(&consultationDB).Where("id LIKE ?", consultationID).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

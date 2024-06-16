@@ -5,21 +5,36 @@ import (
 	"capstone/entities"
 	chatEntities "capstone/entities/chat"
 	consultationEntities "capstone/entities/consultation"
+	doctorEntities "capstone/entities/doctor"
+	transactionEntities "capstone/entities/transaction"
+	userEntities "capstone/entities/user"
 
 	"github.com/go-playground/validator/v10"
 )
 
 type ConsultationUseCase struct {
-	consultationRepo consultationEntities.ConsultationRepository
-	validate         *validator.Validate
-	chatRepo         chatEntities.RepositoryInterface
+	consultationRepo      consultationEntities.ConsultationRepository
+	transactionRepository transactionEntities.TransactionRepository
+	doctorRepository      doctorEntities.DoctorRepositoryInterface
+	userUseCase           userEntities.UseCaseInterface
+	validate              *validator.Validate
+	chatRepo              chatEntities.RepositoryInterface
 }
 
-func NewConsultationUseCase(consultationRepo consultationEntities.ConsultationRepository, validate *validator.Validate, chatRepo chatEntities.RepositoryInterface) consultationEntities.ConsultationUseCase {
+func NewConsultationUseCase(
+	consultationRepo consultationEntities.ConsultationRepository,
+	transactionRepository transactionEntities.TransactionRepository,
+	userUseCase userEntities.UseCaseInterface,
+	doctorRepository doctorEntities.DoctorRepositoryInterface,
+	validate *validator.Validate,
+	chatRepo chatEntities.RepositoryInterface) consultationEntities.ConsultationUseCase {
 	return &ConsultationUseCase{
-		consultationRepo: consultationRepo,
-		validate:         validate,
-		chatRepo:         chatRepo,
+		consultationRepo:      consultationRepo,
+		transactionRepository: transactionRepository,
+		userUseCase:           userUseCase,
+		doctorRepository:      doctorRepository,
+		validate:              validate,
+		chatRepo:              chatRepo,
 	}
 }
 
@@ -60,6 +75,30 @@ func (usecase *ConsultationUseCase) UpdateStatusConsultation(consultation *consu
 	result, err := usecase.consultationRepo.UpdateStatusConsultation(consultation)
 	if err != nil {
 		return nil, err
+	}
+
+	if consultation.Status == constants.REJECTED {
+		transaction := new(transactionEntities.Transaction)
+		transaction, err = usecase.transactionRepository.FindByConsultationID(consultation.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		err = usecase.userUseCase.UpdateFailedPointByUserID(int(transaction.Consultation.UserID), transaction.PointSpend)
+		if err != nil {
+			return nil, err
+		}
+
+		doctorResponse, err := usecase.doctorRepository.GetDoctorByID(int(consultation.DoctorID))
+		if err != nil {
+			return nil, err
+		}
+
+		amountDoctor := doctorResponse.Amount - transaction.Price + constants.ServiceFee
+		err = usecase.doctorRepository.UpdateAmount(consultation.DoctorID, amountDoctor)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return result, nil
 }
