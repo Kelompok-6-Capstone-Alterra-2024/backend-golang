@@ -40,6 +40,16 @@ type ConsultationNotes struct {
 	MoodTrackerNote string
 }
 
+type CountConsultation struct {
+	TotalConsultation    int64
+	TodayConsultation    int64
+	ActiveConsultation   int64
+	DoneConsultation     int64
+	RejectedConsultation int64
+	IncomingConsultation int64
+	PendingConsultation  int64
+}
+
 type ConsultationRepository interface {
 	CreateConsultation(consultation *Consultation) (*Consultation, error)
 	GetConsultationByID(consultationID int) (*Consultation, error)
@@ -66,6 +76,7 @@ type ConsultationUseCase interface {
 	CountConsultationToday(doctorID int) (int64, error)
 	CountConsultationByStatus(doctorID int, status string) (int64, error)
 	CreateConsultationNotes(consultationNotes ConsultationNotes) (ConsultationNotes, error)
+	CountConsultation(doctorID int) (*CountConsultation, error)
 	GetConsultationNotesByID(consultationID int) (ConsultationNotes, error)
 }
 
@@ -92,5 +103,29 @@ func (r *Consultation) ToDoctorResponse() *response.ConsultationDoctorResponse {
 		Date:          r.Date.Format("2006-01-02"),
 		Time:          r.Time.Format("15:04"),
 		Complaint:     r.Complaint.ToResponse(),
+	}
+}
+
+func (r *CountConsultation) ToResponse() *response.ConsultationCount {
+	return &response.ConsultationCount{
+		TotalConsultation:    r.TotalConsultation,
+		TodayConsultation:    r.TodayConsultation,
+		ActiveConsultation:   r.ActiveConsultation,
+		DoneConsultation:     r.DoneConsultation,
+		RejectedConsultation: r.RejectedConsultation,
+		IncomingConsultation: r.IncomingConsultation,
+		PendingConsultation:  r.PendingConsultation,
+	}
+}
+
+func ToCountConsultation(args ...int64) CountConsultation {
+	return CountConsultation{
+		TotalConsultation:    args[0],
+		TodayConsultation:    args[1],
+		ActiveConsultation:   args[2],
+		DoneConsultation:     args[3],
+		RejectedConsultation: args[4],
+		IncomingConsultation: args[5],
+		PendingConsultation:  args[6],
 	}
 }

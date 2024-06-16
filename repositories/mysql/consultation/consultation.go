@@ -76,7 +76,7 @@ func (repository *ConsultationRepo) UpdateStatusConsultation(consultation *consu
 		return nil, constants.ErrDataNotFound
 	}
 
-	if consultationDB.Status == constants.REJECTED {
+	if consultationDB.Status == constants.REJECTED || consultationDB.Status == constants.INCOMING {
 		return nil, constants.ErrConsultationAlreadyRejected
 	}
 
