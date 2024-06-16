@@ -208,3 +208,49 @@ func (u *UserUseCase) HandleFacebookCallback(ctx context.Context, code string) (
 
 	return result, nil
 }
+
+func (u *UserUseCase) UpdateSuccessPointByUserID(id int, pointSpend int) error {
+	if pointSpend < 0 {
+		return constants.ErrPointSpend
+	}
+
+	currentPoints, err := u.repository.GetPointsByUserId(id)
+	if err != nil {
+		return err
+	}
+
+	newPoints := currentPoints - pointSpend
+	if newPoints < 0 {
+		return constants.ErrInsufficientPoint
+	}
+
+	err = u.repository.UpdatePointsByUserID(id, newPoints)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *UserUseCase) UpdateFailedPointByUserID(id int, pointSpend int) error {
+	if pointSpend < 0 {
+		return constants.ErrPointSpend
+	}
+
+	currentPoints, err := u.repository.GetPointsByUserId(id)
+	if err != nil {
+		return err
+	}
+
+	newPoints := currentPoints + pointSpend
+	if newPoints < 0 {
+		return constants.ErrInsufficientPoint
+	}
+
+	err = u.repository.UpdatePointsByUserID(id, newPoints)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
