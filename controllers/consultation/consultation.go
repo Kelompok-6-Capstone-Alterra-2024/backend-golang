@@ -81,16 +81,23 @@ func (controller *ConsultationController) UpdateStatusConsultation(c echo.Contex
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("Invalid ID"))
 	}
-	c.Bind(&consultationRequest)
+	err = c.Bind(&consultationRequest)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
+
+	doctorID, err := utilities.GetUserIdFromToken(c.Request().Header.Get("Authorization"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	consultationRequest.DoctorID = uint(doctorID)
+
 	consultationRequest.ID = uint(consultationID)
 	consultationResponse, err := controller.consultationUseCase.UpdateStatusConsultation(consultationRequest.ToEntities())
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Update Consultation", consultationResponse.ToUserResponse()))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Update Consultation", consultationResponse.ToDoctorResponse()))
 }
 
 func (controller *ConsultationController) GetAllDoctorConsultation(c echo.Context) error {

@@ -8,7 +8,6 @@ import (
 	doctorEntities "capstone/entities/doctor"
 	transactionEntities "capstone/entities/transaction"
 	userEntities "capstone/entities/user"
-
 	"github.com/go-playground/validator/v10"
 )
 
