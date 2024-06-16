@@ -92,6 +92,8 @@ var ErrPointSpend error = errors.New("point spend must be greater than 0")
 
 var ErrInsufficientPoint error = errors.New("insufficient point")
 
+var ErrConsultationAlreadyRejected error = errors.New("status already rejected")
+
 var ErrInvalidCredentials error = errors.New("invalid credentials")
 
 var ErrEmptyInputViewByMonth error = errors.New("start month or end month cannot be empty")

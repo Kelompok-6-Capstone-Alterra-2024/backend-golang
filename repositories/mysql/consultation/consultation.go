@@ -72,8 +72,12 @@ func (repository *ConsultationRepo) GetAllUserConsultation(metadata *entities.Me
 
 func (repository *ConsultationRepo) UpdateStatusConsultation(consultation *consultationEntities.Consultation) (*consultationEntities.Consultation, error) {
 	var consultationDB Consultation
-	if err := repository.db.First(&consultationDB, "id LIKE ?", consultation.ID).Error; err != nil {
+	if err := repository.db.Preload("Complaint").First(&consultationDB, "id LIKE ?", consultation.ID).Error; err != nil {
 		return nil, constants.ErrDataNotFound
+	}
+
+	if consultationDB.Status == constants.REJECTED {
+		return nil, constants.ErrConsultationAlreadyRejected
 	}
 
 	consultationDB.Status = consultation.Status

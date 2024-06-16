@@ -8,7 +8,6 @@ import (
 	doctorEntities "capstone/entities/doctor"
 	transactionEntities "capstone/entities/transaction"
 	userEntities "capstone/entities/user"
-
 	"github.com/go-playground/validator/v10"
 )
 
@@ -81,10 +80,10 @@ func (usecase *ConsultationUseCase) UpdateStatusConsultation(consultation *consu
 		transaction := new(transactionEntities.Transaction)
 		transaction, err = usecase.transactionRepository.FindByConsultationID(consultation.ID)
 		if err != nil {
-			return nil, err
+			return nil, constants.ErrConsultationAlreadyRejected
 		}
 
-		err = usecase.userUseCase.UpdateFailedPointByUserID(int(transaction.Consultation.UserID), transaction.PointSpend)
+		err = usecase.userUseCase.UpdateFailedPointByUserID(int(transaction.Consultation.UserID), transaction.Price)
 		if err != nil {
 			return nil, err
 		}
