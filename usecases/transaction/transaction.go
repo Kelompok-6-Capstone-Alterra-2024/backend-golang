@@ -17,7 +17,7 @@ type Transaction struct {
 	midtransUseCase        midtransEntities.MidtransUseCase
 	consultationRepository consultation.ConsultationRepository
 	doctorRepository       doctorEntities.DoctorRepositoryInterface
-	userRepository         userEntities.RepositoryInterface
+	userUseCase            userEntities.UseCaseInterface
 	validate               *validator.Validate
 }
 
@@ -26,7 +26,7 @@ func NewTransactionUseCase(
 	midtransUseCase midtransEntities.MidtransUseCase,
 	consultationRepository consultation.ConsultationRepository,
 	doctorRepository doctorEntities.DoctorRepositoryInterface,
-	userRepository userEntities.RepositoryInterface,
+	userUseCase userEntities.UseCaseInterface,
 	validate *validator.Validate,
 ) transactionEntities.TransactionUseCase {
 	return &Transaction{
@@ -34,7 +34,7 @@ func NewTransactionUseCase(
 		midtransUseCase:        midtransUseCase,
 		consultationRepository: consultationRepository,
 		doctorRepository:       doctorRepository,
-		userRepository:         userRepository,
+		userUseCase:            userUseCase,
 		validate:               validate,
 	}
 }
@@ -53,7 +53,7 @@ func (usecase *Transaction) InsertWithBuiltInInterface(transaction *transactionE
 	var point int
 	if isUsePoint {
 		// Get User Point
-		point, err = usecase.userRepository.GetPointsByUserId(userID)
+		point, err = usecase.userUseCase.GetPointsByUserId(userID)
 		if err != nil {
 			return nil, err
 		}
@@ -85,7 +85,7 @@ func (usecase *Transaction) InsertWithBuiltInInterface(transaction *transactionE
 		}
 
 		// Update User Point
-		err = usecase.userRepository.UpdatePointsByUserID(userID, point-transaction.PointSpend)
+		err = usecase.userUseCase.UpdateSuccessPointByUserID(userID, transaction.PointSpend)
 		if err != nil {
 			return nil, err
 		}
@@ -108,7 +108,7 @@ func (usecase *Transaction) InsertWithBuiltInInterface(transaction *transactionE
 		return nil, err
 	}
 	// Update User Point
-	err = usecase.userRepository.UpdatePointsByUserID(userID, point-transaction.PointSpend)
+	err = usecase.userUseCase.UpdateSuccessPointByUserID(userID, transaction.PointSpend)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (usecase *Transaction) InsertWithCustomInterface(transaction *transactionEn
 	var point int
 	if isUsePoint {
 		// Get User Point
-		point, err = usecase.userRepository.GetPointsByUserId(userID)
+		point, err = usecase.userUseCase.GetPointsByUserId(userID)
 		if err != nil {
 			return nil, err
 		}
@@ -160,7 +160,7 @@ func (usecase *Transaction) InsertWithCustomInterface(transaction *transactionEn
 			return nil, err
 		}
 		// Update User Point
-		err = usecase.userRepository.UpdatePointsByUserID(userID, point-transaction.PointSpend)
+		err = usecase.userUseCase.UpdateSuccessPointByUserID(userID, transaction.PointSpend)
 		if err != nil {
 			return nil, err
 		}
@@ -190,7 +190,7 @@ func (usecase *Transaction) InsertWithCustomInterface(transaction *transactionEn
 		return nil, err
 	}
 	// Update User Point
-	err = usecase.userRepository.UpdatePointsByUserID(userID, point-transaction.PointSpend)
+	err = usecase.userUseCase.UpdateSuccessPointByUserID(userID, transaction.PointSpend)
 	if err != nil {
 		return nil, err
 	}
@@ -271,13 +271,8 @@ func (usecase *Transaction) ConfirmedPayment(id string, transactionStatus string
 		}
 	} else if transaction.Status == constants.Cancel || transaction.Status == constants.Deny {
 		// Return User Point
-		var point int
 		userID := transaction.Consultation.UserID
-		point, err = usecase.userRepository.GetPointsByUserId(int(userID))
-		if err != nil {
-			return nil, err
-		}
-		err = usecase.userRepository.UpdatePointsByUserID(int(userID), point+transaction.PointSpend)
+		err = usecase.userUseCase.UpdateFailedPointByUserID(int(userID), transaction.PointSpend)
 		if err != nil {
 			return nil, err
 		}
