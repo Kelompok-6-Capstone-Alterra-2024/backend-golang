@@ -20,9 +20,9 @@ func NewUserRepo(db *gorm.DB) *UserRepo {
 }
 
 func (userRepo *UserRepo) Register(user *userEntities.User) (userEntities.User, int64, error) {
-	userDb := User {
+	userDb := User{
 		Username: user.Username,
-		Email: user.Email,
+		Email:    user.Email,
 		Password: user.Password,
 	}
 
@@ -51,10 +51,10 @@ func (userRepo *UserRepo) Register(user *userEntities.User) (userEntities.User, 
 		return userEntities.User{}, 0, err
 	}
 
-	userResult := userEntities.User {
-		Id: userDb.Id,
+	userResult := userEntities.User{
+		Id:       userDb.Id,
 		Username: userDb.Username,
-		Email: userDb.Email,
+		Email:    userDb.Email,
 		Password: userDb.Password,
 	}
 
@@ -62,7 +62,7 @@ func (userRepo *UserRepo) Register(user *userEntities.User) (userEntities.User, 
 }
 
 func (userRepo *UserRepo) Login(user *userEntities.User) (userEntities.User, error) {
-	userDb := User {
+	userDb := User{
 		Username: user.Username,
 		Password: user.Password,
 	}
@@ -79,31 +79,31 @@ func (userRepo *UserRepo) Login(user *userEntities.User) (userEntities.User, err
 		return userEntities.User{}, err
 	}
 
-	userResult := userEntities.User {
-		Id: userDb.Id,
-		Name: userDb.Name,
-		Username: userDb.Username,
-		Email: userDb.Email,
-		Password: userDb.Password,
-		Address: userDb.Address,
-		Bio: userDb.Bio,
-		PhoneNumber: userDb.PhoneNumber,
-		Gender: userDb.Gender,
-		Age: userDb.Age,
+	userResult := userEntities.User{
+		Id:             userDb.Id,
+		Name:           userDb.Name,
+		Username:       userDb.Username,
+		Email:          userDb.Email,
+		Password:       userDb.Password,
+		Address:        userDb.Address,
+		Bio:            userDb.Bio,
+		PhoneNumber:    userDb.PhoneNumber,
+		Gender:         userDb.Gender,
+		Age:            userDb.Age,
 		ProfilePicture: userDb.ProfilePicture,
 	}
 
 	return userResult, nil
 }
 
-func (r *UserRepo) Create(email string, picture string, name string, username string) (userEntities.User ,error) {
+func (r *UserRepo) Create(email string, picture string, name string, username string) (userEntities.User, error) {
 	var userDB User
 	userDB.Email = email
 	userDB.ProfilePicture = picture
 	userDB.Name = name
 	userDB.IsOauth = true
 	userDB.Username = username
-    
+
 	err := r.DB.Create(&userDB).Error
 	if err != nil {
 		return userEntities.User{}, err
@@ -120,10 +120,10 @@ func (r *UserRepo) Create(email string, picture string, name string, username st
 }
 
 func (r *UserRepo) OauthFindByEmail(email string) (userEntities.User, int, error) {
-    var userDB User
-    if err := r.DB.Where("email = ?", email).First(&userDB).Error; err != nil {
-        return userEntities.User{}, 0, err
-    }
+	var userDB User
+	if err := r.DB.Where("email = ?", email).First(&userDB).Error; err != nil {
+		return userEntities.User{}, 0, err
+	}
 
 	if !userDB.IsOauth {
 		return userEntities.User{}, 1, constants.ErrEmailAlreadyExist
@@ -136,7 +136,7 @@ func (r *UserRepo) OauthFindByEmail(email string) (userEntities.User, int, error
 	userEnt.ProfilePicture = userDB.ProfilePicture
 	userEnt.IsOauth = userDB.IsOauth
 
-    return userEnt, 0, nil
+	return userEnt, 0, nil
 }
 
 func (r *UserRepo) GetPointsByUserId(id int) (int, error) {
@@ -150,6 +150,14 @@ func (r *UserRepo) GetPointsByUserId(id int) (int, error) {
 
 func (r *UserRepo) ResetPassword(email string, password string) error {
 	err := r.DB.Model(&User{}).Where("email = ?", email).Update("password", password).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *UserRepo) UpdatePointsByUserID(id int, points int) error {
+	err := r.DB.Model(&User{}).Where("id = ?", id).Update("points", points).Error
 	if err != nil {
 		return err
 	}

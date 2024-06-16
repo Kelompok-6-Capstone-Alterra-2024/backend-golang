@@ -10,6 +10,7 @@ type TransactionRequest struct {
 	Price          int  `json:"price" binding:"required" validate:"required"`
 	Bank           string
 	PaymentType    string
+	UsePoint       bool `json:"use_point" form:"use_point" validator:"required"`
 }
 
 func (r TransactionRequest) ToEntities() *transaction.Transaction {

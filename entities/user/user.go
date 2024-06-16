@@ -26,6 +26,7 @@ type RepositoryInterface interface {
 	OauthFindByEmail(email string) (User, int, error)
 	GetPointsByUserId(id int) (int, error)
 	ResetPassword(email string, password string) error
+	UpdatePointsByUserID(id int, points int) error
 }
 
 type UseCaseInterface interface {

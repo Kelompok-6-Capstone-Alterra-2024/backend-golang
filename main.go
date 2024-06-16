@@ -86,7 +86,7 @@ func main() {
 	storyUC := storyUseCase.NewStoryUseCase(storyRepo)
 	complaintUC := complaintUseCase.NewComplaintUseCase(complaintRepo)
 	midtransUC := midtransUseCase.NewMidtransUseCase(midtransConfig)
-	transactionUC := transactionUseCase.NewTransactionUseCase(transactionRepo, midtransUC, consultationRepo, doctorRepo, validate)
+	transactionUC := transactionUseCase.NewTransactionUseCase(transactionRepo, midtransUC, consultationRepo, doctorRepo, userRepo, validate)
 	musicUC := musicUseCase.NewMusicUseCase(musicRepo)
 	ratingUC := ratingUseCase.NewRatingUseCase(ratingRepo)
 	moodUC := moodUseCase.NewMoodUseCase(moodRepo)
