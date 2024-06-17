@@ -90,13 +90,14 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	e.GET("/v1/users/chatbots/mental-health", r.chatbotController.ChatbotMentalHealth) //mental health chatbot
 	e.GET("/v1/doctors/chatbots/treatment", r.chatbotController.ChatbotTreatment)      //Chatbot Treatment
 
+	// Users
 	userAuth := e.Group("/v1/users")
-	userAuth.POST("/register", r.userController.Register)             //Register User
-	userAuth.POST("/login", r.userController.Login)                   //Login User
-	userAuth.PUT("/reset-password", r.userController.ResetPassword)   //Reset Password
-	userAuth.PUT("/update-profile", r.userController.UpdateProfile)   //Update Profile
-	userAuth.PUT("/change-password", r.userController.ChangePassword) // Change Password
-	userAuth.PUT("/change-email", r.userController.ChangeEmail)       // Change Email (Save new email to pending email)
+	userAuth.POST("/register", r.userController.Register)                //Register User
+	userAuth.POST("/login", r.userController.Login)                      //Login User
+	userAuth.PUT("/reset-password", r.userController.ResetPassword)      //Reset Password
+	userAuth.PUT("/profiles", r.userController.UpdateProfile)            //Update Profile
+	userAuth.PUT("/profiles/password", r.userController.ChangePassword)  // Change Password
+	userAuth.PUT("/profiles/change-email", r.userController.ChangeEmail) // Change Email (Save new email to pending email)
 
 	userAuth.GET("/auth/google/login", r.userController.GoogleLogin)
 	userAuth.GET("/auth/google/callback", r.userController.GoogleCallback)
