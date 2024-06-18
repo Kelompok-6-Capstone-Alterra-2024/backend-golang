@@ -29,6 +29,7 @@ type RepositoryInterface interface {
 	GetAllChatByDoctorId(doctorId int, metadata entities.Metadata, status string, search string) ([]Chat, error)
 	SendMessage(chatMessage ChatMessage) (ChatMessage, error)
 	GetAllMessages(chatId int, lastMessageId int, metadata entities.Metadata) ([]ChatMessage, error)
+	GetConsultationIdByChatId(chatId int) (int, error)
 }
 
 type UseCaseInterface interface {

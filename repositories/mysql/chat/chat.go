@@ -224,11 +224,11 @@ func (c *ChatRepo) GetAllMessages(chatId int, lastMessageId int, metadata entiti
 	var chatMessageDB []ChatMessage
 
 	if lastMessageId == 0 {
-		if err := c.db.Where("chat_id = ?", chatId).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&chatMessageDB).Error; err != nil {
+		if err := c.db.Where("chat_id = ?", chatId).Order("created_at DESC").Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&chatMessageDB).Error; err != nil {
 			return nil, err
 		}
 	} else {
-		if err := c.db.Where("chat_id = ?", chatId).Where("id > ?", lastMessageId).Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&chatMessageDB).Error; err != nil {
+		if err := c.db.Where("chat_id = ?", chatId).Where("id > ?", lastMessageId).Order("created_at DESC").Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&chatMessageDB).Error; err != nil {
 			return nil, err
 		}
 	}
@@ -244,4 +244,12 @@ func (c *ChatRepo) GetAllMessages(chatId int, lastMessageId int, metadata entiti
 	}
 
 	return chatMessageEnts, nil
+}
+
+func (c *ChatRepo) GetConsultationIdByChatId(chatId int) (int, error) {
+	var chatDB Chat
+	if err := c.db.Where("id = ?", chatId).Find(&chatDB).Error; err != nil {
+		return 0, err
+	}
+	return int(chatDB.ConsultationId), nil
 }

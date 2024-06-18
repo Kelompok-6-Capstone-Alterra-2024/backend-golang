@@ -38,6 +38,7 @@ type ConsultationNotes struct {
 	NextStep        string
 	AdditionalNote  string
 	MoodTrackerNote string
+	CreatedAt       string
 }
 
 type CountConsultation struct {

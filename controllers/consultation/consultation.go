@@ -7,10 +7,11 @@ import (
 	"capstone/entities/consultation"
 	"capstone/utilities"
 	"capstone/utilities/base"
-	"github.com/go-playground/validator/v10"
-	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/labstack/echo/v4"
 )
 
 type ConsultationController struct {
@@ -206,11 +207,11 @@ func (controller *ConsultationController) CreateConsultationNotes(c echo.Context
 }
 
 func (controller *ConsultationController) GetConsultationNotesByID(c echo.Context) error {
-	consultationID, err := strconv.Atoi(c.Param("id"))
+	chatID, err := strconv.Atoi(c.Param("chatId"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("Invalid ID"))
 	}
-	res, err := controller.consultationUseCase.GetConsultationNotesByID(consultationID)
+	res, err := controller.consultationUseCase.GetConsultationNotesByID(chatID)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
@@ -240,6 +241,7 @@ func (controller *ConsultationController) GetConsultationNotesByID(c echo.Contex
 	resp.NextStep = res.NextStep
 	resp.AdditionalNote = res.AdditionalNote
 	resp.MoodTrackerNote = res.MoodTrackerNote
+	resp.CreatedAt = res.CreatedAt
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation Notes", resp))
 }
