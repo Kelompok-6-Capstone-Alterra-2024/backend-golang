@@ -46,7 +46,7 @@ func (controller *TransactionController) InsertWithBuiltIn(c echo.Context) error
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(http.StatusOK, transactionResponse.ToUserResponse())
+	return c.JSON(http.StatusCreated, transactionResponse.ToUserResponse())
 }
 
 func (controller *TransactionController) FindByID(c echo.Context) error {
@@ -109,7 +109,7 @@ func (controller *TransactionController) BankTransfer(c echo.Context) error {
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(201, base.NewSuccessResponse("Transaction created", transactionResponse.ToUserResponse()))
+	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Transaction created", transactionResponse.ToUserResponse()))
 }
 
 func (controller *TransactionController) EWallet(c echo.Context) error {
@@ -128,7 +128,7 @@ func (controller *TransactionController) EWallet(c echo.Context) error {
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(201, base.NewSuccessResponse("Transaction created", transactionResponse.ToUserResponse()))
+	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Transaction created", transactionResponse.ToUserResponse()))
 }
 
 func (controller *TransactionController) CallbackTransaction(c echo.Context) error {
