@@ -103,3 +103,7 @@ var ErrBadRequest error = errors.New("bad request")
 var ErrEmptyNewEmail error = errors.New("new email cannot be empty")
 
 var ErrLocationNotFound error = errors.New("location not found")
+
+var ErrNotificationAlreadyRead error = errors.New("notification already read")
+
+var ErrUpdateDatabase error = errors.New("failed update data in database")
