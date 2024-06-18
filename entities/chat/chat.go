@@ -13,6 +13,7 @@ type Chat struct {
 	LatestMessageID uint
 	LatestMessageContent string
 	LatestMessageTime string
+	ConsultationEndTime string
 }
 
 type ChatMessage struct {

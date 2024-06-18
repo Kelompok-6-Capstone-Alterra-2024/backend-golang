@@ -46,6 +46,7 @@ func (chatController *ChatController) GetAllChatByUserId(c echo.Context) (error)
 			Id:            chat.ID,
 			Status:        chat.Status,
 			Isrejected:    chat.Isrejected,
+			EndTime:       chat.ConsultationEndTime,
 			LatestMessage: response.LatestMessage{
 				Id:      chat.LatestMessageID,
 				Message: chat.LatestMessageContent,
