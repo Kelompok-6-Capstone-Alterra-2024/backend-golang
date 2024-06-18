@@ -10,6 +10,7 @@ import (
 	"capstone/controllers/forum"
 	"capstone/controllers/mood"
 	"capstone/controllers/music"
+	"capstone/controllers/notification"
 	"capstone/controllers/otp"
 	"capstone/controllers/post"
 	"capstone/controllers/rating"
@@ -40,6 +41,7 @@ type RouteController struct {
 	articleController      *article.ArticleController
 	chatController         *chat.ChatController
 	otpController          *otp.OtpController
+	notificationController *notification.NotificationController
 }
 
 func NewRoute(
@@ -57,7 +59,8 @@ func NewRoute(
 	chatbotController *chatbot.ChatbotController,
 	articleController *article.ArticleController,
 	chatController *chat.ChatController,
-	otpController *otp.OtpController) *RouteController {
+	otpController *otp.OtpController,
+	notification *notification.NotificationController) *RouteController {
 	return &RouteController{
 		userController:         userController,
 		doctorController:       doctorController,
@@ -74,6 +77,7 @@ func NewRoute(
 		articleController:      articleController,
 		chatController:         chatController,
 		otpController:          otpController,
+		notificationController: notification,
 	}
 }
 
@@ -283,4 +287,10 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("patients", r.complaintController.GetAllByDoctorID) // Get All Patient
 	doctorRoute.GET("patients/:id", r.complaintController.GetByComplaintID)
 	doctorRoute.GET("patients/search", r.complaintController.SearchComplaintByPatientName)
+
+	// Notification
+	doctorRoute.GET("notifications", r.notificationController.GetAllDoctorNotification) // Get Doctor Notification
+	doctorRoute.PUT("notifications/:notificationID", r.notificationController.UpdateToReadConsultation)
+	doctorRoute.DELETE("notifications/:notificationID", r.notificationController.DeleteToReadConsultation)
+
 }
