@@ -8,7 +8,6 @@ import (
 	forumEntities "capstone/entities/forum"
 	musicEntities "capstone/entities/music"
 	"gorm.io/gorm"
-	"time"
 )
 
 type ConsultationRepo struct {
@@ -98,7 +97,7 @@ func (repository *ConsultationRepo) GetAllDoctorConsultation(metadata *entities.
 
 func (repository *ConsultationRepo) CountConsultationToday(doctorID int) (int64, error) {
 	var count int64
-	if err := repository.db.Model(&Consultation{}).Where("doctor_id LIKE ? AND date LIKE ?", doctorID, time.Now().Format("2006-11-22")).Count(&count).Error; err != nil {
+	if err := repository.db.Model(&Consultation{}).Where("doctor_id LIKE ? AND DATE(start_date) = CURDATE()", doctorID).Count(&count).Error; err != nil {
 		return 0, constants.ErrDataNotFound
 	}
 	return count, nil
