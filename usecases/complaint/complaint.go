@@ -28,7 +28,7 @@ func (usecase *ComplaintUseCase) Create(complaint *complaintEntities.Complaint) 
 		return nil, err
 	}
 
-	consultation, err := usecase.consultationUseCase.GetConsultationByID(int(result.ConsultationID))
+	consultation, err := usecase.consultationUseCase.GetConsultationByID(int(complaint.ConsultationID))
 	if err != nil {
 		return nil, err
 	}

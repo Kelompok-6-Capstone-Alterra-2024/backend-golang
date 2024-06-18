@@ -20,17 +20,19 @@ type DoctorNotification struct {
 
 func (n *UserNotification) ToUserResponse() *response.NotificationUserResponse {
 	return &response.NotificationUserResponse{
-		ID:      n.ID,
-		Content: n.Content,
-		IsRead:  n.IsRead,
+		ID:        n.ID,
+		Content:   n.Content,
+		IsRead:    n.IsRead,
+		CreatedAt: n.CreatedAt,
 	}
 }
 
 func (n *DoctorNotification) ToDoctorResponse() *response.NotificationDoctorResponse {
 	return &response.NotificationDoctorResponse{
-		ID:      n.ID,
-		Content: n.Content,
-		IsRead:  n.IsRead,
+		ID:        n.ID,
+		Content:   n.Content,
+		IsRead:    n.IsRead,
+		CreatedAt: n.CreatedAt,
 	}
 }
 

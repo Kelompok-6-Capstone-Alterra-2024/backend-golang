@@ -21,19 +21,21 @@ type DoctorNotification struct {
 
 func (n *UserNotification) ToUserEntities() *notification.UserNotification {
 	return &notification.UserNotification{
-		ID:      n.ID,
-		UserID:  n.UserID,
-		Content: n.Content,
-		IsRead:  n.IsRead,
+		ID:        n.ID,
+		UserID:    n.UserID,
+		Content:   n.Content,
+		IsRead:    n.IsRead,
+		CreatedAt: n.CreatedAt.String(),
 	}
 }
 
 func (n *DoctorNotification) ToDoctorEntities() *notification.DoctorNotification {
 	return &notification.DoctorNotification{
-		ID:       n.ID,
-		DoctorID: n.DoctorID,
-		Content:  n.Content,
-		IsRead:   n.IsRead,
+		ID:        n.ID,
+		DoctorID:  n.DoctorID,
+		Content:   n.Content,
+		IsRead:    n.IsRead,
+		CreatedAt: n.CreatedAt.String(),
 	}
 }
 

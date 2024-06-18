@@ -1,7 +1,6 @@
 package notification
 
 import (
-	"capstone/controllers/notification/request"
 	"capstone/controllers/notification/response"
 	notificationEntities "capstone/entities/notification"
 	"capstone/utilities"
@@ -19,17 +18,17 @@ func NewNotificationController(notificationUseCase notificationEntities.Notifica
 }
 
 func (controller *NotificationController) GetAllDoctorNotification(c echo.Context) error {
-	var notificationRequest request.NotificationCreateRequest
-
 	pageParam := c.QueryParam("page")
 	limitParam := c.QueryParam("limit")
-
 	metadata := utilities.GetMetadata(pageParam, limitParam)
 
-	if err := c.Bind(&notificationRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	token := c.Request().Header.Get("Authorization")
+	doctorID, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse("unauthorized"))
 	}
-	notifications, err := controller.notificationUseCase.GetNotificationByDoctorID(notificationRequest.UserID, metadata)
+
+	notifications, err := controller.notificationUseCase.GetNotificationByDoctorID(doctorID, metadata)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, base.NewErrorResponse(err.Error()))
 	}
