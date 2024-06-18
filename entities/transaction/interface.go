@@ -1,6 +1,9 @@
 package transaction
 
-import "capstone/entities"
+import (
+	"capstone/controllers/transaction/response"
+	"capstone/entities"
+)
 
 type TransactionRepository interface {
 	Insert(transaction *Transaction) (*Transaction, error)
@@ -10,7 +13,7 @@ type TransactionRepository interface {
 	FindAllByDoctorID(metadata *entities.Metadata, doctorID uint, status string) (*[]Transaction, error)
 	Update(transaction *Transaction) (*Transaction, error)
 	Delete(ID string) error
-	CountTransactionByDoctorID(doctorID uint) (int, error)
+	CountTransactionByDoctorID(doctorID uint) (*response.TransactionCount, error)
 }
 
 type TransactionUseCase interface {
@@ -23,5 +26,5 @@ type TransactionUseCase interface {
 	FindAllByDoctorID(metadata *entities.Metadata, doctorID uint, status string) (*[]Transaction, error)
 	Update(transaction *Transaction) (*Transaction, error)
 	Delete(ID string) error
-	CountTransactionByDoctorID(doctorID uint) (int, error)
+	CountTransactionByDoctorID(doctorID uint) (*response.TransactionCount, error)
 }

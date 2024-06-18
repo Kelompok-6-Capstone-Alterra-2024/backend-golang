@@ -73,7 +73,7 @@ func (usecase *MidtransUseCase) VerifyPayment(orderID string) (string, error) {
 			} else if transactionStatusResp.TransactionStatus == "deny" {
 				return constants.Deny, nil
 			} else if transactionStatusResp.TransactionStatus == "cancel" || transactionStatusResp.TransactionStatus == "expire" {
-				return constants.Cancel, nil
+				return constants.Failed, nil
 			} else if transactionStatusResp.TransactionStatus == "pending" {
 				return constants.Pending, nil
 			}

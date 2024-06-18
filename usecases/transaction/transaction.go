@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"capstone/constants"
+	responseTransaction "capstone/controllers/transaction/response"
 	"capstone/entities"
 	"capstone/entities/consultation"
 	doctorEntities "capstone/entities/doctor"
@@ -214,7 +215,7 @@ func (usecase *Transaction) FindByConsultationID(consultationID uint) (*transact
 }
 
 func (usecase *Transaction) FindAllByUserID(metadata *entities.Metadata, userID uint, status string) (*[]transactionEntities.Transaction, error) {
-	if !(status == constants.Success || status == constants.Pending || status == constants.Deny || status == constants.Cancel) {
+	if !(status == constants.Success || status == constants.Pending || status == constants.Deny || status == constants.Failed) {
 		status = ""
 	}
 	newTransaction, err := usecase.transactionRepository.FindAllByUserID(metadata, userID, status)
@@ -273,7 +274,7 @@ func (usecase *Transaction) ConfirmedPayment(id string, transactionStatus string
 		if err != nil {
 			return nil, err
 		}
-	} else if transaction.Status == constants.Cancel || transaction.Status == constants.Deny {
+	} else if transaction.Status == constants.Failed || transaction.Status == constants.Deny {
 		// Return User Point
 		userID := transaction.Consultation.UserID
 		err = usecase.userUseCase.UpdateFailedPointByUserID(int(userID), transaction.PointSpend)
@@ -285,7 +286,7 @@ func (usecase *Transaction) ConfirmedPayment(id string, transactionStatus string
 }
 
 func (usecase *Transaction) FindAllByDoctorID(metadata *entities.Metadata, doctorID uint, status string) (*[]transactionEntities.Transaction, error) {
-	if !(status == constants.Success || status == constants.Pending || status == constants.Deny || status == constants.Cancel) {
+	if !(status == constants.Success || status == constants.Pending || status == constants.Deny || status == constants.Failed) {
 		status = ""
 	}
 	newTransaction, err := usecase.transactionRepository.FindAllByDoctorID(metadata, doctorID, status)
@@ -298,10 +299,10 @@ func (usecase *Transaction) FindAllByDoctorID(metadata *entities.Metadata, docto
 	return newTransaction, nil
 }
 
-func (usecase *Transaction) CountTransactionByDoctorID(doctorID uint) (int, error) {
-	count, err := usecase.transactionRepository.CountTransactionByDoctorID(doctorID)
+func (usecase *Transaction) CountTransactionByDoctorID(doctorID uint) (*responseTransaction.TransactionCount, error) {
+	countTransaction, err := usecase.transactionRepository.CountTransactionByDoctorID(doctorID)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	return count, nil
+	return countTransaction, nil
 }
