@@ -21,7 +21,7 @@ type NotificationUseCase interface {
 	UpdateStatusNotification(notificationID int) error
 
 	GetNotificationByDoctorID(doctorID int, metadata *entities.Metadata) (*[]DoctorNotification, error)
-	CreateDoctorNotification(notification *DoctorNotification) error
+	CreateDoctorNotification(doctorID uint, content string) error
 	DeleteDoctorNotification(notificationID int) error
 	UpdateStatusDoctorNotification(notificationID int) error
 }

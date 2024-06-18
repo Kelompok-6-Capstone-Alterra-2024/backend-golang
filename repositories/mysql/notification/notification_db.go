@@ -15,8 +15,8 @@ type UserNotification struct {
 type DoctorNotification struct {
 	gorm.Model
 	DoctorID uint   `gorm:"column:doctor_id"`
-	Content  string `gorm:"column:content"`
-	IsRead   bool   `gorm:"column:is_read"`
+	Content  string `gorm:"column:content;type:text"`
+	IsRead   bool   `gorm:"column:is_read;default:false;not null"`
 }
 
 func (n *UserNotification) ToUserEntities() *notification.UserNotification {

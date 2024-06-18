@@ -33,3 +33,10 @@ func (n *DoctorNotification) ToDoctorResponse() *response.NotificationDoctorResp
 		IsRead:  n.IsRead,
 	}
 }
+
+func ToDoctorNotification(doctorID uint, content string) DoctorNotification {
+	return DoctorNotification{
+		DoctorID: doctorID,
+		Content:  content,
+	}
+}

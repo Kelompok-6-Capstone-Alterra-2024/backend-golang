@@ -3,14 +3,23 @@ package complaint
 import (
 	"capstone/entities"
 	complaintEntities "capstone/entities/complaint"
+	consultationEntities "capstone/entities/consultation"
+	notificationEntities "capstone/entities/notification"
+	"capstone/utilities"
 )
 
 type ComplaintUseCase struct {
-	complaintRepo complaintEntities.ComplaintRepository
+	complaintRepo       complaintEntities.ComplaintRepository
+	notificationUseCase notificationEntities.NotificationUseCase
+	consultationUseCase consultationEntities.ConsultationUseCase
 }
 
-func NewComplaintUseCase(complaintRepo complaintEntities.ComplaintRepository) complaintEntities.ComplaintUseCase {
-	return &ComplaintUseCase{complaintRepo: complaintRepo}
+func NewComplaintUseCase(complaintRepo complaintEntities.ComplaintRepository, notificationUseCase notificationEntities.NotificationUseCase, consultationUseCase consultationEntities.ConsultationUseCase) complaintEntities.ComplaintUseCase {
+	return &ComplaintUseCase{
+		complaintRepo:       complaintRepo,
+		notificationUseCase: notificationUseCase,
+		consultationUseCase: consultationUseCase,
+	}
 }
 
 func (usecase *ComplaintUseCase) Create(complaint *complaintEntities.Complaint) (*complaintEntities.Complaint, error) {
@@ -18,6 +27,18 @@ func (usecase *ComplaintUseCase) Create(complaint *complaintEntities.Complaint) 
 	if err != nil {
 		return nil, err
 	}
+
+	consultation, err := usecase.consultationUseCase.GetConsultationByID(int(result.ConsultationID))
+	if err != nil {
+		return nil, err
+	}
+
+	notificationContent := utilities.AddContentComplaintUserNotification(result.Name, result.Message)
+
+	if err = usecase.notificationUseCase.CreateDoctorNotification(consultation.DoctorID, notificationContent); err != nil {
+		return nil, err
+	}
+
 	return result, nil
 }
 

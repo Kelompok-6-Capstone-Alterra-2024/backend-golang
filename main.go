@@ -92,10 +92,11 @@ func main() {
 	notificationRepo := notificationRepositories.NewNotificationRepository(db)
 
 	userUC := userUseCase.NewUserUseCase(userRepo, oauthConfig, oauthConfigFB)
+	notificationUC := notificationUseCase.NewNotificationUseCase(notificationRepo)
 	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo, oauthConfigDoctor, oauthConfigFBDoctor)
 	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo, transactionRepo, userUC, doctorRepo, validate, chatRepo)
 	storyUC := storyUseCase.NewStoryUseCase(storyRepo)
-	complaintUC := complaintUseCase.NewComplaintUseCase(complaintRepo)
+	complaintUC := complaintUseCase.NewComplaintUseCase(complaintRepo, notificationUC, consultationUC)
 	midtransUC := midtransUseCase.NewMidtransUseCase(midtransConfig)
 	transactionUC := transactionUseCase.NewTransactionUseCase(transactionRepo, midtransUC, consultationRepo, doctorRepo, userUC, validate)
 	musicUC := musicUseCase.NewMusicUseCase(musicRepo)
@@ -108,7 +109,6 @@ func main() {
 	chatUC := chatUseCase.NewChatUseCase(chatRepo)
 	otpUC := otpUseCase.NewOtpUseCase(otpRepo)
 	cronjobUC := cronjob.NewCronJob(gcron, consultationRepo)
-	notificationUC := notificationUseCase.NewNotificationUseCase(notificationRepo)
 
 	userCont := userController.NewUserController(userUC)
 	doctorCont := doctorController.NewDoctorController(doctorUC, validate)

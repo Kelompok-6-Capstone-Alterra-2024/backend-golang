@@ -43,8 +43,9 @@ func (usecase *NotificationUseCase) GetNotificationByDoctorID(doctorID int, meta
 	return notifications, nil
 }
 
-func (usecase *NotificationUseCase) CreateDoctorNotification(notification *notificationEntities.DoctorNotification) error {
-	if err := usecase.notificationRepository.CreateDoctorNotification(notification); err != nil {
+func (usecase *NotificationUseCase) CreateDoctorNotification(doctorID uint, content string) error {
+	notification := notificationEntities.ToDoctorNotification(doctorID, content)
+	if err := usecase.notificationRepository.CreateDoctorNotification(&notification); err != nil {
 		return err
 	}
 	return nil
