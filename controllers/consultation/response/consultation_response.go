@@ -3,17 +3,18 @@ package response
 import (
 	complaintResponse "capstone/controllers/complaint/response"
 	doctorResponse "capstone/controllers/doctor/response"
+	"time"
 )
 
 type ConsultationUserResponse struct {
-	ID            int `json:"id"`
-	Doctor        *doctorResponse.DoctorResponse
-	Status        string
-	PaymentStatus string
-	IsAccepted    bool
-	IsActive      bool
-	Date          string
-	Time          string
+	ID            int                            `json:"id"`
+	Doctor        *doctorResponse.DoctorResponse `json:"doctor"`
+	Status        string                         `json:"status"`
+	PaymentStatus string                         `json:"payment_status"`
+	IsAccepted    bool                           `json:"is_accepted"`
+	IsActive      bool                           `json:"is_active"`
+	StartDate     time.Time                      `json:"start_date"`
+	EndDate       time.Time                      `json:"end_date"`
 }
 
 type ConsultationDoctorResponse struct {
@@ -22,7 +23,7 @@ type ConsultationDoctorResponse struct {
 	PaymentStatus string                               `json:"payment_status"`
 	IsAccepted    bool                                 `json:"is_accepted"`
 	IsActive      bool                                 `json:"is_active"`
-	Date          string                               `json:"date"`
-	Time          string                               `json:"time"`
+	StartDate     time.Time                            `json:"start_date"`
+	EndDate       time.Time                            `json:"end_date"`
 	Complaint     *complaintResponse.ComplaintResponse `json:"complaint"`
 }

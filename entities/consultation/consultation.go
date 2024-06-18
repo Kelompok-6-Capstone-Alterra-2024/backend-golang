@@ -22,8 +22,8 @@ type Consultation struct {
 	PaymentStatus string
 	IsAccepted    bool
 	IsActive      bool
-	Date          time.Time
-	Time          time.Time
+	StartDate     time.Time
+	EndDate       time.Time
 }
 
 type ConsultationNotes struct {
@@ -89,8 +89,8 @@ func (r *Consultation) ToUserResponse() *response.ConsultationUserResponse {
 		PaymentStatus: r.PaymentStatus,
 		IsAccepted:    r.IsAccepted,
 		IsActive:      r.IsActive,
-		Date:          r.Date.Format("2006-01-02"),
-		Time:          r.Time.Format("15:04"),
+		StartDate:     r.StartDate,
+		EndDate:       r.EndDate,
 	}
 }
 
@@ -101,8 +101,8 @@ func (r *Consultation) ToDoctorResponse() *response.ConsultationDoctorResponse {
 		PaymentStatus: r.PaymentStatus,
 		IsAccepted:    r.IsAccepted,
 		IsActive:      r.IsActive,
-		Date:          r.Date.Format("2006-01-02"),
-		Time:          r.Time.Format("15:04"),
+		StartDate:     r.StartDate,
+		EndDate:       r.EndDate,
 		Complaint:     r.Complaint.ToResponse(),
 	}
 }
