@@ -28,10 +28,13 @@ func (postController *PostController) GetAllPostsByForumId(c echo.Context) error
 
 	metadata := utilities.GetMetadata(pageParam, limitParam)
 
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
 	forumId := c.Param("forumId")
 	forumIdInt, _ := strconv.Atoi(forumId)
 
-	posts, err := postController.postUseCase.GetAllPostsByForumId(uint(forumIdInt), *metadata)
+	posts, err := postController.postUseCase.GetAllPostsByForumId(uint(forumIdInt), *metadata, uint(userId))
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
@@ -44,6 +47,7 @@ func (postController *PostController) GetAllPostsByForumId(c echo.Context) error
 			Content:  post.Content,
 			ImageUrl: post.ImageUrl,
 			NumberOfComments: post.NumberOfComments,
+			IsLiked:  post.IsLiked,
 			User: response.UserPostResponse{
 				ID:             uint(post.User.Id),
 				Username:       post.User.Username,
@@ -59,7 +63,10 @@ func (postController *PostController) GetPostById(c echo.Context) error {
 	postId := c.Param("id")
 	postIdInt, _ := strconv.Atoi(postId)
 
-	post, err := postController.postUseCase.GetPostById(uint(postIdInt))
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	post, err := postController.postUseCase.GetPostById(uint(postIdInt), uint(userId))
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
@@ -68,6 +75,7 @@ func (postController *PostController) GetPostById(c echo.Context) error {
 	resp.ID = post.ID
 	resp.Content = post.Content
 	resp.ImageUrl = post.ImageUrl
+	resp.IsLiked = post.IsLiked
 	resp.User = response.UserPostResponse{
 		ID:             uint(post.User.Id),
 		Username:       post.User.Username,
