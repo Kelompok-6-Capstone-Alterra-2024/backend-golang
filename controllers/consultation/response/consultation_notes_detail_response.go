@@ -10,6 +10,7 @@ type ConsultationNotesDetailResponse struct {
 	NextStep        string                    `json:"next_step"`
 	AdditionalNote  string                    `json:"additional_note"`
 	MoodTrackerNote string                    `json:"mood_tracker_note"`
+	CreatedAt       string                    `json:"created_at"`
 }
 
 type NotesDoctorDetailResponse struct {

@@ -110,7 +110,12 @@ func (usecase *ConsultationUseCase) CreateConsultationNotes(consultationNotes co
 	return result, nil
 }
 
-func (usecase *ConsultationUseCase) GetConsultationNotesByID(consultationID int) (consultationEntities.ConsultationNotes, error) {
+func (usecase *ConsultationUseCase) GetConsultationNotesByID(chatID int) (consultationEntities.ConsultationNotes, error) {
+	consultationID, err := usecase.chatRepo.GetConsultationIdByChatId(chatID)
+	if err != nil {
+		return consultationEntities.ConsultationNotes{}, err
+	}
+	
 	result, err := usecase.consultationRepo.GetConsultationNotesByID(consultationID)
 	if err != nil {
 		return result, err

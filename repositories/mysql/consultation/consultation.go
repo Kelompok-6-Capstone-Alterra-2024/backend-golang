@@ -7,8 +7,9 @@ import (
 	doctorEntities "capstone/entities/doctor"
 	forumEntities "capstone/entities/forum"
 	musicEntities "capstone/entities/music"
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type ConsultationRepo struct {
@@ -170,6 +171,7 @@ func (repository *ConsultationRepo) GetConsultationNotesByID(consultationID int)
 
 	var notesEnt consultationEntities.ConsultationNotes
 	notesEnt.ID = notesDB.ID
+	notesEnt.CreatedAt = notesDB.CreatedAt.Format("2006-01-02 15:04:05")
 
 	notesEnt.Consultation = consultationEntities.Consultation{
 		ID: notesDB.Consultation.ID,
