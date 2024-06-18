@@ -22,8 +22,8 @@ type Consultation struct {
 	PaymentStatus string
 	IsAccepted    bool
 	IsActive      bool
-	Date          time.Time
-	Time          time.Time
+	StartDate     time.Time
+	EndDate       time.Time
 }
 
 type ConsultationNotes struct {
@@ -41,11 +41,22 @@ type ConsultationNotes struct {
 	CreatedAt       string
 }
 
+type CountConsultation struct {
+	TotalConsultation    int64
+	TodayConsultation    int64
+	ActiveConsultation   int64
+	DoneConsultation     int64
+	RejectedConsultation int64
+	IncomingConsultation int64
+	PendingConsultation  int64
+}
+
 type ConsultationRepository interface {
 	CreateConsultation(consultation *Consultation) (*Consultation, error)
 	GetConsultationByID(consultationID int) (*Consultation, error)
 	GetAllUserConsultation(metadata *entities.Metadata, userID int) (*[]Consultation, error)
 	UpdateStatusConsultation(consultation *Consultation) (*Consultation, error)
+	UpdatePaymentStatusConsultation(consultationID int, status string) error
 	GetAllDoctorConsultation(metadata *entities.Metadata, doctorID int) (*[]Consultation, error)
 	GetConsultationByComplaintID(complaintID int) (*Consultation, error)
 	CountConsultationByStatus(doctorID int, status string) (int64, error)
@@ -53,6 +64,7 @@ type ConsultationRepository interface {
 	CountConsultationByDoctorID(doctorID int) (int64, error)
 	CreateConsultationNotes(consultationNotes ConsultationNotes) (ConsultationNotes, error)
 	GetConsultationNotesByID(consultationID int) (ConsultationNotes, error)
+	GetAllConsultation() *[]Consultation
 }
 
 type ConsultationUseCase interface {
@@ -66,6 +78,7 @@ type ConsultationUseCase interface {
 	CountConsultationToday(doctorID int) (int64, error)
 	CountConsultationByStatus(doctorID int, status string) (int64, error)
 	CreateConsultationNotes(consultationNotes ConsultationNotes) (ConsultationNotes, error)
+	CountConsultation(doctorID int) (*CountConsultation, error)
 	GetConsultationNotesByID(consultationID int) (ConsultationNotes, error)
 }
 
@@ -77,8 +90,8 @@ func (r *Consultation) ToUserResponse() *response.ConsultationUserResponse {
 		PaymentStatus: r.PaymentStatus,
 		IsAccepted:    r.IsAccepted,
 		IsActive:      r.IsActive,
-		Date:          r.Date.Format("2006-01-02"),
-		Time:          r.Time.Format("15:04"),
+		StartDate:     r.StartDate,
+		EndDate:       r.EndDate,
 	}
 }
 
@@ -89,8 +102,32 @@ func (r *Consultation) ToDoctorResponse() *response.ConsultationDoctorResponse {
 		PaymentStatus: r.PaymentStatus,
 		IsAccepted:    r.IsAccepted,
 		IsActive:      r.IsActive,
-		Date:          r.Date.Format("2006-01-02"),
-		Time:          r.Time.Format("15:04"),
+		StartDate:     r.StartDate,
+		EndDate:       r.EndDate,
 		Complaint:     r.Complaint.ToResponse(),
+	}
+}
+
+func (r *CountConsultation) ToResponse() *response.ConsultationCount {
+	return &response.ConsultationCount{
+		TotalConsultation:    r.TotalConsultation,
+		TodayConsultation:    r.TodayConsultation,
+		ActiveConsultation:   r.ActiveConsultation,
+		DoneConsultation:     r.DoneConsultation,
+		RejectedConsultation: r.RejectedConsultation,
+		IncomingConsultation: r.IncomingConsultation,
+		PendingConsultation:  r.PendingConsultation,
+	}
+}
+
+func ToCountConsultation(args ...int64) CountConsultation {
+	return CountConsultation{
+		TotalConsultation:    args[0],
+		TodayConsultation:    args[1],
+		ActiveConsultation:   args[2],
+		DoneConsultation:     args[3],
+		RejectedConsultation: args[4],
+		IncomingConsultation: args[5],
+		PendingConsultation:  args[6],
 	}
 }

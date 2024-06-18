@@ -9,6 +9,7 @@ import (
 	"capstone/utilities"
 	"capstone/utilities/base"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -16,12 +17,14 @@ import (
 type TransactionController struct {
 	transactionUseCase transactionEntities.TransactionUseCase
 	midtransUseCase    midtransEntities.MidtransUseCase
+	validator          *validator.Validate
 }
 
-func NewTransactionController(transactionUseCase transactionEntities.TransactionUseCase, midtransUseCase midtransEntities.MidtransUseCase) *TransactionController {
+func NewTransactionController(transactionUseCase transactionEntities.TransactionUseCase, midtransUseCase midtransEntities.MidtransUseCase, validator *validator.Validate) *TransactionController {
 	return &TransactionController{
 		transactionUseCase: transactionUseCase,
 		midtransUseCase:    midtransUseCase,
+		validator:          validator,
 	}
 }
 
@@ -30,12 +33,20 @@ func (controller *TransactionController) InsertWithBuiltIn(c echo.Context) error
 	if err := c.Bind(&transactionRequest); err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
+	if err := controller.validator.Struct(transactionRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(constants.ErrBadRequest.Error()))
+	}
 
-	transactionResponse, err := controller.transactionUseCase.InsertWithBuiltInInterface(transactionRequest.ToEntities())
+	userId, err := utilities.GetUserIdFromToken(c.Request().Header.Get("Authorization"))
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse(constants.ErrUnauthorized.Error()))
+	}
+
+	transactionResponse, err := controller.transactionUseCase.InsertWithBuiltInInterface(transactionRequest.ToEntities(), transactionRequest.UsePoint, userId)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(http.StatusOK, transactionResponse.ToUserResponse())
+	return c.JSON(http.StatusCreated, transactionResponse.ToUserResponse())
 }
 
 func (controller *TransactionController) FindByID(c echo.Context) error {
@@ -89,11 +100,16 @@ func (controller *TransactionController) BankTransfer(c echo.Context) error {
 	transaction.Bank = bankName
 	transaction.PaymentType = constants.BankTransfer
 	transactionRequest := transaction.ToEntities()
-	transactionResponse, err := controller.transactionUseCase.InsertWithCustomInterface(transactionRequest)
+	userId, err := utilities.GetUserIdFromToken(c.Request().Header.Get("Authorization"))
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse(constants.ErrUnauthorized.Error()))
+	}
+
+	transactionResponse, err := controller.transactionUseCase.InsertWithBuiltInInterface(transactionRequest, transaction.UsePoint, userId)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(201, base.NewSuccessResponse("Transaction created", transactionResponse.ToUserResponse()))
+	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Transaction created", transactionResponse.ToUserResponse()))
 }
 
 func (controller *TransactionController) EWallet(c echo.Context) error {
@@ -103,11 +119,16 @@ func (controller *TransactionController) EWallet(c echo.Context) error {
 	}
 	transaction.PaymentType = constants.GoPay
 	transactionRequest := transaction.ToEntities()
-	transactionResponse, err := controller.transactionUseCase.InsertWithCustomInterface(transactionRequest)
+	userId, err := utilities.GetUserIdFromToken(c.Request().Header.Get("Authorization"))
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse(constants.ErrUnauthorized.Error()))
+	}
+
+	transactionResponse, err := controller.transactionUseCase.InsertWithBuiltInInterface(transactionRequest, transaction.UsePoint, userId)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(201, base.NewSuccessResponse("Transaction created", transactionResponse.ToUserResponse()))
+	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Transaction created", transactionResponse.ToUserResponse()))
 }
 
 func (controller *TransactionController) CallbackTransaction(c echo.Context) error {
@@ -133,11 +154,11 @@ func (controller *TransactionController) CountTransactionByDoctorID(c echo.Conte
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
-	count, err := controller.transactionUseCase.CountTransactionByDoctorID(uint(doctorId))
+	transactionResponse, err := controller.transactionUseCase.CountTransactionByDoctorID(uint(doctorId))
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(http.StatusOK, base.NewSuccessResponse("Count transaction success", count))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Count transaction success", transactionResponse))
 }
 
 func (controller *TransactionController) FindAllByDoctorID(c echo.Context) error {

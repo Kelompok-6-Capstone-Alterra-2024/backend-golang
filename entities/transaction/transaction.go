@@ -12,6 +12,7 @@ type Transaction struct {
 	ConsultationID uint `validate:"required"`
 	Consultation   consultation.Consultation
 	Price          int
+	PointSpend     int
 	Status         string
 	PaymentType    string
 	PaymentLink    string
@@ -29,6 +30,7 @@ func (r Transaction) ToUserResponse() *response.UserTransactionResponse {
 		PaymentLink:  r.PaymentLink,
 		Bank:         r.Bank,
 		Status:       r.Status,
+		PointSpend:   r.PointSpend,
 		CreatedAt:    r.CreatedAt.String(),
 		UpdatedAt:    r.UpdatedAt.String(),
 	}
@@ -43,6 +45,7 @@ func (r Transaction) ToDoctorResponse() *response.DoctorTransactionResponse {
 		PaymentLink:  r.PaymentLink,
 		Bank:         r.Bank,
 		Status:       r.Status,
+		PointSpend:   r.PointSpend,
 		CreatedAt:    r.CreatedAt.String(),
 		UpdatedAt:    r.UpdatedAt.String(),
 	}

@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"capstone/constants"
+	"capstone/controllers/transaction/response"
 	"capstone/entities"
 	transactionEntities "capstone/entities/transaction"
 	"capstone/repositories/mysql/consultation"
@@ -39,7 +40,7 @@ func (repository *TransactionRepo) FindByID(ID string) (*transactionEntities.Tra
 
 func (repository *TransactionRepo) FindByConsultationID(consultationID uint) (*transactionEntities.Transaction, error) {
 	transactionDB := new(Transaction)
-	if err := repository.db.Preload("Consultation.Doctor").First(&transactionDB).Error; err != nil {
+	if err := repository.db.Preload("Consultation").Preload("Consultation.Doctor").First(&transactionDB, "consultation_id LIKE ?", consultationID).Error; err != nil {
 		return nil, constants.ErrDataNotFound
 	}
 	return transactionDB.ToEntities(), nil
@@ -68,7 +69,7 @@ func (repository *TransactionRepo) FindAllByUserID(metadata *entities.Metadata, 
 
 func (repository *TransactionRepo) Update(transaction *transactionEntities.Transaction) (*transactionEntities.Transaction, error) {
 	transactionDB := ToTransactionModel(transaction)
-	if err := repository.db.Model(&Transaction{}).Where("id LIKE ?", transactionDB.ID).Update("status", transactionDB.Status).Error; err != nil {
+	if err := repository.db.Model(&Transaction{}).Where("id LIKE ?", transactionDB.ID).Update("status", transactionDB.Status).Update("payment_status", transactionDB.Status).Error; err != nil {
 		return nil, constants.ErrInsertDatabase
 	}
 	transactionDB.Consultation = *consultation.ToConsultationModel(&transaction.Consultation)
@@ -108,15 +109,80 @@ func (repository *TransactionRepo) FindAllByDoctorID(metadata *entities.Metadata
 	return &transactions, nil
 }
 
-func (repository *TransactionRepo) CountTransactionByDoctorID(doctorID uint) (int, error) {
-	var count int64
-	if err := repository.db.
+func (repository *TransactionRepo) CountTransactionByDoctorID(doctorID uint) (*response.TransactionCount, error) {
+	var transactionTotal, transactionSuccess, transactionFailed, transactionToday, transactionWeek, transactionMonth, transactionYear int64
+	var err error
+
+	// Count All Transaction
+	if err = repository.db.
 		Model(&Transaction{}).
 		Joins("JOIN consultations ON consultations.id = transactions.consultation_id").
-		Joins("JOIN doctors ON consultations.doctor_id = doctors.id").
-		Where("doctors.id LIKE ?", doctorID).
-		Count(&count).Error; err != nil {
-		return 0, constants.ErrDataNotFound
+		Where("consultations.doctor_id LIKE ? AND transactions.status NOT LIKE ?", doctorID, constants.PENDING).
+		Count(&transactionTotal).
+		Error; err != nil {
+		return nil, constants.ErrDataNotFound
 	}
-	return int(count), nil
+
+	// Count Success Transaction
+	if err = repository.db.
+		Model(&Transaction{}).
+		Joins("JOIN consultations ON consultations.id = transactions.consultation_id").
+		Where("consultations.doctor_id LIKE ? AND transactions.status LIKE ?", doctorID, constants.Success).
+		Count(&transactionSuccess).
+		Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	// Count Failed Transaction
+	if err = repository.db.
+		Model(&Transaction{}).
+		Joins("JOIN consultations ON consultations.id = transactions.consultation_id").
+		Where("consultations.doctor_id LIKE ? AND transactions.status LIKE ?", doctorID, constants.Failed).
+		Count(&transactionFailed).
+		Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	// Count Today Transaction
+	if err = repository.db.
+		Model(&Transaction{}).
+		Joins("JOIN consultations ON consultations.id = transactions.consultation_id").
+		Where("consultations.doctor_id LIKE ? AND transactions.status NOT LIKE ? AND DATE(transactions.created_at) = CURDATE()", doctorID, constants.PENDING).
+		Count(&transactionToday).
+		Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	// Count Week Transaction
+	if err = repository.db.
+		Model(&Transaction{}).
+		Joins("JOIN consultations ON consultations.id = transactions.consultation_id").
+		Where("consultations.doctor_id LIKE ? AND transactions.status NOT LIKE ? AND YEARWEEK(transactions.created_at, 1) = YEARWEEK(CURDATE(), 1)", doctorID, constants.PENDING).
+		Count(&transactionWeek).
+		Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	// Count Month Transaction
+	if err = repository.db.
+		Model(&Transaction{}).
+		Joins("JOIN consultations ON consultations.id = transactions.consultation_id").
+		Where("consultations.doctor_id LIKE ? AND transactions.status NOT LIKE ? AND MONTH(transactions.created_at) = MONTH(CURDATE())", doctorID, constants.PENDING).
+		Count(&transactionMonth).
+		Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	// Count Year Transaction
+	if err = repository.db.
+		Model(&Transaction{}).
+		Joins("JOIN consultations ON consultations.id = transactions.consultation_id").
+		Where("consultations.doctor_id LIKE ? AND transactions.status NOT LIKE ? AND YEAR(transactions.created_at) = YEAR(CURDATE())", doctorID, constants.PENDING).
+		Count(&transactionYear).
+		Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	countTransaction := response.ToTransactionCount(transactionTotal, transactionSuccess, transactionFailed, transactionToday, transactionWeek, transactionMonth, transactionYear)
+	return countTransaction, nil
 }

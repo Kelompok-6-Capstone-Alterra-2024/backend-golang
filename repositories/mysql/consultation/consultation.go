@@ -7,7 +7,6 @@ import (
 	doctorEntities "capstone/entities/doctor"
 	forumEntities "capstone/entities/forum"
 	musicEntities "capstone/entities/music"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -31,12 +30,7 @@ func (repository *ConsultationRepo) CreateConsultation(consultation *consultatio
 	if err := repository.db.Preload("Doctor").First(&consultationRequest, consultationRequest.ID).Error; err != nil {
 		return nil, constants.ErrDataNotFound
 	}
-
-	consultationResult, err := consultationRequest.ToEntities()
-	if err != nil {
-		return nil, constants.ErrInputTime
-	}
-	return consultationResult, nil
+	return consultationRequest.ToEntities(), nil
 }
 
 func (repository *ConsultationRepo) GetConsultationByID(consultationID int) (consultation *consultationEntities.Consultation, err error) {
@@ -44,12 +38,8 @@ func (repository *ConsultationRepo) GetConsultationByID(consultationID int) (con
 	if err = repository.db.Preload("User").Preload("Doctor").First(&consultationDB, consultationID).Error; err != nil {
 		return nil, constants.ErrDataNotFound
 	}
-	consultationResult, err := consultationDB.ToEntities()
-	if err != nil {
-		return nil, constants.ErrInputTime
-	}
 
-	return consultationResult, nil
+	return consultationDB.ToEntities(), nil
 }
 
 func (repository *ConsultationRepo) GetAllUserConsultation(metadata *entities.Metadata, userID int) (*[]consultationEntities.Consultation, error) {
@@ -61,11 +51,7 @@ func (repository *ConsultationRepo) GetAllUserConsultation(metadata *entities.Me
 
 	var consultations []consultationEntities.Consultation
 	for _, consultation := range consultationDB {
-		consultationResult, err := consultation.ToEntities()
-		if err != nil {
-			return nil, constants.ErrInputTime
-		}
-		consultations = append(consultations, *consultationResult)
+		consultations = append(consultations, *consultation.ToEntities())
 	}
 
 	return &consultations, nil
@@ -73,21 +59,26 @@ func (repository *ConsultationRepo) GetAllUserConsultation(metadata *entities.Me
 
 func (repository *ConsultationRepo) UpdateStatusConsultation(consultation *consultationEntities.Consultation) (*consultationEntities.Consultation, error) {
 	var consultationDB Consultation
-	if err := repository.db.First(&consultationDB, "id LIKE ?", consultation.ID).Error; err != nil {
+	if err := repository.db.Preload("Complaint").First(&consultationDB, "id LIKE ?", consultation.ID).Error; err != nil {
 		return nil, constants.ErrDataNotFound
+	}
+
+	if consultationDB.Status == constants.REJECTED || consultationDB.Status == constants.INCOMING {
+		return nil, constants.ErrConsultationAlreadyRejected
 	}
 
 	consultationDB.Status = consultation.Status
 
-	if err := repository.db.Model(&consultationDB).Save(&consultationDB).Error; err != nil {
-		return nil, err
+	if consultation.Status == constants.DONE {
+		if err := repository.db.Model(&consultationDB).Where("id LIKE ?", consultation.ID).Update("status", consultationDB.Status).Update("end_date", consultation.EndDate).Error; err != nil {
+			return nil, err
+		}
 	}
 
-	consultationResult, err := consultationDB.ToEntities()
-	if err != nil {
-		return nil, constants.ErrInputTime
+	if err := repository.db.Model(&consultationDB).Where("id LIKE ?", consultation.ID).Update("status", consultationDB.Status).Error; err != nil {
+		return nil, err
 	}
-	return consultationResult, nil
+	return consultationDB.ToEntities(), nil
 }
 
 func (repository *ConsultationRepo) GetAllDoctorConsultation(metadata *entities.Metadata, doctorID int) (*[]consultationEntities.Consultation, error) {
@@ -99,11 +90,7 @@ func (repository *ConsultationRepo) GetAllDoctorConsultation(metadata *entities.
 
 	var consultations []consultationEntities.Consultation
 	for _, consultation := range consultationbDB {
-		consultationResult, err := consultation.ToEntities()
-		if err != nil {
-			return nil, constants.ErrInputTime
-		}
-		consultations = append(consultations, *consultationResult)
+		consultations = append(consultations, *consultation.ToEntities())
 	}
 
 	return &consultations, nil
@@ -111,7 +98,7 @@ func (repository *ConsultationRepo) GetAllDoctorConsultation(metadata *entities.
 
 func (repository *ConsultationRepo) CountConsultationToday(doctorID int) (int64, error) {
 	var count int64
-	if err := repository.db.Model(&Consultation{}).Where("doctor_id LIKE ? AND date LIKE ?", doctorID, time.Now().Format("2006-11-22")).Count(&count).Error; err != nil {
+	if err := repository.db.Model(&Consultation{}).Where("doctor_id LIKE ? AND DATE(start_date) = CURDATE()", doctorID).Count(&count).Error; err != nil {
 		return 0, constants.ErrDataNotFound
 	}
 	return count, nil
@@ -206,10 +193,32 @@ func (repository *ConsultationRepo) GetConsultationByComplaintID(complaintID int
 	if err := repository.db.Preload("Complaint").First(&consultationDB, "complaint_id LIKE ?", complaintID).Error; err != nil {
 		return nil, constants.ErrDataNotFound
 	}
-	consultationResult, err := consultationDB.ToEntities()
-	if err != nil {
-		return nil, constants.ErrInputTime
+
+	return consultationDB.ToEntities(), nil
+}
+
+func (repository *ConsultationRepo) UpdatePaymentStatusConsultation(consultationID int, status string) error {
+	var consultationDB Consultation
+
+	consultationDB.PaymentStatus = status
+
+	if err := repository.db.Model(&consultationDB).Where("id LIKE ?", consultationID).Error; err != nil {
+		return err
 	}
 
-	return consultationResult, nil
+	return nil
+}
+
+func (repository *ConsultationRepo) GetAllConsultation() *[]consultationEntities.Consultation {
+	var consultationDB []Consultation
+	if err := repository.db.Find(&consultationDB, "status NOT IN (?)", []string{constants.DONE, constants.REJECTED}).Error; err != nil {
+		return nil
+	}
+
+	var consultations []consultationEntities.Consultation
+	for _, consultation := range consultationDB {
+		consultations = append(consultations, *consultation.ToEntities())
+	}
+
+	return &consultations
 }

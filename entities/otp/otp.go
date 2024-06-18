@@ -10,13 +10,15 @@ type Otp struct {
 }
 
 type RepositoryInterface interface {
-	SendOTP(otp Otp) (error)
-	VerifyOTP(otp Otp) (error)
-	VerifyOTPRegister(otp Otp) (error)
+	SendOTP(otp Otp) error
+	VerifyOTP(otp Otp) error
+	VerifyOTPRegister(otp Otp) error
+	VerifyOTPChangeEmail(otp Otp) error
 }
 
 type UseCaseInterface interface {
-	SendOTP(otp Otp) (error)
-	VerifyOTP(otp Otp) (error)
-	VerifyOTPRegister(otp Otp) (error)
+	SendOTP(otp Otp) error
+	VerifyOTP(otp Otp) error
+	VerifyOTPRegister(otp Otp) error
+	VerifyOTPChangeEmail(otp Otp) error
 }

@@ -1,12 +1,14 @@
 package complaint
 
 import (
+	"capstone/constants"
 	"capstone/controllers/complaint/request"
 	"capstone/controllers/complaint/response"
 	complaintUseCase "capstone/entities/complaint"
 	consultationEntities "capstone/entities/consultation"
 	"capstone/utilities"
 	"capstone/utilities/base"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
@@ -15,19 +17,23 @@ import (
 type ComplaintController struct {
 	complaintUseCase    complaintUseCase.ComplaintUseCase
 	consultationUseCase consultationEntities.ConsultationUseCase
+	validator           *validator.Validate
 }
 
-func NewComplaintController(complaint complaintUseCase.ComplaintUseCase, consultationUseCase consultationEntities.ConsultationUseCase) *ComplaintController {
+func NewComplaintController(complaint complaintUseCase.ComplaintUseCase, consultationUseCase consultationEntities.ConsultationUseCase, validator *validator.Validate) *ComplaintController {
 	return &ComplaintController{
 		complaintUseCase:    complaint,
 		consultationUseCase: consultationUseCase,
+		validator:           validator,
 	}
 }
 
 func (controller *ComplaintController) Create(c echo.Context) error {
 	var complaintRequest request.ComplaintRequest
 	c.Bind(&complaintRequest)
-
+	if err := controller.validator.Struct(complaintRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(constants.ErrBadRequest.Error()))
+	}
 	complaint, err := controller.complaintUseCase.Create(complaintRequest.ToEntities())
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))

@@ -205,3 +205,23 @@ func (c *UserController) ChangePassword(ctx echo.Context) error {
 	}
 	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Change Password", nil))
 }
+
+func (c *UserController) ChangeEmail(ctx echo.Context) error {
+	var req request.ChangeEmailRequest
+	if err := ctx.Bind(&req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	token := ctx.Request().Header.Get("Authorization")
+	userId, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return ctx.JSON(http.StatusUnauthorized, base.NewErrorResponse("Invalid token"))
+	}
+
+	err = c.userUseCase.ChangeEmail(userId, req.NewEmail)
+	if err != nil {
+		return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Change Email", nil))
+}

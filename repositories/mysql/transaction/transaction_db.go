@@ -17,19 +17,20 @@ type Transaction struct {
 	Bank           string                    `gorm:"column:bank;not null;default:'ewallet'"`
 	PaymentLink    string                    `gorm:"column:payment_link;not null"`
 	Status         string                    `gorm:"column:status;not null;type:enum('pending','settlement','failed', 'deny');default:'pending'"`
+	PointSpend     int                       `gorm:"column:point_spend;not null;default:0"`
 }
 
 func (receiver Transaction) ToEntities() *transaction.Transaction {
-	consultationEntities, _ := receiver.Consultation.ToEntities()
 	return &transaction.Transaction{
 		ID:             receiver.ID,
 		ConsultationID: receiver.ConsultationID,
-		Consultation:   *consultationEntities,
+		Consultation:   *receiver.Consultation.ToEntities(),
 		Price:          receiver.Price,
 		PaymentType:    receiver.PaymentType,
 		PaymentLink:    receiver.PaymentLink,
 		Bank:           receiver.Bank,
 		Status:         receiver.Status,
+		PointSpend:     receiver.PointSpend,
 		CreatedAt:      receiver.CreatedAt,
 		UpdatedAt:      receiver.UpdatedAt,
 	}
@@ -45,5 +46,6 @@ func ToTransactionModel(transaction *transaction.Transaction) *Transaction {
 		PaymentLink:    transaction.PaymentLink,
 		Bank:           transaction.Bank,
 		Status:         transaction.Status,
+		PointSpend:     transaction.PointSpend,
 	}
 }

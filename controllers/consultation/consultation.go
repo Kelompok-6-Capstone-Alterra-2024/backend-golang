@@ -1,6 +1,7 @@
 package consultation
 
 import (
+	"capstone/constants"
 	"capstone/controllers/consultation/request"
 	"capstone/controllers/consultation/response"
 	"capstone/entities/consultation"
@@ -9,16 +10,19 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
 type ConsultationController struct {
 	consultationUseCase consultation.ConsultationUseCase
+	validator           *validator.Validate
 }
 
-func NewConsultationController(consultationUseCase consultation.ConsultationUseCase) *ConsultationController {
+func NewConsultationController(consultationUseCase consultation.ConsultationUseCase, validator *validator.Validate) *ConsultationController {
 	return &ConsultationController{
-		consultationUseCase,
+		consultationUseCase: consultationUseCase,
+		validator:           validator,
 	}
 }
 
@@ -36,11 +40,16 @@ func (controller *ConsultationController) CreateConsultation(c echo.Context) err
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
 	consultationRequest.UserID = userId
+
+	if err = controller.validator.Struct(consultationRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(constants.ErrBadRequest.Error()))
+	}
+
 	consultationResponse, err := controller.consultationUseCase.CreateConsultation(consultationRequest.ToEntities(date, time))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Add Consultation", consultationResponse.ToUserResponse()))
+	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success Add Consultation", consultationResponse.ToUserResponse()))
 }
 
 func (controller *ConsultationController) GetConsultationByID(c echo.Context) error {
@@ -82,16 +91,28 @@ func (controller *ConsultationController) UpdateStatusConsultation(c echo.Contex
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("Invalid ID"))
 	}
-	c.Bind(&consultationRequest)
+	err = c.Bind(&consultationRequest)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
+
+	doctorID, err := utilities.GetUserIdFromToken(c.Request().Header.Get("Authorization"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	consultationRequest.DoctorID = uint(doctorID)
+
 	consultationRequest.ID = uint(consultationID)
+
+	if err = controller.validator.Struct(consultationRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(constants.ErrBadRequest.Error()))
+	}
+
 	consultationResponse, err := controller.consultationUseCase.UpdateStatusConsultation(consultationRequest.ToEntities())
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Update Consultation", consultationResponse.ToUserResponse()))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Update Consultation", consultationResponse.ToDoctorResponse()))
 }
 
 func (controller *ConsultationController) GetAllDoctorConsultation(c echo.Context) error {
@@ -223,4 +244,17 @@ func (controller *ConsultationController) GetConsultationNotesByID(c echo.Contex
 	resp.CreatedAt = res.CreatedAt
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation Notes", resp))
+}
+
+func (controller *ConsultationController) CountConsultation(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	doctorId, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	count, err := controller.consultationUseCase.CountConsultation(doctorId)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Count Consultation", count.ToResponse()))
 }

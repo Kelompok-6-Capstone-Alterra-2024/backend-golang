@@ -6,17 +6,18 @@ import (
 )
 
 type ConsultationRequest struct {
-	DoctorID uint `json:"doctor_id" form:"doctor_id" binding:"required"`
-	UserID   int
+	DoctorID uint   `json:"doctor_id" form:"doctor_id" binding:"required" validate:"required"`
+	UserID   int    `validate:"required"`
 	Date     string `json:"date" form:"date" binding:"required"`
 	Time     string `json:"time" form:"time" binding:"required"`
 }
 
-func (r ConsultationRequest) ToEntities(date, time time.Time) *consultation.Consultation {
+func (r ConsultationRequest) ToEntities(consultationDate, consultationTime time.Time) *consultation.Consultation {
+	timeLocation, _ := time.LoadLocation("Asia/Jakarta")
+	newDate := time.Date(consultationDate.Year(), consultationDate.Month(), consultationDate.Day(), consultationTime.Hour(), consultationTime.Minute(), consultationTime.Second(), consultationTime.Nanosecond(), timeLocation)
 	return &consultation.Consultation{
-		DoctorID: r.DoctorID,
-		UserID:   uint(r.UserID),
-		Date:     date,
-		Time:     time,
+		DoctorID:  r.DoctorID,
+		UserID:    uint(r.UserID),
+		StartDate: newDate,
 	}
 }

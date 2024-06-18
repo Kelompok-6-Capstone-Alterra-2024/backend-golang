@@ -29,7 +29,7 @@ func (otpRepo *OtpRepo) SendOTP(otp otpEntities.Otp) error {
 
 func (otpRepo *OtpRepo) VerifyOTP(otp otpEntities.Otp) error {
 	var otpDB Otp
-	
+
 	err := otpRepo.db.Where("email = ? AND code = ?", otp.Email, otp.Code).First(&otpDB).Error
 	if err != nil {
 		return constants.ErrInvalidOTP
@@ -54,6 +54,35 @@ func (otpRepo *OtpRepo) VerifyOTPRegister(otp otpEntities.Otp) error {
 	}
 
 	err = otpRepo.db.Model(&user.User{}).Where("email = ?", otp.Email).Update("is_active", true).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (otpRepo *OtpRepo) VerifyOTPChangeEmail(otp otpEntities.Otp) error {
+	var otpDB Otp
+	err := otpRepo.db.Where("email = ? AND code = ?", otp.Email, otp.Code).First(&otpDB).Error
+	if err != nil {
+		return constants.ErrInvalidOTP
+	}
+
+	if otpDB.ExpiredAt.Before(time.Now()) {
+		return constants.ErrExpiredOTP
+	}
+
+	var userDB user.User
+	err = otpRepo.db.Where("email = ?", otp.Email).First(&userDB).Error
+	if err != nil {
+		return constants.ErrUserNotFound
+	}
+
+	// Update user's email to pending email and clear pending email
+	err = otpRepo.db.Model(&userDB).Updates(map[string]interface{}{
+		"email":         userDB.PendingEmail,
+		"pending_email": "",
+	}).Error
 	if err != nil {
 		return err
 	}

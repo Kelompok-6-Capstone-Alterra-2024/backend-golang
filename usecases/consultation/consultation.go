@@ -5,21 +5,36 @@ import (
 	"capstone/entities"
 	chatEntities "capstone/entities/chat"
 	consultationEntities "capstone/entities/consultation"
-
+	doctorEntities "capstone/entities/doctor"
+	transactionEntities "capstone/entities/transaction"
+	userEntities "capstone/entities/user"
 	"github.com/go-playground/validator/v10"
+	"time"
 )
 
 type ConsultationUseCase struct {
-	consultationRepo consultationEntities.ConsultationRepository
-	validate         *validator.Validate
-	chatRepo         chatEntities.RepositoryInterface
+	consultationRepo      consultationEntities.ConsultationRepository
+	transactionRepository transactionEntities.TransactionRepository
+	doctorRepository      doctorEntities.DoctorRepositoryInterface
+	userUseCase           userEntities.UseCaseInterface
+	validate              *validator.Validate
+	chatRepo              chatEntities.RepositoryInterface
 }
 
-func NewConsultationUseCase(consultationRepo consultationEntities.ConsultationRepository, validate *validator.Validate, chatRepo chatEntities.RepositoryInterface) consultationEntities.ConsultationUseCase {
+func NewConsultationUseCase(
+	consultationRepo consultationEntities.ConsultationRepository,
+	transactionRepository transactionEntities.TransactionRepository,
+	userUseCase userEntities.UseCaseInterface,
+	doctorRepository doctorEntities.DoctorRepositoryInterface,
+	validate *validator.Validate,
+	chatRepo chatEntities.RepositoryInterface) consultationEntities.ConsultationUseCase {
 	return &ConsultationUseCase{
-		consultationRepo: consultationRepo,
-		validate:         validate,
-		chatRepo:         chatRepo,
+		consultationRepo:      consultationRepo,
+		transactionRepository: transactionRepository,
+		userUseCase:           userUseCase,
+		doctorRepository:      doctorRepository,
+		validate:              validate,
+		chatRepo:              chatRepo,
 	}
 }
 
@@ -57,9 +72,44 @@ func (usecase *ConsultationUseCase) GetAllUserConsultation(metadata *entities.Me
 }
 
 func (usecase *ConsultationUseCase) UpdateStatusConsultation(consultation *consultationEntities.Consultation) (*consultationEntities.Consultation, error) {
+	if consultation.Status == constants.DONE {
+		jakartaTime, err := time.LoadLocation("Asia/Jakarta")
+		if err != nil {
+			return nil, constants.ErrDataNotFound
+		}
+		consultation.EndDate = time.Now().In(jakartaTime)
+	}
 	result, err := usecase.consultationRepo.UpdateStatusConsultation(consultation)
 	if err != nil {
 		return nil, err
+	}
+
+	if consultation.Status == constants.REJECTED {
+		transaction := new(transactionEntities.Transaction)
+		transaction, err = usecase.transactionRepository.FindByConsultationID(consultation.ID)
+		if err != nil {
+			return nil, constants.ErrConsultationAlreadyRejected
+		}
+
+		err = usecase.userUseCase.UpdateFailedPointByUserID(int(transaction.Consultation.UserID), transaction.Price)
+		if err != nil {
+			return nil, err
+		}
+
+		doctorResponse, err := usecase.doctorRepository.GetDoctorByID(int(consultation.DoctorID))
+		if err != nil {
+			return nil, err
+		}
+
+		amountDoctor := doctorResponse.Amount - transaction.Price + constants.ServiceFee
+		err = usecase.doctorRepository.UpdateAmount(consultation.DoctorID, amountDoctor)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if consultation.Status == constants.DONE {
+
 	}
 	return result, nil
 }
@@ -129,4 +179,45 @@ func (usecase *ConsultationUseCase) GetConsultationByComplaintID(complaintID int
 		return nil, err
 	}
 	return result, nil
+}
+
+func (usecase *ConsultationUseCase) CountConsultation(doctorID int) (*consultationEntities.CountConsultation, error) {
+	totalConsultation, err := usecase.consultationRepo.CountConsultationByDoctorID(doctorID)
+	if err != nil {
+		return nil, err
+	}
+
+	totalConsultationToday, err := usecase.consultationRepo.CountConsultationToday(doctorID)
+	if err != nil {
+		return nil, err
+	}
+
+	totalConsultationActive, err := usecase.consultationRepo.CountConsultationByStatus(doctorID, constants.ACTIVE)
+	if err != nil {
+		return nil, err
+	}
+
+	totalConsultationDone, err := usecase.consultationRepo.CountConsultationByStatus(doctorID, constants.DONE)
+	if err != nil {
+		return nil, err
+	}
+
+	totalConsultationRejected, err := usecase.consultationRepo.CountConsultationByStatus(doctorID, constants.REJECTED)
+	if err != nil {
+		return nil, err
+	}
+
+	totalConsultationIncoming, err := usecase.consultationRepo.CountConsultationByStatus(doctorID, constants.INCOMING)
+	if err != nil {
+		return nil, err
+	}
+
+	totalConsultationPending, err := usecase.consultationRepo.CountConsultationByStatus(doctorID, constants.PENDING)
+	if err != nil {
+		return nil, err
+	}
+
+	countConsultation := consultationEntities.ToCountConsultation(totalConsultation, totalConsultationToday, totalConsultationActive, totalConsultationDone, totalConsultationRejected, totalConsultationIncoming, totalConsultationPending)
+
+	return &countConsultation, nil
 }
