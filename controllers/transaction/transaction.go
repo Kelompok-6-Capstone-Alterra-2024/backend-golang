@@ -154,11 +154,11 @@ func (controller *TransactionController) CountTransactionByDoctorID(c echo.Conte
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
-	count, err := controller.transactionUseCase.CountTransactionByDoctorID(uint(doctorId))
+	transactionResponse, err := controller.transactionUseCase.CountTransactionByDoctorID(uint(doctorId))
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(http.StatusOK, base.NewSuccessResponse("Count transaction success", count))
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Count transaction success", transactionResponse))
 }
 
 func (controller *TransactionController) FindAllByDoctorID(c echo.Context) error {
