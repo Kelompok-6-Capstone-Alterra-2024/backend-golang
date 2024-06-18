@@ -38,11 +38,10 @@ func (c *Cronjob) UpdateStatusConsultation() {
 	for _, consultation := range *consultations {
 		if consultation.Status != constants.DONE && consultation.Status != constants.REJECTED {
 			// Update Status Pending to Rejected When Date is After Now
-			consultationDate := time.Date(consultation.Date.Year(), consultation.Date.Month(), consultation.Date.Day(), consultation.Time.Hour(), consultation.Time.Minute(), consultation.Time.Second(), 0, time.UTC)
-			currentTime := time.Now().UTC()
+			currentTime := time.Now()
 
 			// Check if consultationDate is after or equal to currentTime
-			if (consultationDate.Before(currentTime) || consultationDate.Equal(currentTime)) && consultation.Status == constants.PENDING {
+			if (consultation.StartDate.Before(currentTime) || consultation.StartDate.Equal(currentTime)) && consultation.Status == constants.PENDING {
 				fmt.Println("Update Status Pending to Rejected")
 				consultation.Status = "rejected"
 				_, err := c.consultationRepository.UpdateStatusConsultation(&consultation)
@@ -52,7 +51,7 @@ func (c *Cronjob) UpdateStatusConsultation() {
 				continue
 			}
 
-			if (consultationDate.After(currentTime) || consultationDate.Equal(currentTime)) && consultation.Status == constants.INCOMING {
+			if (consultation.StartDate.After(currentTime) || consultation.StartDate.Equal(currentTime)) && consultation.Status == constants.INCOMING {
 				fmt.Println("Update Status Incoming to Active")
 				consultation.Status = "active"
 				_, err := c.consultationRepository.UpdateStatusConsultation(&consultation)

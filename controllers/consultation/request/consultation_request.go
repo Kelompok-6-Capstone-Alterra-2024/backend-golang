@@ -12,11 +12,12 @@ type ConsultationRequest struct {
 	Time     string `json:"time" form:"time" binding:"required"`
 }
 
-func (r ConsultationRequest) ToEntities(date, time time.Time) *consultation.Consultation {
+func (r ConsultationRequest) ToEntities(consultationDate, consultationTime time.Time) *consultation.Consultation {
+	timeLocation, _ := time.LoadLocation("Asia/Jakarta")
+	newDate := time.Date(consultationDate.Year(), consultationDate.Month(), consultationDate.Day(), consultationTime.Hour(), consultationTime.Minute(), consultationTime.Second(), consultationTime.Nanosecond(), timeLocation)
 	return &consultation.Consultation{
-		DoctorID: r.DoctorID,
-		UserID:   uint(r.UserID),
-		Date:     date,
-		Time:     time,
+		DoctorID:  r.DoctorID,
+		UserID:    uint(r.UserID),
+		StartDate: newDate,
 	}
 }

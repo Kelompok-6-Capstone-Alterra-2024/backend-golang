@@ -30,12 +30,7 @@ func (repository *ConsultationRepo) CreateConsultation(consultation *consultatio
 	if err := repository.db.Preload("Doctor").First(&consultationRequest, consultationRequest.ID).Error; err != nil {
 		return nil, constants.ErrDataNotFound
 	}
-
-	consultationResult, err := consultationRequest.ToEntities()
-	if err != nil {
-		return nil, constants.ErrInputTime
-	}
-	return consultationResult, nil
+	return consultationRequest.ToEntities(), nil
 }
 
 func (repository *ConsultationRepo) GetConsultationByID(consultationID int) (consultation *consultationEntities.Consultation, err error) {
@@ -43,12 +38,8 @@ func (repository *ConsultationRepo) GetConsultationByID(consultationID int) (con
 	if err = repository.db.Preload("User").Preload("Doctor").First(&consultationDB, consultationID).Error; err != nil {
 		return nil, constants.ErrDataNotFound
 	}
-	consultationResult, err := consultationDB.ToEntities()
-	if err != nil {
-		return nil, constants.ErrInputTime
-	}
 
-	return consultationResult, nil
+	return consultationDB.ToEntities(), nil
 }
 
 func (repository *ConsultationRepo) GetAllUserConsultation(metadata *entities.Metadata, userID int) (*[]consultationEntities.Consultation, error) {
@@ -60,11 +51,7 @@ func (repository *ConsultationRepo) GetAllUserConsultation(metadata *entities.Me
 
 	var consultations []consultationEntities.Consultation
 	for _, consultation := range consultationDB {
-		consultationResult, err := consultation.ToEntities()
-		if err != nil {
-			return nil, constants.ErrInputTime
-		}
-		consultations = append(consultations, *consultationResult)
+		consultations = append(consultations, *consultation.ToEntities())
 	}
 
 	return &consultations, nil
@@ -82,15 +69,16 @@ func (repository *ConsultationRepo) UpdateStatusConsultation(consultation *consu
 
 	consultationDB.Status = consultation.Status
 
+	if consultation.Status == constants.DONE {
+		if err := repository.db.Model(&consultationDB).Where("id LIKE ?", consultation.ID).Update("status", consultationDB.Status).Update("end_date", consultation.EndDate).Error; err != nil {
+			return nil, err
+		}
+	}
+
 	if err := repository.db.Model(&consultationDB).Where("id LIKE ?", consultation.ID).Update("status", consultationDB.Status).Error; err != nil {
 		return nil, err
 	}
-
-	consultationResult, err := consultationDB.ToEntities()
-	if err != nil {
-		return nil, constants.ErrInputTime
-	}
-	return consultationResult, nil
+	return consultationDB.ToEntities(), nil
 }
 
 func (repository *ConsultationRepo) GetAllDoctorConsultation(metadata *entities.Metadata, doctorID int) (*[]consultationEntities.Consultation, error) {
@@ -102,11 +90,7 @@ func (repository *ConsultationRepo) GetAllDoctorConsultation(metadata *entities.
 
 	var consultations []consultationEntities.Consultation
 	for _, consultation := range consultationbDB {
-		consultationResult, err := consultation.ToEntities()
-		if err != nil {
-			return nil, constants.ErrInputTime
-		}
-		consultations = append(consultations, *consultationResult)
+		consultations = append(consultations, *consultation.ToEntities())
 	}
 
 	return &consultations, nil
@@ -208,12 +192,8 @@ func (repository *ConsultationRepo) GetConsultationByComplaintID(complaintID int
 	if err := repository.db.Preload("Complaint").First(&consultationDB, "complaint_id LIKE ?", complaintID).Error; err != nil {
 		return nil, constants.ErrDataNotFound
 	}
-	consultationResult, err := consultationDB.ToEntities()
-	if err != nil {
-		return nil, constants.ErrInputTime
-	}
 
-	return consultationResult, nil
+	return consultationDB.ToEntities(), nil
 }
 
 func (repository *ConsultationRepo) UpdatePaymentStatusConsultation(consultationID int, status string) error {
@@ -236,11 +216,7 @@ func (repository *ConsultationRepo) GetAllConsultation() *[]consultationEntities
 
 	var consultations []consultationEntities.Consultation
 	for _, consultation := range consultationDB {
-		consultationResult, err := consultation.ToEntities()
-		if err != nil {
-			return nil
-		}
-		consultations = append(consultations, *consultationResult)
+		consultations = append(consultations, *consultation.ToEntities())
 	}
 
 	return &consultations

@@ -101,3 +101,5 @@ var ErrEmptyInputViewByMonth error = errors.New("start month or end month cannot
 var ErrBadRequest error = errors.New("bad request")
 
 var ErrEmptyNewEmail error = errors.New("new email cannot be empty")
+
+var ErrLocationNotFound error = errors.New("location not found")

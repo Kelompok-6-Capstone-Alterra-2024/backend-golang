@@ -48,7 +48,7 @@ func (controller *ConsultationController) CreateConsultation(c echo.Context) err
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
-	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Add Consultation", consultationResponse.ToUserResponse()))
+	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success Add Consultation", consultationResponse.ToUserResponse()))
 }
 
 func (controller *ConsultationController) GetConsultationByID(c echo.Context) error {

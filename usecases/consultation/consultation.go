@@ -9,6 +9,7 @@ import (
 	transactionEntities "capstone/entities/transaction"
 	userEntities "capstone/entities/user"
 	"github.com/go-playground/validator/v10"
+	"time"
 )
 
 type ConsultationUseCase struct {
@@ -71,6 +72,13 @@ func (usecase *ConsultationUseCase) GetAllUserConsultation(metadata *entities.Me
 }
 
 func (usecase *ConsultationUseCase) UpdateStatusConsultation(consultation *consultationEntities.Consultation) (*consultationEntities.Consultation, error) {
+	if consultation.Status == constants.DONE {
+		jakartaTime, err := time.LoadLocation("Asia/Jakarta")
+		if err != nil {
+			return nil, constants.ErrDataNotFound
+		}
+		consultation.EndDate = time.Now().In(jakartaTime)
+	}
 	result, err := usecase.consultationRepo.UpdateStatusConsultation(consultation)
 	if err != nil {
 		return nil, err
@@ -98,6 +106,10 @@ func (usecase *ConsultationUseCase) UpdateStatusConsultation(consultation *consu
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	if consultation.Status == constants.DONE {
+
 	}
 	return result, nil
 }

@@ -24,8 +24,8 @@ type Consultation struct {
 	PaymentStatus string              `gorm:"column:payment_status;not null;type:enum('pending', 'paid', 'canceled');default:'pending'"`
 	IsAccepted    bool                `gorm:"column:is_accepted"`
 	IsActive      bool                `gorm:"column:is_active"`
-	Date          time.Time           `gorm:"column:date;type:date;not null"`
-	Time          string              `gorm:"column:time;type:time(3);not null"`
+	StartDate     time.Time           `gorm:"column:start_date;type:datetime;NULL"`
+	EndDate       time.Time           `gorm:"column:end_date;type:datetime;default:NULL"`
 }
 
 type ConstultationNotes struct {
@@ -42,18 +42,7 @@ type ConstultationNotes struct {
 	MoodTrackerNote string       `gorm:"column:mood_tracker_note;default:NULL"`
 }
 
-func (receiver Consultation) ToEntities() (*consultation.Consultation, error) {
-	consultationTime, err := time.Parse("15:04:05.000", receiver.Time)
-	if err != nil {
-		consultationTime, err = time.Parse("15:04", receiver.Time)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if err != nil {
-		return nil, err
-	}
-
+func (receiver Consultation) ToEntities() *consultation.Consultation {
 	return &consultation.Consultation{
 		ID:            receiver.ID,
 		DoctorID:      receiver.DoctorID,
@@ -64,9 +53,9 @@ func (receiver Consultation) ToEntities() (*consultation.Consultation, error) {
 		PaymentStatus: receiver.PaymentStatus,
 		IsAccepted:    receiver.IsAccepted,
 		IsActive:      receiver.IsActive,
-		Date:          receiver.Date,
-		Time:          consultationTime,
-	}, nil
+		StartDate:     receiver.StartDate,
+		EndDate:       receiver.EndDate,
+	}
 }
 
 func ToConsultationModel(request *consultation.Consultation) *Consultation {
@@ -78,7 +67,7 @@ func ToConsultationModel(request *consultation.Consultation) *Consultation {
 		PaymentStatus: request.PaymentStatus,
 		IsAccepted:    request.IsAccepted,
 		IsActive:      request.IsActive,
-		Date:          request.Date,
-		Time:          request.Time.Format("15:04"),
+		StartDate:     request.StartDate,
+		EndDate:       request.EndDate,
 	}
 }
