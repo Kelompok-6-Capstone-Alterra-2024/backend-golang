@@ -7,6 +7,7 @@ import (
 	"capstone/utilities/base"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"strconv"
 )
 
 type NotificationController struct {
@@ -38,4 +39,32 @@ func (controller *NotificationController) GetAllDoctorNotification(c echo.Contex
 	}
 
 	return c.JSON(http.StatusOK, base.NewMetadataSuccessResponse("success get notifications", metadata, notificationResponses))
+}
+
+func (controller *NotificationController) UpdateToReadConsultation(c echo.Context) error {
+	strNotificationID := c.Param("notificationID")
+	notificationID, err := strconv.Atoi(strNotificationID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("notification id must be a number"))
+	}
+	err = controller.notificationUseCase.UpdateStatusDoctorNotification(notificationID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("success update to read consultation", nil))
+}
+
+func (controller *NotificationController) DeleteToReadConsultation(c echo.Context) error {
+	strNotificationID := c.Param("notificationID")
+	notificationID, err := strconv.Atoi(strNotificationID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("notification id must be a number"))
+	}
+	err = controller.notificationUseCase.DeleteDoctorNotification(notificationID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("success delete notification", nil))
 }

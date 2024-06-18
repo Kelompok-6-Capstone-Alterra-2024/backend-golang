@@ -6,7 +6,7 @@ type NotificationRepository interface {
 	GetNotificationByUserID(userID int, metadata *entities.Metadata) (*[]UserNotification, error)
 	CreateUserNotification(notification *UserNotification) error
 	DeleteUserNotification(notificationID int) error
-	UpdateStatusNotification(notificationID int) error
+	UpdateStatusUserNotification(notificationID int) error
 
 	GetNotificationByDoctorID(doctorID int, metadata *entities.Metadata) (*[]DoctorNotification, error)
 	CreateDoctorNotification(notification *DoctorNotification) error
@@ -18,7 +18,7 @@ type NotificationUseCase interface {
 	GetNotificationByUserID(userID int, metadata *entities.Metadata) (*[]UserNotification, error)
 	CreateUserNotification(notification *UserNotification) error
 	DeleteUserNotification(notificationID int) error
-	UpdateStatusNotification(notificationID int) error
+	UpdateStatusUserNotification(notificationID int) error
 
 	GetNotificationByDoctorID(doctorID int, metadata *entities.Metadata) (*[]DoctorNotification, error)
 	CreateDoctorNotification(doctorID uint, content string) error

@@ -290,5 +290,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 
 	// Notification
 	doctorRoute.GET("notifications", r.notificationController.GetAllDoctorNotification) // Get Doctor Notification
+	doctorRoute.PUT("notifications/:notificationID", r.notificationController.UpdateToReadConsultation)
+	doctorRoute.DELETE("notifications/:notificationID", r.notificationController.DeleteToReadConsultation)
 
 }

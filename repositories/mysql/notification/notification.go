@@ -4,6 +4,7 @@ import (
 	"capstone/constants"
 	"capstone/entities"
 	notificationEntities "capstone/entities/notification"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -30,7 +31,7 @@ func (repository *NotificationRepository) DeleteUserNotification(notificationID 
 	panic("implement me")
 }
 
-func (repository *NotificationRepository) UpdateStatusNotification(notificationID int) error {
+func (repository *NotificationRepository) UpdateStatusUserNotification(notificationID int) error {
 	//TODO implement me
 	panic("implement me")
 }
@@ -64,6 +65,7 @@ func (repository *NotificationRepository) DeleteDoctorNotification(notificationI
 
 func (repository *NotificationRepository) UpdateStatusDoctorNotification(notificationID int) error {
 	var notification DoctorNotification
+	fmt.Println(notificationID)
 	if err := repository.db.First(&notification, "id = ?", notificationID).Error; err != nil {
 		return constants.ErrDataNotFound
 	}

@@ -30,7 +30,7 @@ func (usecase *NotificationUseCase) DeleteUserNotification(notificationID int) e
 	panic("implement me")
 }
 
-func (usecase *NotificationUseCase) UpdateStatusNotification(notificationID int) error {
+func (usecase *NotificationUseCase) UpdateStatusUserNotification(notificationID int) error {
 	//TODO implement me
 	panic("implement me")
 }
