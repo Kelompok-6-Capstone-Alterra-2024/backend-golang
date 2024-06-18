@@ -123,7 +123,31 @@ func ConvertResponseCode(err error) int {
 
 	case constants.ErrEmptyInputViewByMonth:
 		return http.StatusBadRequest
-		
+
+	case constants.ErrDataEmpty:
+		return http.StatusNotFound
+
+	case constants.ErrInputTime:
+		return http.StatusBadRequest
+
+	case constants.ErrInvalidPrice:
+		return http.StatusBadRequest
+
+	case constants.ErrUnauthorized:
+		return http.StatusUnauthorized
+
+	case constants.ErrPointSpend:
+		return http.StatusBadRequest
+
+	case constants.ErrInsufficientPoint:
+		return http.StatusBadRequest
+
+	case constants.ErrConsultationAlreadyRejected:
+		return http.StatusBadRequest
+
+	case constants.ErrLocationNotFound:
+		return http.StatusNotFound
+
 	default:
 		return http.StatusInternalServerError
 	}
