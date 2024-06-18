@@ -5,6 +5,7 @@ import (
 	postEntities "capstone/entities/post"
 	userEntities "capstone/entities/user"
 	"capstone/repositories/mysql/user"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -20,7 +21,7 @@ func NewPostRepo(db *gorm.DB) *PostRepo {
 	}
 }
 
-func (postRepo *PostRepo) GetAllPostsByForumId(forumId uint, metadata entities.Metadata) ([]postEntities.Post, error) {
+func (postRepo *PostRepo) GetAllPostsByForumId(forumId uint, metadata entities.Metadata, userId uint) ([]postEntities.Post, error) {
 	var posts []Post
 	err := postRepo.db.Limit(metadata.Limit).Offset((metadata.Page-1)*metadata.Limit).Where("forum_id = ?", forumId).Preload("User").Find(&posts).Error
 	if err != nil {
@@ -28,10 +29,28 @@ func (postRepo *PostRepo) GetAllPostsByForumId(forumId uint, metadata entities.M
 	}
 
 	counter := make([]int64, len(posts))
+	helpers := make([]int64, len(posts))
+	isLikeds := make([]bool, len(posts))
 	for i, post := range posts {
 		err := postRepo.db.Model(postEntities.PostComment{}).Where("post_id = ?", post.ID).Count(&counter[i]).Error
 		if err != nil {
 			return []postEntities.Post{}, err
+		}
+
+		fmt.Println(post.ID)
+		fmt.Println(userId)
+
+		err = postRepo.db.Model(PostLike{}).Where("post_id = ? AND user_id = ?", post.ID, userId).Count(&helpers[i]).Error
+		if err != nil {
+			return []postEntities.Post{}, err
+		}
+
+		fmt.Println(helpers[i])
+
+		if helpers[i] > 0 {
+			isLikeds[i] = true
+		} else {
+			isLikeds[i] = false
 		}
 	}
 
@@ -43,6 +62,7 @@ func (postRepo *PostRepo) GetAllPostsByForumId(forumId uint, metadata entities.M
 			Content:  post.Content,
 			ImageUrl: post.ImageUrl,
 			NumberOfComments: int(counter[i]),
+			IsLiked:  isLikeds[i],
 			User:     userEntities.User{
 				Id:             post.User.Id,
 				Username:       post.User.Username,
@@ -54,18 +74,32 @@ func (postRepo *PostRepo) GetAllPostsByForumId(forumId uint, metadata entities.M
 	return postEnts, nil
 }
 
-func (postRepo *PostRepo) GetPostById(postId uint) (postEntities.Post, error) {
+func (postRepo *PostRepo) GetPostById(postId uint, userId uint) (postEntities.Post, error) {
 	var post Post
 	err := postRepo.db.Where("id = ?", postId).Preload("User").Find(&post).Error
 	if err != nil {
 		return postEntities.Post{}, err
 	}
+
+	var counter int64
+	err = postRepo.db.Model(PostLike{}).Where("post_id = ? AND user_id = ?", post.ID, userId).Count(&counter).Error
+	if err != nil {
+		return postEntities.Post{}, err
+	}
 	
+	var isLiked bool
+	if counter > 0 {
+		isLiked = true
+	} else {
+		isLiked = false
+	}
+
 	var postEnt postEntities.Post
 	postEnt.ID = post.ID
 	postEnt.ForumId = post.ForumID
 	postEnt.Content = post.Content
 	postEnt.ImageUrl = post.ImageUrl
+	postEnt.IsLiked = isLiked
 	postEnt.User = userEntities.User{
 		Id:             post.User.Id,
 		Username:       post.User.Username,

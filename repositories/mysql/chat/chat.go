@@ -85,6 +85,7 @@ func (c *ChatRepo) GetAllChatByUserId(userId int, metadata entities.Metadata, st
 		chatEnts[i].LatestMessageID = latestMessage[i].ID
 		chatEnts[i].LatestMessageContent = latestMessage[i].Message
 		chatEnts[i].LatestMessageTime = latestMessage[i].CreatedAt.Format("2006-01-02 15:04:05")
+		chatEnts[i].ConsultationEndTime = chat.Consultation.EndDate.Format("2006-01-02 15:04:05")
 		chatEnts[i].Consultation.Doctor = &doctor.Doctor{
 			ID:         chat.Consultation.Doctor.ID,
 			Name:       chat.Consultation.Doctor.Name,

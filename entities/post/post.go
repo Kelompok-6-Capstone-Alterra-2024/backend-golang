@@ -15,6 +15,7 @@ type Post struct {
 	User     user.User
 	Comments []PostComment
 	NumberOfComments int
+	IsLiked          bool
 }
 
 type PostComment struct {
@@ -27,8 +28,8 @@ type PostComment struct {
 }
 
 type RepositoryInterface interface {
-	GetAllPostsByForumId(forumId uint, metadata entities.Metadata) ([]Post, error)
-	GetPostById(postId uint) (Post, error)
+	GetAllPostsByForumId(forumId uint, metadata entities.Metadata, userId uint) ([]Post, error)
+	GetPostById(postId uint, userId uint) (Post, error)
 	SendPost(post Post) (Post, error)
 	LikePost(postId uint, userId uint) error
 	SendComment(comment PostComment) (PostComment, error)
@@ -36,8 +37,8 @@ type RepositoryInterface interface {
 }
 
 type UseCaseInterface interface {
-	GetAllPostsByForumId(forumId uint, metadata entities.Metadata) ([]Post, error)
-	GetPostById(postId uint) (Post, error)
+	GetAllPostsByForumId(forumId uint, metadata entities.Metadata, userId uint) ([]Post, error)
+	GetPostById(postId uint, userId uint) (Post, error)
 	SendPost(post Post, file *multipart.FileHeader) (Post, error)
 	LikePost(postId uint, userId uint) error
 	SendComment(comment PostComment) (PostComment, error)

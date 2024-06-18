@@ -5,6 +5,7 @@ type PostResponse struct {
 	Content          string           `json:"content"`
 	ImageUrl         string           `json:"image_url"`
 	NumberOfComments int              `json:"total_comments"`
+	IsLiked          bool             `json:"is_liked"`
 	User             UserPostResponse `json:"user"`
 }
 

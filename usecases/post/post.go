@@ -18,16 +18,16 @@ func NewPostUseCase(postRepository postEntities.RepositoryInterface) *PostUseCas
 	}
 }
 
-func (postUseCase *PostUseCase) GetAllPostsByForumId(forumId uint, metadata entities.Metadata) ([]postEntities.Post, error) {
-	posts, err := postUseCase.postRepository.GetAllPostsByForumId(forumId, metadata)
+func (postUseCase *PostUseCase) GetAllPostsByForumId(forumId uint, metadata entities.Metadata, userId uint) ([]postEntities.Post, error) {
+	posts, err := postUseCase.postRepository.GetAllPostsByForumId(forumId, metadata, userId)
 	if err != nil {
 		return []postEntities.Post{}, err
 	}
 	return posts, nil
 }
 
-func (postUseCase *PostUseCase) GetPostById(postId uint) (postEntities.Post, error) {
-	post, err := postUseCase.postRepository.GetPostById(postId)
+func (postUseCase *PostUseCase) GetPostById(postId uint, userId uint) (postEntities.Post, error) {
+	post, err := postUseCase.postRepository.GetPostById(postId, userId)
 	if err != nil {
 		return postEntities.Post{}, err
 	}

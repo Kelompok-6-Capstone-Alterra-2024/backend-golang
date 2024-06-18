@@ -4,6 +4,7 @@ type ChatUserResponse struct {
 	Id            uint               `json:"id"`
 	Status        string             `json:"status"`
 	Isrejected    bool               `json:"isrejected"`
+	EndTime       string             `json:"end_time"`
 	LatestMessage LatestMessage      `json:"latest_message"`
 	Doctor        DoctorChatResponse `json:"doctor"`
 }
