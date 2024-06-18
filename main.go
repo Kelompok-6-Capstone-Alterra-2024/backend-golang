@@ -11,6 +11,7 @@ import (
 	forumController "capstone/controllers/forum"
 	moodController "capstone/controllers/mood"
 	musicController "capstone/controllers/music"
+	notificationController "capstone/controllers/notification"
 	otpController "capstone/controllers/otp"
 	postController "capstone/controllers/post"
 	ratingController "capstone/controllers/rating"
@@ -26,6 +27,7 @@ import (
 	forumRepositories "capstone/repositories/mysql/forum"
 	moodRepositories "capstone/repositories/mysql/mood"
 	musicRepositories "capstone/repositories/mysql/music"
+	notificationRepositories "capstone/repositories/mysql/notification"
 	otpRepositories "capstone/repositories/mysql/otp"
 	postRepositories "capstone/repositories/mysql/post"
 	ratingRepositories "capstone/repositories/mysql/rating"
@@ -44,6 +46,7 @@ import (
 	midtransUseCase "capstone/usecases/midtrans"
 	moodUseCase "capstone/usecases/mood"
 	musicUseCase "capstone/usecases/music"
+	notificationUseCase "capstone/usecases/notification"
 	otpUseCase "capstone/usecases/otp"
 	postUseCase "capstone/usecases/post"
 	ratingUseCase "capstone/usecases/rating"
@@ -86,6 +89,7 @@ func main() {
 	articleRepo := articleRepositories.NewArticleRepo(db)
 	chatRepo := chatRepositories.NewChatRepo(db)
 	otpRepo := otpRepositories.NewOtpRepo(db)
+	notificationRepo := notificationRepositories.NewNotificationRepository(db)
 
 	userUC := userUseCase.NewUserUseCase(userRepo, oauthConfig, oauthConfigFB)
 	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo, oauthConfigDoctor, oauthConfigFBDoctor)
@@ -104,6 +108,7 @@ func main() {
 	chatUC := chatUseCase.NewChatUseCase(chatRepo)
 	otpUC := otpUseCase.NewOtpUseCase(otpRepo)
 	cronjobUC := cronjob.NewCronJob(gcron, consultationRepo)
+	notificationUC := notificationUseCase.NewNotificationUseCase(notificationRepo)
 
 	userCont := userController.NewUserController(userUC)
 	doctorCont := doctorController.NewDoctorController(doctorUC, validate)
@@ -120,8 +125,9 @@ func main() {
 	articleCont := articleController.NewArticleController(articleUC)
 	chatCont := chatController.NewChatController(chatUC)
 	otpCont := otpController.NewOtpController(otpUC)
+	notificationCont := notificationController.NewNotificationController(notificationUC)
 
-	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont, ratingCont, moodCont, forumCont, postCont, chatbotCont, articleCont, chatCont, otpCont)
+	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont, ratingCont, moodCont, forumCont, postCont, chatbotCont, articleCont, chatCont, otpCont, notificationCont)
 
 	e := echo.New()
 	route.InitRoute(e)
