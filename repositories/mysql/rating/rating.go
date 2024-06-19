@@ -99,10 +99,12 @@ func (repository *RatingRepo) GetSummaryRating(doctorId uint) (ratingEntities.Ra
 	if err != nil {
 		return ratingEntities.Rating{}, constants.ErrServer
 	}
-	if fiveStarCount != 0 && fourStarCount != 0 && threeStarCount != 0 && twoStarCount != 0 && oneStarCount != 0 {
-		average = float64((oneStarCount + twoStarCount*2 + threeStarCount*3 + fourStarCount*4 + fiveStarCount*5) / (oneStarCount + twoStarCount + threeStarCount + fourStarCount + fiveStarCount))
-	}else{
+
+	total := (oneStarCount + twoStarCount + threeStarCount + fourStarCount + fiveStarCount)
+	if total == 0 {
 		average = 0
+	}else{
+		average = float64((oneStarCount + twoStarCount*2 + threeStarCount*3 + fourStarCount*4 + fiveStarCount*5) / total)
 	}
 	
 	result := ratingEntities.Rating{

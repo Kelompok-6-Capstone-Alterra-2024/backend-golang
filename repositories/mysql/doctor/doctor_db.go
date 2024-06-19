@@ -19,12 +19,12 @@ type Doctor struct {
 	ProfilePicture   string `gorm:"type:varchar(255)"`
 	Balance          int    `gorm:"type:int;default:0"`
 	Experience       int    `gorm:"type:int"`
-	Almamater        string `gorm:"type:varchar(100)"`
-	GraduationYear   int    `gorm:"type:int"`
+	BachelorAlmamater string `gorm:"type:varchar(100)"`
+	BachelorGraduationYear int    `gorm:"type:int"`
+	MasterAlmamater        string `gorm:"type:varchar(100)"`
+	MasterGraduationYear   int    `gorm:"type:int"`
 	PracticeLocation string `gorm:"type:text"`
 	PracticeCity     string `gorm:"type:varchar(100)"`
-	PracticeProvince string `gorm:"type:varchar(100)"`
-	StrNumber        string `gorm:"type:varchar(100)"`
 	Fee              int    `gorm:"type:int"`
 	Specialist       string `gorm:"type:varchar(100)"`
 	IsOauth          bool   `gorm:"type:boolean;default:false"`
@@ -45,12 +45,12 @@ func (doctor *Doctor) ToEntities() *doctorEntities.Doctor {
 		ProfilePicture:   doctor.ProfilePicture,
 		Balance:          doctor.Balance,
 		Experience:       doctor.Experience,
-		Almamater:        doctor.Almamater,
-		GraduationYear:   doctor.GraduationYear,
+		BachelorAlmamater: doctor.BachelorAlmamater,
+		BachelorGraduationYear: doctor.BachelorGraduationYear,
+		MasterAlmamater: doctor.MasterAlmamater,
+		MasterGraduationYear: doctor.MasterGraduationYear,
 		PracticeLocation: doctor.PracticeLocation,
 		PracticeCity:     doctor.PracticeCity,
-		PracticeProvince: doctor.PracticeProvince,
-		StrNumber:        doctor.StrNumber,
 		Fee:              doctor.Fee,
 		Specialist:       doctor.Specialist,
 		Amount:           doctor.Amount,
@@ -69,12 +69,12 @@ func ToDoctorModel(request *doctorEntities.Doctor) *Doctor {
 		ProfilePicture:   request.ProfilePicture,
 		Balance:          request.Balance,
 		Experience:       request.Experience,
-		Almamater:        request.Almamater,
-		GraduationYear:   request.GraduationYear,
+		BachelorAlmamater: request.BachelorAlmamater,
+		BachelorGraduationYear: request.BachelorGraduationYear,
+		MasterAlmamater: request.MasterAlmamater,
+		MasterGraduationYear: request.MasterGraduationYear,
 		PracticeLocation: request.PracticeLocation,
 		PracticeCity:     request.PracticeCity,
-		PracticeProvince: request.PracticeProvince,
-		StrNumber:        request.StrNumber,
 		Specialist:       request.Specialist,
 		Amount:           request.Amount,
 	}

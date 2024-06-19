@@ -17,12 +17,12 @@ type DoctorRegisterRequest struct {
 	Gender           string                `json:"gender" form:"gender"`
 	ProfilePicture   *multipart.FileHeader `json:"profile_picture" form:"profile_picture"`
 	Experience       int                   `json:"experience" form:"experience"`
-	Almamater        string                `json:"almamater" form:"almamater"`
-	GraduationYear   int                   `json:"graduation_year" form:"graduation_year"`
+	BachelorAlmamater string                `json:"bachelor_almamater" form:"bachelor_almamater"`
+	BachelorGraduationYear int                  `json:"bachelor_graduation_year" form:"bachelor_graduation_year"`
+	MasterAlmamater string                `json:"master_almamater" form:"master_almamater"`
+	MasterGraduationYear int                  `json:"master_graduation_year" form:"master_graduation_year"`
 	PracticeLocation string                `json:"practice_location" form:"practice_location"`
 	PracticeCity     string                `json:"practice_city" form:"practice_city"`
-	PracticeProvince string                `json:"practice_province" form:"practice_province"`
-	StrNumber        string                `json:"str_number" form:"str_number"`
 	Fee              int                   `json:"fee" form:"fee"`
 	Specialist       string                `json:"specialist" form:"specialist"`
 }
@@ -47,12 +47,12 @@ func (r *DoctorRegisterRequest) ToDoctorEntities() (*doctor.Doctor, error) {
 		PhoneNumber:      r.PhoneNumber,
 		Gender:           r.Gender,
 		Experience:       r.Experience,
-		Almamater:        r.Almamater,
-		GraduationYear:   r.GraduationYear,
+		BachelorAlmamater: r.BachelorAlmamater,
+		BachelorGraduationYear: r.BachelorGraduationYear,
+		MasterAlmamater: r.MasterAlmamater,
+		MasterGraduationYear: r.MasterGraduationYear,
 		PracticeLocation: r.PracticeLocation,
 		PracticeCity:     r.PracticeCity,
-		PracticeProvince: r.PracticeProvince,
-		StrNumber:        r.StrNumber,
 		Fee:              r.Fee,
 		Specialist:       r.Specialist,
 	}, nil

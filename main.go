@@ -53,9 +53,10 @@ import (
 	storyUseCase "capstone/usecases/story"
 	transactionUseCase "capstone/usecases/transaction"
 	userUseCase "capstone/usecases/user"
+	"log"
+
 	"github.com/go-co-op/gocron/v2"
 	"github.com/go-playground/validator/v10"
-	"log"
 
 	"github.com/labstack/echo/v4"
 )
@@ -93,7 +94,7 @@ func main() {
 
 	userUC := userUseCase.NewUserUseCase(userRepo, oauthConfig, oauthConfigFB)
 	notificationUC := notificationUseCase.NewNotificationUseCase(notificationRepo)
-	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo, oauthConfigDoctor, oauthConfigFBDoctor)
+	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo, ratingRepo ,oauthConfigDoctor, oauthConfigFBDoctor)
 	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo, transactionRepo, userUC, doctorRepo, validate, chatRepo)
 	storyUC := storyUseCase.NewStoryUseCase(storyRepo)
 	complaintUC := complaintUseCase.NewComplaintUseCase(complaintRepo, notificationUC, consultationUC)

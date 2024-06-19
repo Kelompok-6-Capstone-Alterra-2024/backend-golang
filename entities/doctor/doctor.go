@@ -19,17 +19,18 @@ type Doctor struct {
 	ProfilePicture   string
 	Balance          int
 	Experience       int
-	Almamater        string
-	GraduationYear   int
+	BachelorAlmamater string
+	BachelorGraduationYear int
+	MasterAlmamater        string
+	MasterGraduationYear   int
 	PracticeLocation string
 	PracticeCity     string
-	PracticeProvince string
-	StrNumber        string
 	Fee              int
 	Specialist       string
 	Token            string
 	IsOauth          bool
 	Amount           int
+	RatingPrecentage float64
 }
 
 type DoctorRepositoryInterface interface {
@@ -79,14 +80,15 @@ func (r *Doctor) ToDoctorResponse() *response.DoctorResponse {
 		ProfilePicture:   r.ProfilePicture,
 		Balance:          r.Balance,
 		Experience:       r.Experience,
-		Almamater:        r.Almamater,
-		GraduationYear:   r.GraduationYear,
+		BachelorAlmamater: r.BachelorAlmamater,
+		BachelorGraduationYear: r.BachelorGraduationYear,
+		MasterAlmamater: r.MasterAlmamater,
+		MasterGraduationYear: r.MasterGraduationYear,
 		PracticeLocation: r.PracticeLocation,
 		PracticeCity:     r.PracticeCity,
-		PracticeProvince: r.PracticeProvince,
-		StrNumber:        r.StrNumber,
 		Fee:              r.Fee,
 		Specialist:       r.Specialist,
 		Amount:           r.Amount,
+		RatingPrecentage: r.RatingPrecentage,
 	}
 }
