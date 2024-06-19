@@ -135,6 +135,21 @@ func (postController *PostController) LikePost(c echo.Context) error {
 	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success Like Post", nil))
 }
 
+func (postController *PostController) UnlikePost(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	var postLikeReq request.PostLikeRequest
+	c.Bind(&postLikeReq)
+
+	err := postController.postUseCase.UnlikePost(uint(postLikeReq.PostId), uint(userId))
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Unlike Post", nil))
+}
+
 func (postController *PostController) SendComment(c echo.Context) error {
 	token := c.Request().Header.Get("Authorization")
 	userId, _ := utilities.GetUserIdFromToken(token)

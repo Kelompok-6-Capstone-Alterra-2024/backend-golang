@@ -171,6 +171,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("posts/:id", r.postController.GetPostById)                        // Get Post By ID
 	userRoute.POST("posts", r.postController.SendPost)                              // Create Post
 	userRoute.POST("posts/like", r.postController.LikePost)                         // Like Post
+	userRoute.DELETE("posts/like", r.postController.UnlikePost)                      // Unlike Post
 	userRoute.POST("comments", r.postController.SendComment)                        // Create Comment
 	userRoute.GET("posts/:postId/comments", r.postController.GetAllCommentByPostId) // Get All Comment By Post ID
 
@@ -179,6 +180,9 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("articles/:id", r.articleController.GetArticleById)
 	userRoute.GET("articles/liked", r.articleController.GetLikedArticle)
 	userRoute.POST("articles/like", r.articleController.LikeArticle)
+
+	// Profiles
+	userRoute.GET("profiles", r.userController.GetDetailedProfile) // Get Profile By User ID
 
 	// Consultation Notes
 	userRoute.GET("consultation-notes/consultation/:chatId", r.consultationController.GetConsultationNotesByID) // Get Consultation Note By ID
