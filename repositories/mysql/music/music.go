@@ -203,6 +203,15 @@ func (m *MusicRepo) LikeMusic(musicId int, userId int) error {
 	return nil
 }
 
+func (m *MusicRepo) UnlikeMusic(musicId int, userId int) error {
+	err := m.db.Where("music_id = ? AND user_id = ?", musicId, userId).Delete(&MusicLikes{}).Error
+	if err != nil {
+		return constants.ErrServer
+	}
+
+	return nil
+}
+
 func (m *MusicRepo) CountMusicByDoctorId(doctorId int) (int, error) {
 	var counter int64
 	err := m.db.Model(&Music{}).Where("doctor_id = ?", doctorId).Count(&counter).Error

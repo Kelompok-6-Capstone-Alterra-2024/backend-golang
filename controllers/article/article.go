@@ -188,6 +188,28 @@ func (controller *ArticleController) LikeArticle(c echo.Context) error {
 	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success Like Article", nil))
 }
 
+func (controller *ArticleController) UnlikeArticle(c echo.Context) error {
+	var req request.ArticleLike
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("Invalid request body"))
+	}
+
+	token := c.Request().Header.Get("Authorization")
+	userId, err := utilities.GetUserIdFromToken(token)
+
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, base.NewErrorResponse("Invalid token"))
+	}
+
+	err = controller.articleUseCase.UnlikeArticle(req.ArticleID, userId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Unlike Article", nil))
+}
+
 func (controller *ArticleController) GetArticleByIdForDoctor(c echo.Context) error {
 	articleId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

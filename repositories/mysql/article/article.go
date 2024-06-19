@@ -239,6 +239,15 @@ func (repository *ArticleRepo) LikeArticle(articleId int, userId int) error {
 	return nil
 }
 
+func (repository *ArticleRepo) UnlikeArticle(articleId int, userId int) error {
+	var articleLikes ArticleLikes
+	err := repository.db.Where("user_id = ? AND article_id = ?", userId, articleId).Delete(&articleLikes).Error
+	if err != nil {
+		return constants.ErrServer
+	}
+	return nil
+}
+
 func (repository *ArticleRepo) GetArticleByIdForDoctor(articleId int) (articleEntities.Article, error) {
 	var articleDb Article
 	err := repository.db.Where("id = ?", articleId).First(&articleDb).Error

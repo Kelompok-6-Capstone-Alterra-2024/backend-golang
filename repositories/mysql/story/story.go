@@ -177,6 +177,15 @@ func (repository *StoriesRepo) LikeStory(storyId int, userId int) error {
 	return nil
 }
 
+func (repository *StoriesRepo) UnlikeStory(storyId int, userId int) error {
+	err := repository.DB.Where("user_id = ? AND story_id = ?", userId, storyId).Delete(&StoryLikes{}).Error
+	if err != nil {
+		return constants.ErrServer
+	}
+
+	return nil
+}
+
 func (repository *StoriesRepo) CountStoriesByDoctorId(doctorId int) (int, error) {
 	var counter int64
 	err := repository.DB.Model(&Story{}).Where("doctor_id = ?", doctorId).Count(&counter).Error
