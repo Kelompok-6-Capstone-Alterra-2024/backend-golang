@@ -13,7 +13,10 @@ type ConsultationRequest struct {
 }
 
 func (r ConsultationRequest) ToEntities(consultationDate, consultationTime time.Time) *consultation.Consultation {
-	timeLocation, _ := time.LoadLocation("Asia/Jakarta")
+	timeLocation, err := time.LoadLocation("Asia/Jakarta")
+	if err != nil {
+		timeLocation = time.Local
+	}
 	newDate := time.Date(consultationDate.Year(), consultationDate.Month(), consultationDate.Day(), consultationTime.Hour(), consultationTime.Minute(), consultationTime.Second(), consultationTime.Nanosecond(), timeLocation)
 	return &consultation.Consultation{
 		DoctorID:  r.DoctorID,
