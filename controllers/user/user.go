@@ -225,3 +225,31 @@ func (c *UserController) ChangeEmail(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Change Email", nil))
 }
+
+func (c *UserController) GetDetailedProfile(ctx echo.Context) error {
+	token := ctx.Request().Header.Get("Authorization")
+	userId, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return ctx.JSON(http.StatusUnauthorized, base.NewErrorResponse("Invalid token"))
+	}
+
+	user, err := c.userUseCase.GetDetailedProfile(userId)
+	if err != nil {
+		return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	userResp := response.UserDetailedResponse{
+		Id:             user.Id,
+		Email:          user.Email,
+		Name:           user.Name,
+		Username:       user.Username,
+		Address:        user.Address,
+		Bio:            user.Bio,
+		PhoneNumber:    user.PhoneNumber,
+		Gender:         user.Gender,
+		Age:            user.Age,
+		ProfilePicture: user.ProfilePicture,
+	}
+
+	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Detailed Profile", userResp))
+}

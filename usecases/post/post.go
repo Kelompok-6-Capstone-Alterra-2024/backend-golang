@@ -66,6 +66,18 @@ func (postUseCase *PostUseCase) LikePost(postId uint, userId uint) error {
 	return nil
 }
 
+func (postUseCase *PostUseCase) UnlikePost(postId uint, userId uint) error {
+	if postId == 0 {
+		return constants.ErrEmptyInputLike
+	}
+
+	err := postUseCase.postRepository.UnlikePost(postId, userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (postUseCase *PostUseCase) SendComment(comment postEntities.PostComment) (postEntities.PostComment, error) {
 	if comment.PostID == 0 || comment.Content == "" {
 		return postEntities.PostComment{}, constants.ErrEmptyInputComment

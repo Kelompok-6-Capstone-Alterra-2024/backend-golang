@@ -32,6 +32,7 @@ type RepositoryInterface interface {
 	UpdateUserProfile(user *User) (User, error)
 	ChangePassword(userId int, oldPassword, newPassword string) error
 	ChangeEmail(userId int, email string) error
+	GetDetailedProfile(id int) (User, error)
 }
 
 type UseCaseInterface interface {
@@ -48,4 +49,5 @@ type UseCaseInterface interface {
 	UpdateUserProfile(user *User) (User, error)
 	ChangePassword(userId int, oldPassword, newPassword string) error
 	ChangeEmail(userId int, newEmail string) error
+	GetDetailedProfile(id int) (User, error)
 }

@@ -234,3 +234,25 @@ func (r *UserRepo) ChangeEmail(userId int, email string) error {
 	}
 	return nil
 }
+
+func (r *UserRepo) GetDetailedProfile(id int) (userEntities.User, error) {
+	var userDB User
+	if err := r.DB.Where("id = ?", id).First(&userDB).Error; err != nil {
+		return userEntities.User{}, err
+	}
+
+	return userEntities.User{
+		Id:             userDB.Id,
+		Name:           userDB.Name,
+		Username:       userDB.Username,
+		Email:          userDB.Email,
+		Address:        userDB.Address,
+		Bio:            userDB.Bio,
+		PhoneNumber:    userDB.PhoneNumber,
+		Gender:         userDB.Gender,
+		Age:            userDB.Age,
+		ProfilePicture: userDB.ProfilePicture,
+		IsOauth:        userDB.IsOauth,
+		Points:         userDB.Points,
+	}, nil
+}

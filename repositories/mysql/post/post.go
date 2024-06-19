@@ -5,7 +5,6 @@ import (
 	postEntities "capstone/entities/post"
 	userEntities "capstone/entities/user"
 	"capstone/repositories/mysql/user"
-	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -37,15 +36,10 @@ func (postRepo *PostRepo) GetAllPostsByForumId(forumId uint, metadata entities.M
 			return []postEntities.Post{}, err
 		}
 
-		fmt.Println(post.ID)
-		fmt.Println(userId)
-
 		err = postRepo.db.Model(PostLike{}).Where("post_id = ? AND user_id = ?", post.ID, userId).Count(&helpers[i]).Error
 		if err != nil {
 			return []postEntities.Post{}, err
 		}
-
-		fmt.Println(helpers[i])
 
 		if helpers[i] > 0 {
 			isLikeds[i] = true
@@ -146,6 +140,14 @@ func (postRepo *PostRepo) LikePost(postId uint, userId uint) error {
 	postLikeDB.UserID = userId
 
 	err := postRepo.db.Create(&postLikeDB).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (postRepo *PostRepo) UnlikePost(postId uint, userId uint) error {
+	err := postRepo.db.Where("post_id = ? AND user_id = ?", postId, userId).Delete(&PostLike{}).Error
 	if err != nil {
 		return err
 	}

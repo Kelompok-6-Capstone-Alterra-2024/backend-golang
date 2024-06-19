@@ -287,3 +287,12 @@ func (u *UserUseCase) ChangeEmail(userId int, newEmail string) error {
 	}
 	return nil
 }
+
+func (u *UserUseCase) GetDetailedProfile(id int) (userEntitites.User, error) {
+	user, err := u.repository.GetDetailedProfile(id)
+	if err != nil {
+		return userEntitites.User{}, err
+	}
+
+	return user, nil
+}

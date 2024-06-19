@@ -32,6 +32,7 @@ type RepositoryInterface interface {
 	GetPostById(postId uint, userId uint) (Post, error)
 	SendPost(post Post) (Post, error)
 	LikePost(postId uint, userId uint) error
+	UnlikePost(postId uint, userId uint) error
 	SendComment(comment PostComment) (PostComment, error)
 	GetAllCommentByPostId(postId uint, metadata entities.Metadata) ([]PostComment, error)
 }
@@ -41,6 +42,7 @@ type UseCaseInterface interface {
 	GetPostById(postId uint, userId uint) (Post, error)
 	SendPost(post Post, file *multipart.FileHeader) (Post, error)
 	LikePost(postId uint, userId uint) error
+	UnlikePost(postId uint, userId uint) error
 	SendComment(comment PostComment) (PostComment, error)
 	GetAllCommentByPostId(postId uint, metadata entities.Metadata) ([]PostComment, error)
 }
