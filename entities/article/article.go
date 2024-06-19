@@ -27,6 +27,7 @@ type ArticleRepositoryInterface interface {
 	GetArticleById(articleId int, userId int) (Article, error)
 	GetLikedArticle(metadata entities.Metadata, userId int) ([]Article, error)
 	LikeArticle(articleId int, userId int) error
+	UnlikeArticle(articleId int, userId int) error
 	GetArticleByIdForDoctor(articleId int) (Article, error)
 	GetAllArticleByDoctorId(metadata entities.MetadataFull, doctorId int) ([]Article, error)
 	CountArticleByDoctorId(doctorId int) (int, error)
@@ -44,6 +45,7 @@ type ArticleUseCaseInterface interface {
 	GetArticleById(articleId int, userId int) (Article, error)
 	GetLikedArticle(metadata entities.Metadata, userId int) ([]Article, error)
 	LikeArticle(articleId int, userId int) error
+	UnlikeArticle(articleId int, userId int) error
 	GetArticleByIdForDoctor(articleId int) (Article, error)
 	GetAllArticleByDoctorId(metadata entities.MetadataFull, doctorId int) ([]Article, error)
 	CountArticleByDoctorId(doctorId int) (int, error)

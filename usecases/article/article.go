@@ -68,6 +68,14 @@ func (useCase *ArticleUseCase) LikeArticle(articleId int, userId int) error {
 	return nil
 }
 
+func (useCase *ArticleUseCase) UnlikeArticle(articleId int, userId int) error {
+	err := useCase.articleRepository.UnlikeArticle(articleId, userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (useCase *ArticleUseCase) GetArticleByIdForDoctor(articleId int) (articleEntities.Article, error) {
 	articles, err := useCase.articleRepository.GetArticleByIdForDoctor(articleId)
 	if err != nil {

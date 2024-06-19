@@ -24,6 +24,7 @@ type RepositoryInterface interface {
 	GetStoryById(storyId int, userId int) (Story, error)
 	GetLikedStories(metadata entities.Metadata, userId int) ([]Story, error)
 	LikeStory(storyId int, userId int) error
+	UnlikeStory(storyId int, userId int) error
 	CountStoriesByDoctorId(doctorId int) (int, error)
 	CountStoryLikesByDoctorId(doctorId int) (int, error)
 	CountStoryViewByDoctorId(doctorId int) (int, error)
@@ -40,6 +41,7 @@ type UseCaseInterface interface {
 	GetStoryById(storyId int, userId int) (Story, error)
 	GetLikedStories(metadata entities.Metadata, userId int) ([]Story, error)
 	LikeStory(storyId int, userId int) error
+	UnlikeStory(storyId int, userId int) error
 	CountStoriesByDoctorId(doctorId int) (int, error)
 	CountStoryLikesByDoctorId(doctorId int) (int, error)
 	CountStoryViewByDoctorId(doctorId int) (int, error)

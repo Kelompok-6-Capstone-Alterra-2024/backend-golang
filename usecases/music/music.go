@@ -58,6 +58,14 @@ func (musicUseCase *MusicUseCase) LikeMusic(musicId int, userId int) error {
 	return nil
 }
 
+func (musicUseCase *MusicUseCase) UnlikeMusic(musicId int, userId int) error {
+	err := musicUseCase.musicInterface.UnlikeMusic(musicId, userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (musicUseCase *MusicUseCase) CountMusicByDoctorId(doctorId int) (int, error) {
 	count, err := musicUseCase.musicInterface.CountMusicByDoctorId(doctorId)
 	if err != nil {

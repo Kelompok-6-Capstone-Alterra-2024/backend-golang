@@ -160,6 +160,25 @@ func (musicController *MusicController) LikeMusic(c echo.Context) error {
 	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success Like Music", nil))
 }
 
+func (musicController *MusicController) UnlikeMusic(c echo.Context) error {
+	var req request.MusicLikeRequest
+
+	err := c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	err = musicController.musicUseCase.UnlikeMusic(req.MusicId, userId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Unlike Music", nil))
+}
+
 func (musicController *MusicController) CountMusicByDoctorId(c echo.Context) error {
 	token := c.Request().Header.Get("Authorization")
 	doctorId, _ := utilities.GetUserIdFromToken(token)

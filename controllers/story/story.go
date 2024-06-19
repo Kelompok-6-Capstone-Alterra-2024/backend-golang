@@ -140,6 +140,25 @@ func (storyController *StoryController) LikeStory(c echo.Context) error {
 	return c.JSON(http.StatusCreated, base.NewSuccessResponse("Success Like Story", nil))
 }
 
+func (storyController *StoryController) UnlikeStory(c echo.Context) error {
+	var req request.StoryLike
+
+	err := c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	token := c.Request().Header.Get("Authorization")
+	userId, _ := utilities.GetUserIdFromToken(token)
+
+	err = storyController.storyUseCase.UnlikeStory(req.StoryId, userId)
+	if err != nil {
+		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Unlike Story", nil))
+}
+
 func (storyController *StoryController) CountStoriesByDoctorId(c echo.Context) error {
 	token := c.Request().Header.Get("Authorization")
 	doctorId, _ := utilities.GetUserIdFromToken(token)

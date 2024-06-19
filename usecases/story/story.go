@@ -50,6 +50,14 @@ func (storiesUseCase *StoryUseCase) LikeStory(storyId int, userId int) error {
 	return nil
 }
 
+func (storiesUseCase *StoryUseCase) UnlikeStory(storyId int, userId int) error {
+	err := storiesUseCase.storyRepository.UnlikeStory(storyId, userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (storiesUseCase *StoryUseCase) CountStoriesByDoctorId(doctorId int) (int, error) {
 	count, err := storiesUseCase.storyRepository.CountStoriesByDoctorId(doctorId)
 	if err != nil {

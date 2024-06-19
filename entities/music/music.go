@@ -24,6 +24,7 @@ type RepositoryInterface interface {
 	GetMusicById(musicId int, userId int) (Music, error)
 	GetLikedMusics(metadata entities.Metadata, userId int) ([]Music, error)
 	LikeMusic(musicId int, userId int) error
+	UnlikeMusic(musicId int, userId int) error
 	CountMusicByDoctorId(doctorId int) (int, error)
 	CountMusicLikesByDoctorId(doctorId int) (int, error)
 	CountMusicViewCountByDoctorId(doctorId int) (int, error)
@@ -40,6 +41,7 @@ type UseCaseInterface interface {
 	GetMusicById(musicId int, userId int) (Music, error)
 	GetLikedMusics(metadata entities.Metadata, userId int) ([]Music, error)
 	LikeMusic(musicId int, userId int) error
+	UnlikeMusic(musicId int, userId int) error
 	CountMusicByDoctorId(doctorId int) (int, error)
 	CountMusicLikesByDoctorId(doctorId int) (int, error)
 	CountMusicViewCountByDoctorId(doctorId int) (int, error)
