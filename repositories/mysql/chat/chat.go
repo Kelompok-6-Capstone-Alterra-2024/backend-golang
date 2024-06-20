@@ -62,7 +62,7 @@ func (c *ChatRepo) GetAllChatByUserId(userId int, metadata entities.Metadata, st
 		query = query.Where("consultation_id IN ?", consultationIds)
 	}
 
-	err = query.Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&chatDB).Error
+	err = query.Order("created_at DESC").Limit(metadata.Limit).Offset((metadata.Page - 1) * metadata.Limit).Find(&chatDB).Error
 	if err != nil {
 		return nil, err
 	}
