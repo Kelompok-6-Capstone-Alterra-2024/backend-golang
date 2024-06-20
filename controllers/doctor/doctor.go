@@ -7,9 +7,10 @@ import (
 	doctorUseCase "capstone/entities/doctor"
 	"capstone/utilities"
 	"capstone/utilities/base"
-	"github.com/go-playground/validator/v10"
 	"net/http"
 	"strconv"
+
+	"github.com/go-playground/validator/v10"
 
 	"github.com/labstack/echo/v4"
 )
@@ -200,12 +201,12 @@ func (c *DoctorController) UpdateDoctorProfile(ctx echo.Context) error {
 		Gender:           doctorFromRequest.Gender,
 		ProfilePicture:   imageURL,
 		Experience:       doctorFromRequest.Experience,
-		Almamater:        doctorFromRequest.Almamater,
-		GraduationYear:   doctorFromRequest.GraduationYear,
+		BachelorAlmamater: doctorFromRequest.BachelorAlmamater,
+		BachelorGraduationYear: doctorFromRequest.BachelorGraduationYear,
+		MasterAlmamater:        doctorFromRequest.MasterAlmamater,
+		MasterGraduationYear:   doctorFromRequest.MasterGraduationYear,
 		PracticeLocation: doctorFromRequest.PracticeLocation,
 		PracticeCity:     doctorFromRequest.PracticeCity,
-		PracticeProvince: doctorFromRequest.PracticeProvince,
-		StrNumber:        doctorFromRequest.StrNumber,
 		Fee:              doctorFromRequest.Fee,
 		Specialist:       doctorFromRequest.Specialist,
 	}
@@ -225,12 +226,12 @@ func (c *DoctorController) UpdateDoctorProfile(ctx echo.Context) error {
 		Gender:           updatedDoctor.Gender,
 		ProfilePicture:   updatedDoctor.ProfilePicture,
 		Experience:       updatedDoctor.Experience,
-		Almamater:        updatedDoctor.Almamater,
-		GraduationYear:   updatedDoctor.GraduationYear,
+		BachelorAlmamater: updatedDoctor.BachelorAlmamater,
+		BachelorGraduationYear: updatedDoctor.BachelorGraduationYear,
+		MasterAlmamater: updatedDoctor.MasterAlmamater,
+		MasterGraduationYear: updatedDoctor.MasterGraduationYear,
 		PracticeLocation: updatedDoctor.PracticeLocation,
 		PracticeCity:     updatedDoctor.PracticeCity,
-		PracticeProvince: updatedDoctor.PracticeProvince,
-		StrNumber:        updatedDoctor.StrNumber,
 		Fee:              updatedDoctor.Fee,
 		Specialist:       updatedDoctor.Specialist,
 	}

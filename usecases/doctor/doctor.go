@@ -4,6 +4,7 @@ import (
 	"capstone/constants"
 	"capstone/entities"
 	doctorEntities "capstone/entities/doctor"
+	ratingEntities "capstone/entities/rating"
 	"capstone/middlewares"
 	"capstone/utilities"
 	"context"
@@ -17,13 +18,15 @@ import (
 
 type DoctorUseCase struct {
 	doctorRepository doctorEntities.DoctorRepositoryInterface
+	ratingRepository ratingEntities.RepositoryInterface
 	oauthConfig      *myoauth.Config
 	oauthConfigFB    *myoauth.Config
 }
 
-func NewDoctorUseCase(doctorRepository doctorEntities.DoctorRepositoryInterface, oauthConfig *myoauth.Config, oauthConfigFB *myoauth.Config) doctorEntities.DoctorUseCaseInterface {
+func NewDoctorUseCase(doctorRepository doctorEntities.DoctorRepositoryInterface, ratingRepository ratingEntities.RepositoryInterface ,oauthConfig *myoauth.Config, oauthConfigFB *myoauth.Config) doctorEntities.DoctorUseCaseInterface {
 	return &DoctorUseCase{
 		doctorRepository: doctorRepository,
+		ratingRepository: ratingRepository,
 		oauthConfig:      oauthConfig,
 		oauthConfigFB:    oauthConfigFB,
 	}
@@ -71,6 +74,11 @@ func (usecase *DoctorUseCase) GetDoctorByID(doctorID int) (*doctorEntities.Docto
 	if err != nil {
 		return nil, err
 	}
+
+	ratingResult, _ := usecase.ratingRepository.GetSummaryRating(result.ID)
+
+	result.RatingPrecentage = (ratingResult.Average / 5) * 100
+
 	return result, nil
 }
 
@@ -79,6 +87,17 @@ func (usecase *DoctorUseCase) GetAllDoctor(metadata *entities.Metadata) (*[]doct
 	if err != nil {
 		return nil, err
 	}
+
+	ratingResult := make([]ratingEntities.Rating, len(*result))
+
+	for i, doctor := range *result {
+		ratingResult[i], _ = usecase.ratingRepository.GetSummaryRating(doctor.ID)
+	}
+
+	for i, rating := range ratingResult {
+		(*result)[i].RatingPrecentage = (rating.Average / 5) * 100
+	}
+
 	return result, nil
 }
 
@@ -87,6 +106,17 @@ func (usecase *DoctorUseCase) GetActiveDoctor(metadata *entities.Metadata) (*[]d
 	if err != nil {
 		return nil, err
 	}
+
+	ratingResult := make([]ratingEntities.Rating, len(*result))
+
+	for i, doctor := range *result {
+		ratingResult[i], _ = usecase.ratingRepository.GetSummaryRating(doctor.ID)
+	}
+
+	for i, rating := range ratingResult {
+		(*result)[i].RatingPrecentage = (rating.Average / 5) * 100
+	}
+
 	return result, nil
 }
 
@@ -200,6 +230,17 @@ func (usecase *DoctorUseCase) SearchDoctor(search string, metadata *entities.Met
 	if err != nil {
 		return nil, err
 	}
+
+	ratingResult := make([]ratingEntities.Rating, len(*result))
+
+	for i, doctor := range *result {
+		ratingResult[i], _ = usecase.ratingRepository.GetSummaryRating(doctor.ID)
+	}
+
+	for i, rating := range ratingResult {
+		(*result)[i].RatingPrecentage = (rating.Average / 5) * 100
+	}
+
 	return result, nil
 }
 

@@ -166,12 +166,12 @@ func (r *DoctorRepo) UpdateDoctorProfile(doctor *doctorEntities.Doctor) (doctorE
 	existingDoctor.Gender = doctor.Gender
 	existingDoctor.ProfilePicture = doctor.ProfilePicture
 	existingDoctor.Experience = doctor.Experience
-	existingDoctor.Almamater = doctor.Almamater
-	existingDoctor.GraduationYear = doctor.GraduationYear
+	existingDoctor.BachelorAlmamater = doctor.BachelorAlmamater
+	existingDoctor.BachelorGraduationYear = doctor.BachelorGraduationYear
+	existingDoctor.MasterAlmamater = doctor.MasterAlmamater
+	existingDoctor.MasterGraduationYear = doctor.MasterGraduationYear
 	existingDoctor.PracticeLocation = doctor.PracticeLocation
 	existingDoctor.PracticeCity = doctor.PracticeCity
-	existingDoctor.PracticeProvince = doctor.PracticeProvince
-	existingDoctor.StrNumber = doctor.StrNumber
 	existingDoctor.Fee = doctor.Fee
 	existingDoctor.Specialist = doctor.Specialist
 
@@ -189,12 +189,12 @@ func (r *DoctorRepo) UpdateDoctorProfile(doctor *doctorEntities.Doctor) (doctorE
 		Gender:           existingDoctor.Gender,
 		ProfilePicture:   existingDoctor.ProfilePicture,
 		Experience:       existingDoctor.Experience,
-		Almamater:        existingDoctor.Almamater,
-		GraduationYear:   existingDoctor.GraduationYear,
+		BachelorAlmamater: existingDoctor.BachelorAlmamater,
+		BachelorGraduationYear: existingDoctor.BachelorGraduationYear,
+		MasterAlmamater: existingDoctor.MasterAlmamater,
+		MasterGraduationYear: existingDoctor.MasterGraduationYear,
 		PracticeLocation: existingDoctor.PracticeLocation,
 		PracticeCity:     existingDoctor.PracticeCity,
-		PracticeProvince: existingDoctor.PracticeProvince,
-		StrNumber:        existingDoctor.StrNumber,
 		Fee:              existingDoctor.Fee,
 		Specialist:       existingDoctor.Specialist,
 	}
