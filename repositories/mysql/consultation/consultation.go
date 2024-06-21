@@ -231,3 +231,26 @@ func (repository *ConsultationRepo) GetDoctorConsultationByID(consultationID int
 
 	return consultationDB.ToEntities(), nil
 }
+
+func (repository *ConsultationRepo) GetByComplaintID(complaintID int) (*consultationEntities.Consultation, error) {
+	var consultationDB Consultation
+	if err := repository.db.Preload("Complaint").First(&consultationDB, "complaint_id LIKE ?", complaintID).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	return consultationDB.ToEntities(), nil
+}
+
+func (repository *ConsultationRepo) GetDoctorConsultationByComplaint(metadata *entities.Metadata, doctorID int) (*[]consultationEntities.Consultation, error) {
+	var consultationDB []Consultation
+	if err := repository.db.Limit(metadata.Limit).Offset(metadata.Offset()).Preload("Complaint").Find(&consultationDB, "doctor_id LIKE ? AND complaint_id IS NOT NULL", doctorID).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	var consultations []consultationEntities.Consultation
+	for _, consultation := range consultationDB {
+		consultations = append(consultations, *consultation.ToEntities())
+	}
+
+	return &consultations, nil
+}

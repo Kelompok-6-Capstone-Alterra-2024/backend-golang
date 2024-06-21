@@ -66,6 +66,8 @@ type ConsultationRepository interface {
 	CreateConsultationNotes(consultationNotes ConsultationNotes) (ConsultationNotes, error)
 	GetConsultationNotesByID(consultationID int) (ConsultationNotes, error)
 	GetAllConsultation() *[]Consultation
+	GetByComplaintID(complaintID int) (*Consultation, error)
+	GetDoctorConsultationByComplaint(metadata *entities.Metadata, doctorID int) (*[]Consultation, error)
 }
 
 type ConsultationUseCase interface {
@@ -82,6 +84,8 @@ type ConsultationUseCase interface {
 	CreateConsultationNotes(consultationNotes ConsultationNotes) (ConsultationNotes, error)
 	CountConsultation(doctorID int) (*CountConsultation, error)
 	GetConsultationNotesByID(consultationID int) (ConsultationNotes, error)
+	GetByComplaintID(complaintID int) (*Consultation, error)
+	GetDoctorConsultationByComplaint(metadata *entities.Metadata, doctorID int) (*[]Consultation, error)
 }
 
 func (r *Consultation) ToUserResponse() *response.ConsultationUserResponse {

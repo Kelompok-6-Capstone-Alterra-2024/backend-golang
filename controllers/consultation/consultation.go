@@ -267,3 +267,16 @@ func (controller *ConsultationController) CountConsultation(c echo.Context) erro
 	}
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Count Consultation", count.ToResponse()))
 }
+
+func (controller *ConsultationController) GetByComplaintID(c echo.Context) error {
+	complaintID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse("Invalid ID"))
+	}
+	res, err := controller.consultationUseCase.GetConsultationByComplaintID(complaintID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation", res.ToDoctorResponse()))
+}
