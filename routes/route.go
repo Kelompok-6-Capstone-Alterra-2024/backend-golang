@@ -206,7 +206,6 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorAuth.POST("/login", r.doctorController.Login)                        //Login Doctor
 	doctorAuth.GET("/auth/google/login", r.doctorController.GoogleLogin)       // Google Login
 	doctorAuth.GET("/auth/google/callback", r.doctorController.GoogleCallback) // Google Callback
-	doctorAuth.PUT("/update-profile", r.doctorController.UpdateDoctorProfile)  // Update Doctor Profile
 
 	doctorAuth.GET("/auth/facebook/login", r.doctorController.FacebookLogin)
 	doctorAuth.GET("/auth/facebook/callback", r.doctorController.FacebookCallback)
@@ -300,4 +299,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.PUT("notifications/:notificationID", r.notificationController.UpdateToReadConsultation)
 	doctorRoute.DELETE("notifications/:notificationID", r.notificationController.DeleteToReadConsultation)
 
+	// Profiles
+	doctorRoute.PUT("profiles", r.doctorController.UpdateDoctorProfile)  // Update Doctor Profile
+	doctorRoute.GET("profiles", r.doctorController.GetDetailProfile)    // Get Detail Profile
 }

@@ -255,3 +255,19 @@ func (u *DoctorUseCase) UpdateDoctorProfile(doctor *doctorEntities.Doctor) (doct
 	}
 	return updatedDoctor, nil
 }
+
+func (u *DoctorUseCase) GetDetailProfile(doctorID uint) (doctorEntities.Doctor, error) {
+	doctor, err := u.doctorRepository.GetDetailProfile(doctorID)
+	if err != nil {
+		return doctorEntities.Doctor{}, err
+	}
+
+	rating, err := u.ratingRepository.GetSummaryRating(doctor.ID)
+	if err != nil {
+		return doctorEntities.Doctor{}, err
+	}
+
+	doctor.RatingPrecentage = (rating.Average / 5) * 100
+
+	return doctor, nil
+}
