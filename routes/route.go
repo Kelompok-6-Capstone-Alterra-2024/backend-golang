@@ -291,8 +291,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.DELETE("transactions/:id", r.transactionController.DeleteTransaction)         // Delete Transaction
 
 	// Patient
-	doctorRoute.GET("patients", r.complaintController.GetAllByDoctorID) // Get All Patient
-	doctorRoute.GET("patients/:id", r.complaintController.GetByComplaintID)
+	doctorRoute.GET("patients", r.complaintController.GetAllComplaint) // Get All Patient
+	doctorRoute.GET("patients/:id", r.complaintController.GetConsultationByComplaintID)
 	doctorRoute.GET("patients/search", r.complaintController.SearchComplaintByPatientName)
 
 	// Notification

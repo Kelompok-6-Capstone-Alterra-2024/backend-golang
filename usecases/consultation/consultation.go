@@ -229,3 +229,27 @@ func (usecase *ConsultationUseCase) GetDoctorConsultationByID(consultationID int
 	}
 	return result, nil
 }
+
+func (usecase *ConsultationUseCase) GetByComplaintID(complaintID int) (*consultationEntities.Consultation, error) {
+	result, err := usecase.consultationRepo.GetByComplaintID(complaintID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (usecase *ConsultationUseCase) GetDoctorConsultationByComplaint(metadata *entities.Metadata, doctorID int) (*[]consultationEntities.Consultation, error) {
+	result, err := usecase.consultationRepo.GetDoctorConsultationByComplaint(metadata, doctorID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (usecase *ConsultationUseCase) SearchConsultationByComplaintName(metadata *entities.Metadata, doctorID int, name string) (*[]consultationEntities.Consultation, error) {
+	result, err := usecase.consultationRepo.SearchConsultationByComplaintName(metadata, doctorID, name)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
