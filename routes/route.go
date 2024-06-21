@@ -173,7 +173,7 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.GET("posts/:id", r.postController.GetPostById)                        // Get Post By ID
 	userRoute.POST("posts", r.postController.SendPost)                              // Create Post
 	userRoute.POST("posts/like", r.postController.LikePost)                         // Like Post
-	userRoute.DELETE("posts/like", r.postController.UnlikePost)                      // Unlike Post
+	userRoute.DELETE("posts/like", r.postController.UnlikePost)                     // Unlike Post
 	userRoute.POST("comments", r.postController.SendComment)                        // Create Comment
 	userRoute.GET("posts/:postId/comments", r.postController.GetAllCommentByPostId) // Get All Comment By Post ID
 
@@ -251,8 +251,8 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.GET("consultations", r.consultationController.GetAllDoctorConsultation) //Get All Consultation
 	doctorRoute.GET("consultations/count", r.consultationController.CountConsultation)
 	doctorRoute.GET("consultations/today/count", r.consultationController.CountConsultationToday)
-	doctorRoute.GET("consultations/:id", r.consultationController.GetConsultationByID)      //Get Consultation By ID
-	doctorRoute.PUT("consultations/:id", r.consultationController.UpdateStatusConsultation) // Update Status Consultation
+	doctorRoute.GET("consultations/:id", r.consultationController.GetDoctorConsultationByID) //Get Consultation By ID
+	doctorRoute.PUT("consultations/:id", r.consultationController.UpdateStatusConsultation)  // Update Status Consultation
 
 	doctorRoute.GET("stories/view/count", r.storyController.CountStoryViewByDoctorId) // Count Stories View Count By Doctor ID
 	doctorRoute.PUT("stories/:id", r.storyController.EditStory)                       // Update Story

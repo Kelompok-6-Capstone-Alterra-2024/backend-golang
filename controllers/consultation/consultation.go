@@ -61,6 +61,15 @@ func (controller *ConsultationController) GetConsultationByID(c echo.Context) er
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation", consultationResponse.ToUserResponse()))
 }
 
+func (controller *ConsultationController) GetDoctorConsultationByID(c echo.Context) error {
+	consultationID, err := strconv.Atoi(c.Param("id"))
+	consultationResponse, err := controller.consultationUseCase.GetDoctorConsultationByID(consultationID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
+	}
+	return c.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Consultation", consultationResponse.ToDoctorResponse()))
+}
+
 func (controller *ConsultationController) GetAllConsultation(c echo.Context) error {
 	pageParam := c.QueryParam("page")
 	limitParam := c.QueryParam("limit")

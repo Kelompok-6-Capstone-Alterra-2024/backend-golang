@@ -165,7 +165,7 @@ func (usecase *ConsultationUseCase) GetConsultationNotesByID(chatID int) (consul
 	if err != nil {
 		return consultationEntities.ConsultationNotes{}, err
 	}
-	
+
 	result, err := usecase.consultationRepo.GetConsultationNotesByID(consultationID)
 	if err != nil {
 		return result, err
@@ -220,4 +220,12 @@ func (usecase *ConsultationUseCase) CountConsultation(doctorID int) (*consultati
 	countConsultation := consultationEntities.ToCountConsultation(totalConsultation, totalConsultationToday, totalConsultationActive, totalConsultationDone, totalConsultationRejected, totalConsultationIncoming, totalConsultationPending)
 
 	return &countConsultation, nil
+}
+
+func (usecase *ConsultationUseCase) GetDoctorConsultationByID(consultationID int) (*consultationEntities.Consultation, error) {
+	result, err := usecase.consultationRepo.GetDoctorConsultationByID(consultationID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }

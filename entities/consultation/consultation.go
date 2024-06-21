@@ -54,6 +54,7 @@ type CountConsultation struct {
 type ConsultationRepository interface {
 	CreateConsultation(consultation *Consultation) (*Consultation, error)
 	GetConsultationByID(consultationID int) (*Consultation, error)
+	GetDoctorConsultationByID(consultationID int) (*Consultation, error)
 	GetAllUserConsultation(metadata *entities.Metadata, userID int) (*[]Consultation, error)
 	UpdateStatusConsultation(consultation *Consultation) (*Consultation, error)
 	UpdatePaymentStatusConsultation(consultationID int, status string) error
@@ -70,6 +71,7 @@ type ConsultationRepository interface {
 type ConsultationUseCase interface {
 	CreateConsultation(consultation *Consultation) (*Consultation, error)
 	GetConsultationByID(consultationID int) (*Consultation, error)
+	GetDoctorConsultationByID(consultationID int) (*Consultation, error)
 	GetAllUserConsultation(metadata *entities.Metadata, userID int) (*[]Consultation, error)
 	UpdateStatusConsultation(consultation *Consultation) (*Consultation, error)
 	GetAllDoctorConsultation(metadata *entities.Metadata, doctorID int) (*[]Consultation, error)
