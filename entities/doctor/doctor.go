@@ -44,6 +44,7 @@ type DoctorRepositoryInterface interface {
 	UpdateAmount(doctorID uint, amount int) error
 	SearchDoctor(search string, metadata *entities.Metadata) (*[]Doctor, error)
 	UpdateDoctorProfile(doctor *Doctor) (Doctor, error)
+	GetDetailProfile(doctorID uint) (Doctor, error)
 }
 
 type DoctorUseCaseInterface interface {
@@ -58,6 +59,7 @@ type DoctorUseCaseInterface interface {
 	HandleFacebookCallback(ctx context.Context, code string) (Doctor, error)
 	SearchDoctor(search string, metadata *entities.Metadata) (*[]Doctor, error)
 	UpdateDoctorProfile(doctor *Doctor) (Doctor, error)
+	GetDetailProfile(doctorID uint) (Doctor, error)
 }
 
 func (r *Doctor) ToResponse() response.DoctorLoginAndRegisterResponse {

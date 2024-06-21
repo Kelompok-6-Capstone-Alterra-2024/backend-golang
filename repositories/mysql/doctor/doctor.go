@@ -159,20 +159,22 @@ func (r *DoctorRepo) UpdateDoctorProfile(doctor *doctorEntities.Doctor) (doctorE
 		return doctorEntities.Doctor{}, err
 	}
 
-	existingDoctor.Username = doctor.Username
+	// existingDoctor.Username = doctor.Username
 	existingDoctor.Name = doctor.Name
-	existingDoctor.Address = doctor.Address
-	existingDoctor.PhoneNumber = doctor.PhoneNumber
+	// existingDoctor.Address = doctor.Address
+	// existingDoctor.PhoneNumber = doctor.PhoneNumber
 	existingDoctor.Gender = doctor.Gender
-	existingDoctor.ProfilePicture = doctor.ProfilePicture
-	existingDoctor.Experience = doctor.Experience
+	if doctor.ProfilePicture != "" {
+		existingDoctor.ProfilePicture = doctor.ProfilePicture
+	}
+	// existingDoctor.Experience = doctor.Experience
 	existingDoctor.BachelorAlmamater = doctor.BachelorAlmamater
-	existingDoctor.BachelorGraduationYear = doctor.BachelorGraduationYear
+	// existingDoctor.BachelorGraduationYear = doctor.BachelorGraduationYear
 	existingDoctor.MasterAlmamater = doctor.MasterAlmamater
-	existingDoctor.MasterGraduationYear = doctor.MasterGraduationYear
+	// existingDoctor.MasterGraduationYear = doctor.MasterGraduationYear
 	existingDoctor.PracticeLocation = doctor.PracticeLocation
-	existingDoctor.PracticeCity = doctor.PracticeCity
-	existingDoctor.Fee = doctor.Fee
+	// existingDoctor.PracticeCity = doctor.PracticeCity
+	// existingDoctor.Fee = doctor.Fee
 	existingDoctor.Specialist = doctor.Specialist
 
 	if err := r.db.Save(&existingDoctor).Error; err != nil {
@@ -200,4 +202,35 @@ func (r *DoctorRepo) UpdateDoctorProfile(doctor *doctorEntities.Doctor) (doctorE
 	}
 
 	return updatedDoctor, nil
+}
+
+func (r *DoctorRepo) GetDetailProfile(doctorID uint) (doctorEntities.Doctor, error) {
+	var doctorDB Doctor
+	if err := r.db.Where("id = ?", doctorID).First(&doctorDB).Error; err != nil {
+		return doctorEntities.Doctor{}, err
+	}
+
+	var doctorEnt doctorEntities.Doctor
+	doctorEnt.ID = doctorDB.ID
+	doctorEnt.Username = doctorDB.Username
+	doctorEnt.Email = doctorDB.Email
+	doctorEnt.Name = doctorDB.Name
+	doctorEnt.Address = doctorDB.Address
+	doctorEnt.PhoneNumber = doctorDB.PhoneNumber
+	doctorEnt.Gender = doctorDB.Gender
+	doctorEnt.IsAvailable = doctorDB.IsAvailable
+	doctorEnt.ProfilePicture = doctorDB.ProfilePicture
+	doctorEnt.Balance = doctorDB.Balance
+	doctorEnt.Experience = doctorDB.Experience
+	doctorEnt.BachelorAlmamater = doctorDB.BachelorAlmamater
+	doctorEnt.BachelorGraduationYear = doctorDB.BachelorGraduationYear
+	doctorEnt.MasterAlmamater = doctorDB.MasterAlmamater
+	doctorEnt.MasterGraduationYear = doctorDB.MasterGraduationYear
+	doctorEnt.PracticeLocation = doctorDB.PracticeLocation
+	doctorEnt.PracticeCity = doctorDB.PracticeCity
+	doctorEnt.Fee = doctorDB.Fee
+	doctorEnt.Specialist = doctorDB.Specialist
+	doctorEnt.Amount = doctorDB.Amount
+
+	return doctorEnt, nil
 }

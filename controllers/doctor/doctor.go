@@ -194,20 +194,20 @@ func (c *DoctorController) UpdateDoctorProfile(ctx echo.Context) error {
 
 	doctorEntities := doctorUseCase.Doctor{
 		ID:               uint(doctorID),
-		Username:         doctorFromRequest.Username,
+		// Username:         doctorFromRequest.Username,
 		Name:             doctorFromRequest.Name,
-		Address:          doctorFromRequest.Address,
-		PhoneNumber:      doctorFromRequest.PhoneNumber,
+		// Address:          doctorFromRequest.Address,
+		// PhoneNumber:      doctorFromRequest.PhoneNumber,
 		Gender:           doctorFromRequest.Gender,
 		ProfilePicture:   imageURL,
-		Experience:       doctorFromRequest.Experience,
+		// Experience:       doctorFromRequest.Experience,
 		BachelorAlmamater: doctorFromRequest.BachelorAlmamater,
-		BachelorGraduationYear: doctorFromRequest.BachelorGraduationYear,
+		// BachelorGraduationYear: doctorFromRequest.BachelorGraduationYear,
 		MasterAlmamater:        doctorFromRequest.MasterAlmamater,
-		MasterGraduationYear:   doctorFromRequest.MasterGraduationYear,
+		// MasterGraduationYear:   doctorFromRequest.MasterGraduationYear,
 		PracticeLocation: doctorFromRequest.PracticeLocation,
-		PracticeCity:     doctorFromRequest.PracticeCity,
-		Fee:              doctorFromRequest.Fee,
+		// PracticeCity:     doctorFromRequest.PracticeCity,
+		// Fee:              doctorFromRequest.Fee,
 		Specialist:       doctorFromRequest.Specialist,
 	}
 
@@ -237,4 +237,43 @@ func (c *DoctorController) UpdateDoctorProfile(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Update Profile", doctorResponse))
+}
+
+func (c *DoctorController) GetDetailProfile(ctx echo.Context) error {
+	token := ctx.Request().Header.Get("Authorization")
+	doctorID, err := utilities.GetUserIdFromToken(token)
+	if err != nil {
+		return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	doctor, err := c.doctorUseCase.GetDetailProfile(uint(doctorID))
+	if err != nil {
+		return ctx.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
+	}
+
+	doctorResponse := response.DoctorResponse{
+		ID:               doctor.ID,
+		Username:         doctor.Username,
+		Email:            doctor.Email,
+		Name:             doctor.Name,
+		Address:          doctor.Address,
+		PhoneNumber:      doctor.PhoneNumber,
+		Gender:           doctor.Gender,
+		ProfilePicture:   doctor.ProfilePicture,
+		Experience:       doctor.Experience,
+		BachelorAlmamater: doctor.BachelorAlmamater,
+		BachelorGraduationYear: doctor.BachelorGraduationYear,
+		MasterAlmamater: doctor.MasterAlmamater,
+		MasterGraduationYear: doctor.MasterGraduationYear,
+		PracticeLocation: doctor.PracticeLocation,
+		PracticeCity:     doctor.PracticeCity,
+		Fee:              doctor.Fee,
+		Specialist:       doctor.Specialist,
+		Amount:           doctor.Amount,
+		IsAvailable:      doctor.IsAvailable,
+		Balance:          doctor.Balance,
+		RatingPrecentage: doctor.RatingPrecentage,
+	}
+
+	return ctx.JSON(http.StatusOK, base.NewSuccessResponse("Success Get Detail Profile", doctorResponse))
 }
