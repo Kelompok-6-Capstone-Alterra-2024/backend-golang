@@ -42,3 +42,10 @@ func ToDoctorNotification(doctorID uint, content string) DoctorNotification {
 		Content:  content,
 	}
 }
+
+func ToUserNotification(userID uint, content string) UserNotification {
+	return UserNotification{
+		UserID:  userID,
+		Content: content,
+	}
+}

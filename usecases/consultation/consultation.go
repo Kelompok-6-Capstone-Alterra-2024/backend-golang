@@ -6,8 +6,10 @@ import (
 	chatEntities "capstone/entities/chat"
 	consultationEntities "capstone/entities/consultation"
 	doctorEntities "capstone/entities/doctor"
+	notificationEntities "capstone/entities/notification"
 	transactionEntities "capstone/entities/transaction"
 	userEntities "capstone/entities/user"
+	"capstone/utilities"
 	"github.com/go-playground/validator/v10"
 	"time"
 )
@@ -17,6 +19,7 @@ type ConsultationUseCase struct {
 	transactionRepository transactionEntities.TransactionRepository
 	doctorRepository      doctorEntities.DoctorRepositoryInterface
 	userUseCase           userEntities.UseCaseInterface
+	notificationUseCase   notificationEntities.NotificationUseCase
 	validate              *validator.Validate
 	chatRepo              chatEntities.RepositoryInterface
 }
@@ -26,6 +29,7 @@ func NewConsultationUseCase(
 	transactionRepository transactionEntities.TransactionRepository,
 	userUseCase userEntities.UseCaseInterface,
 	doctorRepository doctorEntities.DoctorRepositoryInterface,
+	notificationUseCase notificationEntities.NotificationUseCase,
 	validate *validator.Validate,
 	chatRepo chatEntities.RepositoryInterface) consultationEntities.ConsultationUseCase {
 	return &ConsultationUseCase{
@@ -33,6 +37,7 @@ func NewConsultationUseCase(
 		transactionRepository: transactionRepository,
 		userUseCase:           userUseCase,
 		doctorRepository:      doctorRepository,
+		notificationUseCase:   notificationUseCase,
 		validate:              validate,
 		chatRepo:              chatRepo,
 	}
@@ -52,6 +57,8 @@ func (usecase *ConsultationUseCase) CreateConsultation(consultation *consultatio
 		return nil, err
 	}
 
+	contentNotification := utilities.AddContentConsultationUserNotification(result.User.Name, result.Status)
+	err = usecase.notificationUseCase.CreateUserNotification(int(result.UserID), contentNotification)
 	return result, nil
 }
 
@@ -108,9 +115,11 @@ func (usecase *ConsultationUseCase) UpdateStatusConsultation(consultation *consu
 		}
 	}
 
-	if consultation.Status == constants.DONE {
-
+	contentNotification := utilities.AddContentConsultationUserNotification(result.Doctor.Name, result.Status)
+	if err = usecase.notificationUseCase.CreateUserNotification(int(result.UserID), contentNotification); err != nil {
+		return nil, err
 	}
+
 	return result, nil
 }
 

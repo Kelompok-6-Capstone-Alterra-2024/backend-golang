@@ -14,25 +14,33 @@ func NewNotificationUseCase(notificationRepository notificationEntities.Notifica
 }
 
 func (usecase *NotificationUseCase) GetNotificationByUserID(userID int, metadata *entities.Metadata) (*[]notificationEntities.UserNotification, error) {
-	//TODO implement me
-	panic("implement me")
+	notifications, err := usecase.notificationRepository.GetNotificationByUserID(userID, metadata)
+	if err != nil {
+		return nil, err
+	}
+	return notifications, nil
 }
 
-func (usecase *NotificationUseCase) CreateUserNotification(notification *notificationEntities.UserNotification) error {
-	if err := usecase.notificationRepository.CreateUserNotification(notification); err != nil {
+func (usecase *NotificationUseCase) CreateUserNotification(userID int, content string) error {
+	notification := notificationEntities.ToUserNotification(uint(userID), content)
+	if err := usecase.notificationRepository.CreateUserNotification(&notification); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (usecase *NotificationUseCase) DeleteUserNotification(notificationID int) error {
-	//TODO implement me
-	panic("implement me")
+	if err := usecase.notificationRepository.DeleteUserNotification(notificationID); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (usecase *NotificationUseCase) UpdateStatusUserNotification(notificationID int) error {
-	//TODO implement me
-	panic("implement me")
+	if err := usecase.notificationRepository.UpdateStatusUserNotification(notificationID); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (usecase *NotificationUseCase) GetNotificationByDoctorID(doctorID int, metadata *entities.Metadata) (*[]notificationEntities.DoctorNotification, error) {
