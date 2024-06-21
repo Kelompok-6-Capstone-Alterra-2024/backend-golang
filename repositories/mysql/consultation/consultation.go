@@ -222,3 +222,12 @@ func (repository *ConsultationRepo) GetAllConsultation() *[]consultationEntities
 
 	return &consultations
 }
+
+func (repository *ConsultationRepo) GetDoctorConsultationByID(consultationID int) (*consultationEntities.Consultation, error) {
+	var consultationDB Consultation
+	if err := repository.db.Preload("Complaint").First(&consultationDB, "id LIKE ?", consultationID).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	return consultationDB.ToEntities(), nil
+}

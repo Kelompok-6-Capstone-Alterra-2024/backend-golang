@@ -30,7 +30,7 @@ func (repository *ComplaintRepo) GetAllByDoctorID(metadata *entities.Metadata, d
 	var complaintDB []Complaint
 	if err := repository.db.
 		Joins("JOIN consultations ON consultations.complaint_id = complaints.id").
-		Where("consultations.doctor_id = ?", doctorID). // Use '=' instead of 'LIKE' for ID comparison
+		Where("consultations.doctor_id = ? AND consultations.complaint_id IS NOT NULL", doctorID). // Use '=' instead of 'LIKE' for ID comparison
 		Limit(metadata.Limit).
 		Offset(metadata.Offset()).
 		Find(&complaintDB).Error; err != nil {
