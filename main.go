@@ -94,8 +94,8 @@ func main() {
 
 	userUC := userUseCase.NewUserUseCase(userRepo, oauthConfig, oauthConfigFB)
 	notificationUC := notificationUseCase.NewNotificationUseCase(notificationRepo)
-	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo, ratingRepo ,oauthConfigDoctor, oauthConfigFBDoctor)
-	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo, transactionRepo, userUC, doctorRepo, validate, chatRepo)
+	doctorUC := doctorUseCase.NewDoctorUseCase(doctorRepo, ratingRepo, oauthConfigDoctor, oauthConfigFBDoctor)
+	consultationUC := consultationUseCase.NewConsultationUseCase(consultationRepo, transactionRepo, userUC, doctorRepo, notificationUC, validate, chatRepo)
 	storyUC := storyUseCase.NewStoryUseCase(storyRepo)
 	complaintUC := complaintUseCase.NewComplaintUseCase(complaintRepo, notificationUC, consultationUC)
 	midtransUC := midtransUseCase.NewMidtransUseCase(midtransConfig)

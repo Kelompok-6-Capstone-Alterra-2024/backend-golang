@@ -16,7 +16,7 @@ type NotificationRepository interface {
 
 type NotificationUseCase interface {
 	GetNotificationByUserID(userID int, metadata *entities.Metadata) (*[]UserNotification, error)
-	CreateUserNotification(notification *UserNotification) error
+	CreateUserNotification(userID int, content string) error
 	DeleteUserNotification(notificationID int) error
 	UpdateStatusUserNotification(notificationID int) error
 
