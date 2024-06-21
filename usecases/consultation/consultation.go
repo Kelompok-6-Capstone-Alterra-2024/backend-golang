@@ -245,3 +245,11 @@ func (usecase *ConsultationUseCase) GetDoctorConsultationByComplaint(metadata *e
 	}
 	return result, nil
 }
+
+func (usecase *ConsultationUseCase) SearchConsultationByComplaintName(metadata *entities.Metadata, doctorID int, name string) (*[]consultationEntities.Consultation, error) {
+	result, err := usecase.consultationRepo.SearchConsultationByComplaintName(metadata, doctorID, name)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}

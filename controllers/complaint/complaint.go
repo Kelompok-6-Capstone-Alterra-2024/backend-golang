@@ -93,14 +93,14 @@ func (controller *ComplaintController) SearchComplaintByPatientName(c echo.Conte
 		return c.JSON(http.StatusBadRequest, base.NewErrorResponse(err.Error()))
 	}
 
-	complaints, err := controller.complaintUseCase.SearchComplaintByPatientName(metadata, name, uint(doctorID))
+	complaints, err := controller.consultationUseCase.SearchConsultationByComplaintName(metadata, doctorID, name)
 	if err != nil {
 		return c.JSON(base.ConvertResponseCode(err), base.NewErrorResponse(err.Error()))
 	}
 
-	var complaintsResponse []response.ComplaintResponse
+	var complaintsResponse []response2.ConsultationDoctorResponse
 	for _, value := range *complaints {
-		complaintsResponse = append(complaintsResponse, *value.ToResponse())
+		complaintsResponse = append(complaintsResponse, *value.ToDoctorResponse())
 	}
 
 	return c.JSON(http.StatusOK, base.NewSuccessResponse("Complaint Retrieved", complaintsResponse))

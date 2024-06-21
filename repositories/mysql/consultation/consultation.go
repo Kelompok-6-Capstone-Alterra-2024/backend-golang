@@ -254,3 +254,23 @@ func (repository *ConsultationRepo) GetDoctorConsultationByComplaint(metadata *e
 
 	return &consultations, nil
 }
+
+func (repository *ConsultationRepo) SearchConsultationByComplaintName(metadata *entities.Metadata, doctorID int, name string) (*[]consultationEntities.Consultation, error) {
+	var consultationDB []Consultation
+	if err := repository.db.
+		Limit(metadata.Limit).
+		Offset(metadata.Offset()).
+		Preload("Complaint").
+		Joins("JOIN complaints ON consultations.complaint_id = complaints.id").
+		Where("complaints.name LIKE ?", "%"+name+"%").
+		Find(&consultationDB, "doctor_id LIKE ? AND complaint_id IS NOT NULL", doctorID).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	var consultations []consultationEntities.Consultation
+	for _, consultation := range consultationDB {
+		consultations = append(consultations, *consultation.ToEntities())
+	}
+
+	return &consultations, nil
+}

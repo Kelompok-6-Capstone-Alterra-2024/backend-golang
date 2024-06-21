@@ -68,6 +68,7 @@ type ConsultationRepository interface {
 	GetAllConsultation() *[]Consultation
 	GetByComplaintID(complaintID int) (*Consultation, error)
 	GetDoctorConsultationByComplaint(metadata *entities.Metadata, doctorID int) (*[]Consultation, error)
+	SearchConsultationByComplaintName(metadata *entities.Metadata, doctorID int, name string) (*[]Consultation, error)
 }
 
 type ConsultationUseCase interface {
@@ -86,6 +87,7 @@ type ConsultationUseCase interface {
 	GetConsultationNotesByID(consultationID int) (ConsultationNotes, error)
 	GetByComplaintID(complaintID int) (*Consultation, error)
 	GetDoctorConsultationByComplaint(metadata *entities.Metadata, doctorID int) (*[]Consultation, error)
+	SearchConsultationByComplaintName(metadata *entities.Metadata, doctorID int, name string) (*[]Consultation, error)
 }
 
 func (r *Consultation) ToUserResponse() *response.ConsultationUserResponse {
