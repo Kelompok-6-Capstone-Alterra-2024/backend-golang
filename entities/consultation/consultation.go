@@ -98,8 +98,8 @@ func (r *Consultation) ToUserResponse() *response.ConsultationUserResponse {
 		PaymentStatus: r.PaymentStatus,
 		IsAccepted:    r.IsAccepted,
 		IsActive:      r.IsActive,
-		StartDate:     r.StartDate,
-		EndDate:       r.EndDate,
+		StartDate:     r.StartDate.Local(),
+		EndDate:       r.EndDate.Local(),
 	}
 }
 
@@ -110,8 +110,9 @@ func (r *Consultation) ToDoctorResponse() *response.ConsultationDoctorResponse {
 		PaymentStatus: r.PaymentStatus,
 		IsAccepted:    r.IsAccepted,
 		IsActive:      r.IsActive,
-		StartDate:     r.StartDate,
-		EndDate:       r.EndDate,
+		StartDate:     r.StartDate.Local(),
+		EndDate:       r.EndDate.Local(),
+		UserID:        r.UserID,
 		Complaint:     r.Complaint.ToResponse(),
 	}
 }
