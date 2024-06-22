@@ -59,7 +59,7 @@ func (repository *ConsultationRepo) GetAllUserConsultation(metadata *entities.Me
 
 func (repository *ConsultationRepo) UpdateStatusConsultation(consultation *consultationEntities.Consultation) (*consultationEntities.Consultation, error) {
 	var consultationDB Consultation
-	if err := repository.db.Preload("Complaint").First(&consultationDB, "id LIKE ?", consultation.ID).Error; err != nil {
+	if err := repository.db.Preload("Complaint").Preload("Doctor").First(&consultationDB, "id LIKE ?", consultation.ID).Error; err != nil {
 		return nil, constants.ErrDataNotFound
 	}
 
@@ -230,4 +230,47 @@ func (repository *ConsultationRepo) GetDoctorConsultationByID(consultationID int
 	}
 
 	return consultationDB.ToEntities(), nil
+}
+
+func (repository *ConsultationRepo) GetByComplaintID(complaintID int) (*consultationEntities.Consultation, error) {
+	var consultationDB Consultation
+	if err := repository.db.Preload("Complaint").First(&consultationDB, "complaint_id LIKE ?", complaintID).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	return consultationDB.ToEntities(), nil
+}
+
+func (repository *ConsultationRepo) GetDoctorConsultationByComplaint(metadata *entities.Metadata, doctorID int) (*[]consultationEntities.Consultation, error) {
+	var consultationDB []Consultation
+	if err := repository.db.Limit(metadata.Limit).Offset(metadata.Offset()).Preload("Complaint").Find(&consultationDB, "doctor_id LIKE ? AND complaint_id IS NOT NULL", doctorID).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	var consultations []consultationEntities.Consultation
+	for _, consultation := range consultationDB {
+		consultations = append(consultations, *consultation.ToEntities())
+	}
+
+	return &consultations, nil
+}
+
+func (repository *ConsultationRepo) SearchConsultationByComplaintName(metadata *entities.Metadata, doctorID int, name string) (*[]consultationEntities.Consultation, error) {
+	var consultationDB []Consultation
+	if err := repository.db.
+		Limit(metadata.Limit).
+		Offset(metadata.Offset()).
+		Preload("Complaint").
+		Joins("JOIN complaints ON consultations.complaint_id = complaints.id").
+		Where("complaints.name LIKE ?", "%"+name+"%").
+		Find(&consultationDB, "doctor_id LIKE ? AND complaint_id IS NOT NULL", doctorID).Error; err != nil {
+		return nil, constants.ErrDataNotFound
+	}
+
+	var consultations []consultationEntities.Consultation
+	for _, consultation := range consultationDB {
+		consultations = append(consultations, *consultation.ToEntities())
+	}
+
+	return &consultations, nil
 }

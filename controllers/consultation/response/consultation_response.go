@@ -25,5 +25,6 @@ type ConsultationDoctorResponse struct {
 	IsActive      bool                                 `json:"is_active"`
 	StartDate     time.Time                            `json:"start_date"`
 	EndDate       time.Time                            `json:"end_date"`
+	UserID        uint                                 `json:"user_id"`
 	Complaint     *complaintResponse.ComplaintResponse `json:"complaint"`
 }

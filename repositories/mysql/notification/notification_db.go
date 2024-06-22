@@ -43,7 +43,6 @@ func ToNotificationUserModel(notification *notification.UserNotification) *UserN
 	return &UserNotification{
 		UserID:  notification.UserID,
 		Content: notification.Content,
-		IsRead:  notification.IsRead,
 	}
 }
 
@@ -51,6 +50,5 @@ func ToNotificationDoctorModel(notification *notification.DoctorNotification) *D
 	return &DoctorNotification{
 		DoctorID: notification.DoctorID,
 		Content:  notification.Content,
-		IsRead:   notification.IsRead,
 	}
 }

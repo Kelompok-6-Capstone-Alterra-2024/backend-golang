@@ -183,6 +183,11 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userRoute.POST("articles/like", r.articleController.LikeArticle)
 	userRoute.DELETE("articles/like", r.articleController.UnlikeArticle)
 
+	// Notification
+	userRoute.GET("notifications", r.notificationController.GetAllUserNotification) // Get User Notification
+	userRoute.PUT("notifications/:notificationID", r.notificationController.UpdateToReadConsultationUser)
+	userRoute.DELETE("notifications/:notificationID", r.notificationController.DeleteToReadConsultationUser)
+
 	// Profiles
 	userRoute.GET("profiles", r.userController.GetDetailedProfile) // Get Profile By User ID
 
@@ -293,14 +298,14 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.DELETE("transactions/:id", r.transactionController.DeleteTransaction)         // Delete Transaction
 
 	// Patient
-	doctorRoute.GET("patients", r.complaintController.GetAllByDoctorID) // Get All Patient
-	doctorRoute.GET("patients/:id", r.complaintController.GetByComplaintID)
+	doctorRoute.GET("patients", r.complaintController.GetAllComplaint) // Get All Patient
+	doctorRoute.GET("patients/:id", r.complaintController.GetConsultationByComplaintID)
 	doctorRoute.GET("patients/search", r.complaintController.SearchComplaintByPatientName)
 
 	// Notification
 	doctorRoute.GET("notifications", r.notificationController.GetAllDoctorNotification) // Get Doctor Notification
-	doctorRoute.PUT("notifications/:notificationID", r.notificationController.UpdateToReadConsultation)
-	doctorRoute.DELETE("notifications/:notificationID", r.notificationController.DeleteToReadConsultation)
+	doctorRoute.PUT("notifications/:notificationID", r.notificationController.UpdateToReadConsultationDoctor)
+	doctorRoute.DELETE("notifications/:notificationID", r.notificationController.DeleteToReadConsultationDoctor)
 
 	// Profiles
 	doctorRoute.PUT("profiles", r.doctorController.UpdateDoctorProfile)  // Update Doctor Profile

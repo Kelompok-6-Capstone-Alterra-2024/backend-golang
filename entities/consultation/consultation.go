@@ -66,6 +66,9 @@ type ConsultationRepository interface {
 	CreateConsultationNotes(consultationNotes ConsultationNotes) (ConsultationNotes, error)
 	GetConsultationNotesByID(consultationID int) (ConsultationNotes, error)
 	GetAllConsultation() *[]Consultation
+	GetByComplaintID(complaintID int) (*Consultation, error)
+	GetDoctorConsultationByComplaint(metadata *entities.Metadata, doctorID int) (*[]Consultation, error)
+	SearchConsultationByComplaintName(metadata *entities.Metadata, doctorID int, name string) (*[]Consultation, error)
 }
 
 type ConsultationUseCase interface {
@@ -82,6 +85,9 @@ type ConsultationUseCase interface {
 	CreateConsultationNotes(consultationNotes ConsultationNotes) (ConsultationNotes, error)
 	CountConsultation(doctorID int) (*CountConsultation, error)
 	GetConsultationNotesByID(consultationID int) (ConsultationNotes, error)
+	GetByComplaintID(complaintID int) (*Consultation, error)
+	GetDoctorConsultationByComplaint(metadata *entities.Metadata, doctorID int) (*[]Consultation, error)
+	SearchConsultationByComplaintName(metadata *entities.Metadata, doctorID int, name string) (*[]Consultation, error)
 }
 
 func (r *Consultation) ToUserResponse() *response.ConsultationUserResponse {
@@ -92,8 +98,8 @@ func (r *Consultation) ToUserResponse() *response.ConsultationUserResponse {
 		PaymentStatus: r.PaymentStatus,
 		IsAccepted:    r.IsAccepted,
 		IsActive:      r.IsActive,
-		StartDate:     r.StartDate,
-		EndDate:       r.EndDate,
+		StartDate:     r.StartDate.Local(),
+		EndDate:       r.EndDate.Local(),
 	}
 }
 
@@ -104,8 +110,9 @@ func (r *Consultation) ToDoctorResponse() *response.ConsultationDoctorResponse {
 		PaymentStatus: r.PaymentStatus,
 		IsAccepted:    r.IsAccepted,
 		IsActive:      r.IsActive,
-		StartDate:     r.StartDate,
-		EndDate:       r.EndDate,
+		StartDate:     r.StartDate.Local(),
+		EndDate:       r.EndDate.Local(),
+		UserID:        r.UserID,
 		Complaint:     r.Complaint.ToResponse(),
 	}
 }
