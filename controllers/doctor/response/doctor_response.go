@@ -10,7 +10,6 @@ type DoctorResponse struct {
 	Gender                 string  `json:"gender"`
 	IsAvailable            bool    `json:"is_available"`
 	ProfilePicture         string  `json:"profile_picture"`
-	Balance                int     `json:"balance"`
 	Experience             int     `json:"experience"`
 	BachelorAlmamater      string  `json:"bachelor_almamater"`
 	BachelorGraduationYear int     `json:"bachelor_graduation_year"`
@@ -20,6 +19,6 @@ type DoctorResponse struct {
 	PracticeCity           string  `json:"practice_city"`
 	Fee                    int     `json:"fee"`
 	Specialist             string  `json:"specialist"`
-	Amount                 int     `json:"amount"`
+	Balance                int     `json:"balance"`
 	RatingPrecentage       float64 `json:"rating_precentage"`
 }
