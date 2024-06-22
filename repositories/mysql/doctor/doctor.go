@@ -133,8 +133,8 @@ func (r *DoctorRepo) OauthFindByEmail(email string) (doctorEntities.Doctor, int,
 	return doctorEnt, 0, nil
 }
 
-func (r *DoctorRepo) UpdateAmount(doctorID uint, amount int) error {
-	if err := r.db.Model(&Doctor{}).Where("id = ?", doctorID).Update("amount", amount).Error; err != nil {
+func (r *DoctorRepo) UpdateBalance(doctorID uint, balance int) error {
+	if err := r.db.Model(&Doctor{}).Where("id = ?", doctorID).Update("balance", balance).Error; err != nil {
 		return err
 	}
 
@@ -182,23 +182,23 @@ func (r *DoctorRepo) UpdateDoctorProfile(doctor *doctorEntities.Doctor) (doctorE
 	}
 
 	updatedDoctor := doctorEntities.Doctor{
-		ID:               existingDoctor.ID,
-		Username:         existingDoctor.Username,
-		Email:            existingDoctor.Email,
-		Name:             existingDoctor.Name,
-		Address:          existingDoctor.Address,
-		PhoneNumber:      existingDoctor.PhoneNumber,
-		Gender:           existingDoctor.Gender,
-		ProfilePicture:   existingDoctor.ProfilePicture,
-		Experience:       existingDoctor.Experience,
-		BachelorAlmamater: existingDoctor.BachelorAlmamater,
+		ID:                     existingDoctor.ID,
+		Username:               existingDoctor.Username,
+		Email:                  existingDoctor.Email,
+		Name:                   existingDoctor.Name,
+		Address:                existingDoctor.Address,
+		PhoneNumber:            existingDoctor.PhoneNumber,
+		Gender:                 existingDoctor.Gender,
+		ProfilePicture:         existingDoctor.ProfilePicture,
+		Experience:             existingDoctor.Experience,
+		BachelorAlmamater:      existingDoctor.BachelorAlmamater,
 		BachelorGraduationYear: existingDoctor.BachelorGraduationYear,
-		MasterAlmamater: existingDoctor.MasterAlmamater,
-		MasterGraduationYear: existingDoctor.MasterGraduationYear,
-		PracticeLocation: existingDoctor.PracticeLocation,
-		PracticeCity:     existingDoctor.PracticeCity,
-		Fee:              existingDoctor.Fee,
-		Specialist:       existingDoctor.Specialist,
+		MasterAlmamater:        existingDoctor.MasterAlmamater,
+		MasterGraduationYear:   existingDoctor.MasterGraduationYear,
+		PracticeLocation:       existingDoctor.PracticeLocation,
+		PracticeCity:           existingDoctor.PracticeCity,
+		Fee:                    existingDoctor.Fee,
+		Specialist:             existingDoctor.Specialist,
 	}
 
 	return updatedDoctor, nil
@@ -220,7 +220,6 @@ func (r *DoctorRepo) GetDetailProfile(doctorID uint) (doctorEntities.Doctor, err
 	doctorEnt.Gender = doctorDB.Gender
 	doctorEnt.IsAvailable = doctorDB.IsAvailable
 	doctorEnt.ProfilePicture = doctorDB.ProfilePicture
-	doctorEnt.Balance = doctorDB.Balance
 	doctorEnt.Experience = doctorDB.Experience
 	doctorEnt.BachelorAlmamater = doctorDB.BachelorAlmamater
 	doctorEnt.BachelorGraduationYear = doctorDB.BachelorGraduationYear
@@ -230,7 +229,7 @@ func (r *DoctorRepo) GetDetailProfile(doctorID uint) (doctorEntities.Doctor, err
 	doctorEnt.PracticeCity = doctorDB.PracticeCity
 	doctorEnt.Fee = doctorDB.Fee
 	doctorEnt.Specialist = doctorDB.Specialist
-	doctorEnt.Amount = doctorDB.Amount
+	doctorEnt.Balance = doctorDB.Balance
 
 	return doctorEnt, nil
 }
