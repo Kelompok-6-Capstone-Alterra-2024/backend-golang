@@ -112,7 +112,6 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	userAuth.POST("/otp/send", r.otpController.SendOtp)                             // Send OTP
 	userAuth.POST("/otp/verify/forgot-password", r.otpController.VerifyOtp)         // Verify OTP Forgot Password
 	userAuth.POST("/otp/verify/register", r.otpController.VerifyOTPRegister)        // Verify OTP Register
-	userAuth.POST("/otp/verify/change-email", r.otpController.VerifyOTPChangeEmail) // Verify OTP Change Email
 
 	userRoute := userAuth.Group("/")
 	userRoute.Use(echojwt.JWT([]byte(os.Getenv("SECRET_JWT"))))
@@ -203,6 +202,10 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	// Chat Messages
 	userRoute.POST("chats/messages", r.chatController.SendMessage)           // Send Message
 	userRoute.GET("chats/:chatId/messages", r.chatController.GetAllMessages) // Get All Message
+
+	// OTP
+	userRoute.POST("otp/send/change-email", r.otpController.SendOTPChangeEmail) // Send OTP Change Email
+	userRoute.POST("otp/verify/change-email", r.otpController.VerifyOTPChangeEmail) // Verify OTP Change Email
 
 	doctorAuth := e.Group("/v1/doctors")
 
