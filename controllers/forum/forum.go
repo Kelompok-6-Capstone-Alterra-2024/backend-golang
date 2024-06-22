@@ -188,6 +188,7 @@ func (forumController *ForumController) GetAllForumsByDoctorId(c echo.Context) e
 	var resp []response.ForumGetDoctorResponse
 	for _, forum := range forums {
 		resp = append(resp, response.ForumGetDoctorResponse{
+			ID:              forum.ID,
 			Name:            forum.Name,
 			ImageUrl:        forum.ImageUrl,
 			NumberOfMembers: forum.NumberOfMembers,
