@@ -108,8 +108,8 @@ func (usecase *ConsultationUseCase) UpdateStatusConsultation(consultation *consu
 			return nil, err
 		}
 
-		amountDoctor := doctorResponse.Amount - transaction.Price + constants.ServiceFee
-		err = usecase.doctorRepository.UpdateAmount(consultation.DoctorID, amountDoctor)
+		amountDoctor := doctorResponse.Balance - transaction.Price + constants.ServiceFee
+		err = usecase.doctorRepository.UpdateBalance(consultation.DoctorID, amountDoctor)
 		if err != nil {
 			return nil, err
 		}
