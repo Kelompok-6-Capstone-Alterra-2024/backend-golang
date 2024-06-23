@@ -121,7 +121,7 @@ func (repository *ConsultationRepo) CountConsultationByStatus(doctorID int, stat
 }
 
 func (repository *ConsultationRepo) CreateConsultationNotes(consultationNotes consultationEntities.ConsultationNotes) (consultationEntities.ConsultationNotes, error) {
-	var notesDB ConstultationNotes
+	var notesDB ConsultationNotes
 	notesDB.ID = consultationNotes.ID
 	notesDB.ConsultationID = consultationNotes.ConsultationID
 	notesDB.MusicID = consultationNotes.MusicID
@@ -149,7 +149,7 @@ func (repository *ConsultationRepo) CreateConsultationNotes(consultationNotes co
 }
 
 func (repository *ConsultationRepo) GetConsultationNotesByID(consultationID int) (consultationEntities.ConsultationNotes, error) {
-	var notesDB ConstultationNotes
+	var notesDB ConsultationNotes
 	err := repository.db.Preload("Music").Preload("Forum").Preload("Consultation").Preload("Consultation.Doctor").Where("consultation_id = ?", consultationID).First(&notesDB).Error
 
 	if err != nil {
