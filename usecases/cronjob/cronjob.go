@@ -10,13 +10,15 @@ import (
 )
 
 type Cronjob struct {
+	consultationUC         consultationEntities.ConsultationUseCase
 	consultationRepository consultationEntities.ConsultationRepository
 	scheduler              gocron.Scheduler
 }
 
-func NewCronJob(scheduler gocron.Scheduler, consultationRepository consultationEntities.ConsultationRepository) *Cronjob {
+func NewCronJob(scheduler gocron.Scheduler, consultationUC consultationEntities.ConsultationUseCase, consultationRepository consultationEntities.ConsultationRepository) *Cronjob {
 	return &Cronjob{
 		scheduler:              scheduler,
+		consultationUC:         consultationUC,
 		consultationRepository: consultationRepository,
 	}
 }
@@ -43,8 +45,8 @@ func (c *Cronjob) UpdateStatusConsultation() {
 			// Check if consultationDate is after or equal to currentTime
 			if (consultation.StartDate.Before(currentTime) || consultation.StartDate.Equal(currentTime)) && consultation.Status == constants.PENDING {
 				fmt.Println("Update Status Pending to Rejected")
-				consultation.Status = "rejected"
-				_, err := c.consultationRepository.UpdateStatusConsultation(&consultation)
+				consultation.Status = constants.REJECTED
+				_, err := c.consultationUC.UpdateStatusConsultation(&consultation)
 				if err != nil {
 					log.Println(err.Error())
 				}
@@ -53,8 +55,8 @@ func (c *Cronjob) UpdateStatusConsultation() {
 
 			if (consultation.StartDate.After(currentTime) || consultation.StartDate.Equal(currentTime)) && consultation.Status == constants.INCOMING {
 				fmt.Println("Update Status Incoming to Active")
-				consultation.Status = "active"
-				_, err := c.consultationRepository.UpdateStatusConsultation(&consultation)
+				consultation.Status = constants.ACTIVE
+				_, err := c.consultationUC.UpdateStatusConsultation(&consultation)
 				if err != nil {
 					log.Println(err.Error())
 				}
