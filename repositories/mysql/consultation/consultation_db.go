@@ -28,7 +28,7 @@ type Consultation struct {
 	EndDate       time.Time           `gorm:"column:end_date;type:datetime;default:NULL"`
 }
 
-type ConstultationNotes struct {
+type ConsultationNotes struct {
 	gorm.Model
 	ConsultationID  uint         `gorm:"column:consultation_id;unique;not null"`
 	Consultation    Consultation `gorm:"foreignKey:consultation_id;references:id"`
