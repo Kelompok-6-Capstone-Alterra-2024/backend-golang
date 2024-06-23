@@ -69,7 +69,7 @@ func (repository *TransactionRepo) FindAllByUserID(metadata *entities.Metadata, 
 
 func (repository *TransactionRepo) Update(transaction *transactionEntities.Transaction) (*transactionEntities.Transaction, error) {
 	transactionDB := ToTransactionModel(transaction)
-	if err := repository.db.Model(&Transaction{}).Where("id LIKE ?", transactionDB.ID).Update("status", transactionDB.Status).Update("payment_status", transactionDB.Status).Error; err != nil {
+	if err := repository.db.Model(&Transaction{}).Where("id LIKE ?", transactionDB.ID).Update("status", transactionDB.Status).Error; err != nil {
 		return nil, constants.ErrInsertDatabase
 	}
 	transactionDB.Consultation = *consultation.ToConsultationModel(&transaction.Consultation)
