@@ -198,11 +198,8 @@ func (repository *ConsultationRepo) GetConsultationByComplaintID(complaintID int
 }
 
 func (repository *ConsultationRepo) UpdatePaymentStatusConsultation(consultationID int, status string) error {
-	var consultationDB Consultation
 
-	consultationDB.PaymentStatus = status
-
-	if err := repository.db.Model(&consultationDB).Where("id LIKE ?", consultationID).Error; err != nil {
+	if err := repository.db.Model(&Consultation{}).Where("id LIKE ?", consultationID).UpdateColumn("payment_status", status).Error; err != nil {
 		return err
 	}
 
