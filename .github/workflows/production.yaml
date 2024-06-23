@@ -15,14 +15,14 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
       - name: build image
-        run: docker build -t wdinx/capstone-project:latest .
+        run: docker build -t wdinx/capstone-production:latest .
       - name: login registry
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: push image
-        run: docker push wdinx/capstone-project:latest
+        run: docker push wdinx/capstone-production:latest
 
 
   deploy:
@@ -38,6 +38,6 @@ jobs:
           passphrase: ${{ secrets.PASSPRHASE }}
           script: |
             cd ~/
-            docker pull wdinx/capstone-project:latest
+            docker pull wdinx/capstone-production:latest
             docker container rm -f capstone-production
-            docker run -d --name capstone-production -p 8081:8080 --env DBHost=${{ secrets.DBHOST }} --env DBPort=${{ secrets.DBPORT }} --env DBUser=${{ secrets.DBUSER }} --env DBPass=${{ secrets.DBPASS }} --env DBName=${{ secrets.DBNAME_PRODUCTION }} --env SECRET_JWT=${{ secrets.SECRET_JWT }} --env MIDTRANS_CLIENT_KEY=${{ secrets.MIDTRANS_KEY }} --env MIDTRANS_SERVER_KEY=${{ secrets.MIDTRANS_SERVER_KEY }} --env MIDTRANS_BASE_URL=${{ secrets.MIDTRANS_BASE_URL }} --env MIDTRANS_ENV=${{ secrets.MIDTRANS_ENV }} --env CLOUDINARY_URL=${{ secrets.CLOUDINARY_URL }} --env AI_KEY=${{ secrets.AI_KEY }} --env GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} --env GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} --env GOOGLE_CLIENT_ID_DOCTOR=${{ secrets.GOOGLE_CLIENT_ID_DOCTOR }} --env GOOGLE_CLIENT_SECRET_DOCTOR=${{ secrets.GOOGLE_CLIENT_SECRET_DOCTOR }} --env FACEBOOK_CLIENT_ID=${{ secrets.FACEBOOK_CLIENT_ID }} --env FACEBOOK_CLIENT_SECRET=${{ secrets.FACEBOOK_CLIENT_SECRET }} --env FACEBOOK_CLIENT_ID_DOCTOR=${{ secrets.FACEBOOK_CLIENT_ID_DOCTOR }} --env FACEBOOK_CLIENT_SECRET_DOCTOR=${{ secrets.FACEBOOK_CLIENT_SECRET_DOCTOR }} wdinx/capstone-project:latest
+            docker run -d --name capstone-production -p 8081:8080 --env DBHost=${{ secrets.DBHOST }} --env DBPort=${{ secrets.DBPORT }} --env DBUser=${{ secrets.DBUSER }} --env DBPass=${{ secrets.DBPASS }} --env DBName=${{ secrets.DBNAME_PRODUCTION }} --env SECRET_JWT=${{ secrets.SECRET_JWT }} --env MIDTRANS_CLIENT_KEY=${{ secrets.MIDTRANS_KEY }} --env MIDTRANS_SERVER_KEY=${{ secrets.MIDTRANS_SERVER_KEY }} --env MIDTRANS_BASE_URL=${{ secrets.MIDTRANS_BASE_URL }} --env MIDTRANS_ENV=${{ secrets.MIDTRANS_ENV }} --env CLOUDINARY_URL=${{ secrets.CLOUDINARY_URL }} --env AI_KEY=${{ secrets.AI_KEY }} --env GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} --env GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} --env GOOGLE_CLIENT_ID_DOCTOR=${{ secrets.GOOGLE_CLIENT_ID_DOCTOR }} --env GOOGLE_CLIENT_SECRET_DOCTOR=${{ secrets.GOOGLE_CLIENT_SECRET_DOCTOR }} --env FACEBOOK_CLIENT_ID=${{ secrets.FACEBOOK_CLIENT_ID }} --env FACEBOOK_CLIENT_SECRET=${{ secrets.FACEBOOK_CLIENT_SECRET }} --env FACEBOOK_CLIENT_ID_DOCTOR=${{ secrets.FACEBOOK_CLIENT_ID_DOCTOR }} --env FACEBOOK_CLIENT_SECRET_DOCTOR=${{ secrets.FACEBOOK_CLIENT_SECRET_DOCTOR }} wdinx/capstone-production:latest
