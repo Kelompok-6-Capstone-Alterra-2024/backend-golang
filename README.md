@@ -186,6 +186,11 @@ Execute the following command to run the main.go file:
 ```sh
 go run main.go
 ```
+# API Documentation
+This is the API documentation for MINDEASE. This document provides an overview of the endpoints, request methods, parameters, and responses supported by our API.
+
+_For more examples, please refer to the [Documentation](https://documenter.getpostman.com/view/27063468/2sA3Qv7pzK)_
+
 
 # Entity Relationship Diagram
 <div align="center">
@@ -203,8 +208,13 @@ go run main.go
 
 # Contributors
 **MAHARDIKO CESARTISTA RASENDRIYA**
+<br>
 [![MAHARDIKO CESARTISTA RASENDRIYA - GitHub](https://img.shields.io/badge/MAHARDIKO_CESARTISTA_RASENDRIYA-black?logo=github)](https://github.com/Dikocesrt)
+
 **WAHYUDDIN**
+<br>
 [![WAHYUDDIN - GitHub](https://img.shields.io/badge/WAHYUDDIN-black?logo=github)](https://github.com/wdinx)
+
 **ALFIAN NUR FAZAR RIZKY**
+<br>
 [![ALFIAN NUR FAZAR RIZKY - GitHub](https://img.shields.io/badge/ALFIAN_NUR_FAZAR_RIZKY-black?logo=github)](https://github.com/hantzord)
