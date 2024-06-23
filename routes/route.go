@@ -83,7 +83,6 @@ func NewRoute(
 
 func (r *RouteController) InitRoute(e *echo.Echo) {
 	myMiddleware.LogMiddleware(e)
-
 	e.HTTPErrorHandler = base.ErrorHandler
 	e.Use(myMiddleware.CORSMiddleware())
 
@@ -308,6 +307,6 @@ func (r *RouteController) InitRoute(e *echo.Echo) {
 	doctorRoute.DELETE("notifications/:notificationID", r.notificationController.DeleteToReadConsultationDoctor)
 
 	// Profiles
-	doctorRoute.PUT("profiles", r.doctorController.UpdateDoctorProfile)  // Update Doctor Profile
+	doctorRoute.PUT("profiles", r.doctorController.UpdateDoctorProfile) // Update Doctor Profile
 	doctorRoute.GET("profiles", r.doctorController.GetDetailProfile)    // Get Detail Profile
 }

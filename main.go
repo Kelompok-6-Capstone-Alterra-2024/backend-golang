@@ -129,8 +129,8 @@ func main() {
 	notificationCont := notificationController.NewNotificationController(notificationUC)
 
 	route := routes.NewRoute(userCont, doctorCont, consultationCont, storyCont, complaintCont, transactionCont, musicCont, ratingCont, moodCont, forumCont, postCont, chatbotCont, articleCont, chatCont, otpCont, notificationCont)
-
 	e := echo.New()
+
 	route.InitRoute(e)
 	cronjobUC.InitCronJob()
 
