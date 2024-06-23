@@ -109,7 +109,7 @@ func main() {
 	articleUC := articleUseCase.NewArticleUseCase(articleRepo)
 	chatUC := chatUseCase.NewChatUseCase(chatRepo)
 	otpUC := otpUseCase.NewOtpUseCase(otpRepo)
-	cronjobUC := cronjob.NewCronJob(gcron, consultationRepo)
+	cronjobUC := cronjob.NewCronJob(gcron, consultationUC, consultationRepo)
 
 	userCont := userController.NewUserController(userUC)
 	doctorCont := doctorController.NewDoctorController(doctorUC, validate)
